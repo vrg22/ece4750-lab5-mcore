@@ -23,7 +23,6 @@
 typedef struct packed {
 
   logic       result_en;        // Enable for result register
-  logic       b_reg_en;         // Enable for B register
   logic       a_mux_sel;        // Sel for mux in front of A reg
   logic       b_mux_sel;        // sel for mux in front of B reg
   logic       result_mux_sel;   // sel for mux in front of result reg
@@ -65,13 +64,13 @@ module lab1_imul_IntMulBaseDpath
 endmodule
 
 //========================================================================
-// Control
+// Control Unit
 //========================================================================
 
 module lab1_imul_IntMulBaseCtrl
 (
   input  logic                 clk,
-  input  logic                 reset,
+  input  logic                 reset,     
 
   // Dataflow signals
 
@@ -80,10 +79,10 @@ module lab1_imul_IntMulBaseCtrl
   output logic                 resp_val,
   input  logic                 resp_rdy,
 
-  // Control and satus signals
+  // Control and status signals
 
-  output ex_gcd_cs_t           cs,
-  input  ex_gcd_ss_t           ss
+  output lab1_imul_cs_t           cs,
+  input  lab1_imul_ss_t           ss
 );
 
   //----------------------------------------------------------------------
@@ -102,12 +101,15 @@ module lab1_imul_IntMulBaseCtrl
 
   state_t state_reg;
   state_t state_next;
+  logic [5:0]           counter, //DOES THIS GO HERE?
 
   always @( posedge clk ) begin
     if ( reset ) begin
       state_reg <= STATE_IDLE;
+      counter <= 0;
     end
     else begin
+      counter <= counter + 1;
       state_reg <= state_next;
     end
   end
@@ -122,7 +124,7 @@ module lab1_imul_IntMulBaseCtrl
 
   assign req_go       = req_val  && req_rdy;
   assign resp_go      = resp_val && resp_rdy;
-  assign is_calc_done = !ss.is_a_lt_b && ss.is_b_zero;
+  assign is_calc_done = (counter == 32);
 
   always @(*) begin
 
@@ -142,6 +144,7 @@ module lab1_imul_IntMulBaseCtrl
   // State Outputs
   //----------------------------------------------------------------------
 
+  /*
   localparam a_x   = 2'dx;
   localparam a_ld  = 2'd0;
   localparam a_b   = 2'd1;
@@ -150,15 +153,17 @@ module lab1_imul_IntMulBaseCtrl
   localparam b_x   = 1'dx;
   localparam b_ld  = 1'd0;
   localparam b_a   = 1'd1;
+  */
 
   task set_cs
   (
     input logic       cs_req_rdy,
     input logic       cs_resp_val,
-    input logic [1:0] cs_a_mux_sel,
-    input logic       cs_a_reg_en,
+    input logic       cs_b_result_en
+    input logic       cs_a_mux_sel,
     input logic       cs_b_mux_sel,
-    input logic       cs_b_reg_en
+    input logic       cs_result_mux_sel,
+    input logic       cs_add_mux_sel,
   );
   begin
     req_rdy      = cs_req_rdy;
@@ -167,6 +172,8 @@ module lab1_imul_IntMulBaseCtrl
     cs.b_reg_en  = cs_b_reg_en;
     cs.a_mux_sel = cs_a_mux_sel;
     cs.b_mux_sel = cs_b_mux_sel;
+    cs.result_mux_sel = cs_result_mux_sel;
+    cs.add_mux_sel = cs_add_mux_sel;
   end
   endtask
 
