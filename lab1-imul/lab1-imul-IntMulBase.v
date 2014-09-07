@@ -59,7 +59,11 @@ module lab1_imul_IntMulBaseDpath
   output lab1_imul_ss_t       ss
 );
 
-//INSERT MODULES HERE!!!
+
+
+//INSERT MODULES HERE
+
+
 
 endmodule
 
@@ -101,7 +105,7 @@ module lab1_imul_IntMulBaseCtrl
 
   state_t state_reg;
   state_t state_next;
-  logic [5:0]           counter, //DOES THIS GO HERE?
+  logic [5:0] counter; //DOES THIS GO HERE?
 
   always @( posedge clk ) begin
     if ( reset ) begin
@@ -143,23 +147,21 @@ module lab1_imul_IntMulBaseCtrl
   //----------------------------------------------------------------------
   // State Outputs
   //----------------------------------------------------------------------
+  
+  //CONVENTION: mux path's from diagram,
+  //top to bottom go 0 to max value (???)
+  localparam x   = 1'dx;        
+  
+  localparam 
+  localparam tmp   = 1'd0;
 
-  /*
-  localparam a_x   = 2'dx;
-  localparam a_ld  = 2'd0;
-  localparam a_b   = 2'd1;
-  localparam a_sub = 2'd2;
 
-  localparam b_x   = 1'dx;
-  localparam b_ld  = 1'd0;
-  localparam b_a   = 1'd1;
-  */
 
   task set_cs
   (
     input logic       cs_req_rdy,
     input logic       cs_resp_val,
-    input logic       cs_b_result_en
+    input logic       cs_result_en,
     input logic       cs_a_mux_sel,
     input logic       cs_b_mux_sel,
     input logic       cs_result_mux_sel,
@@ -168,8 +170,9 @@ module lab1_imul_IntMulBaseCtrl
   begin
     req_rdy      = cs_req_rdy;
     resp_val     = cs_resp_val;
-    cs.a_reg_en  = cs_a_reg_en;
-    cs.b_reg_en  = cs_b_reg_en;
+    //cs.a_reg_en  = cs_a_reg_en;
+    //cs.b_reg_en  = cs_b_reg_en;
+    cs.result_en = cs_result_en;
     cs.a_mux_sel = cs_a_mux_sel;
     cs.b_mux_sel = cs_b_mux_sel;
     cs.result_mux_sel = cs_result_mux_sel;
@@ -179,31 +182,32 @@ module lab1_imul_IntMulBaseCtrl
 
   // Labels for Mealy transistions
 
-  logic do_swap;
-  logic do_sub;
+  logic do_add_shift;
+  logic do_shift;
 
-  assign do_swap = ss.is_a_lt_b;
-  assign do_sub  = !ss.is_b_zero;
+  assign do_add_shift = (counter < 32) && (ss.b_lsb == 1);
+  assign do_shift  = (counter < 32) && (ss.b_lsb == 0);
 
   // Set outputs using a control signal "table"
 
   always @(*) begin
 
-    set_cs( 0, 0, a_x, 0, b_x, 0 );
+    set_cs( 0, 0, x, x, x, 0, x );                         //CHECK!!!!
     case ( state_reg )
-      //                                 req resp a mux  a  b mux b
-      //                                 rdy val  sel    en sel   en
-      STATE_IDLE:                set_cs( 1,  0,   a_ld,  1, b_ld, 1 );
-      STATE_CALC: if ( do_swap ) set_cs( 0,  0,   a_b,   1, b_a,  1 );
-             else if ( do_sub  ) set_cs( 0,  0,   a_sub, 1, b_x,  0 );
-      STATE_DONE:                set_cs( 0,  1,   a_x,   0, b_x,  0 );
+      //req resp a mux b mux result mux result add mux
+      //rdy val  sel   sel   sel        en     sel
+      STATE_IDLE:               set_cs( 1,  0,  1,  1,  1,  1,  x ); //x?
+      STATE_CALC: 
+        if ( do_add_shift )     set_cs( 0,  0,  0,  0,  0,  1,  0 );
+        else if ( do_shift )    set_cs( 0,  0,  0,  0,  0,  0,  1 );
+      STATE_DONE:               set_cs( 0,  1,  x,  x,  x,  0,  x );
 
     endcase
 
   end
 
 
-
+endmodule
 
 
 //========================================================================
