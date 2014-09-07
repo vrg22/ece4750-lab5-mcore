@@ -150,11 +150,8 @@ module lab1_imul_IntMulBaseCtrl
   
   //CONVENTION: mux path's from diagram,
   //top to bottom go 0 to max value (???)
-  localparam x   = 1'dx;        
-  
-  localparam 
+  localparam x   = 1'dx;
   localparam tmp   = 1'd0;
-
 
 
   task set_cs
