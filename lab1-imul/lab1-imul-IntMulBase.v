@@ -59,11 +59,130 @@ module lab1_imul_IntMulBaseDpath
   output lab1_imul_ss_t       ss
 );
 
+ localparam c_nbits = `LAB1_IMUL_REQ_MSG_A_NBITS;
 
+  // A Mux
 
-//INSERT MODULES HERE
+  logic [c_nbits-1:0] b_reg_out;      //Why listed up here and not with unit?
+  logic [c_nbits-1:0] sub_out;
+  logic [c_nbits-1:0] a_mux_out;
 
+  vc_Mux2#(c_nbits) a_mux
+  (
+    .sel   (cs.a_mux_sel),
+    .in0   (l_shift_out),    //NAME? <<
+    .in1   (req_msg.a),
+    .out   (a_mux_out)
+  );
 
+  // A register
+
+  logic [c_nbits-1:0] a_reg_out;
+
+  vc_Reg#(c_nbits) a_reg
+  (
+    .clk   (clk),
+    .reset (reset),
+    .d     (a_mux_out),
+    .q     (a_reg_out)
+  );
+
+  // B Mux
+
+  logic [c_nbits-1:0] b_mux_out;
+
+  vc_Mux2#(c_nbits) b_mux
+  (
+    .sel   (cs.b_mux_sel),
+    .in0   (r_shift_out),     //NAME? >>
+    .in1   (req_msg.b),
+    .out   (b_mux_out)
+  );
+
+  // B register
+
+  vc_Reg#(c_nbits) b_reg
+  (
+    .clk   (clk),
+    .reset (reset),
+    .d     (b_mux_out),
+    .q     (b_reg_out)
+  );
+
+  assign ss.b_lsb = b_reg_out[0]; //CHECK
+
+  // Result Mux
+
+  logic [c_nbits-1:0] rslt_mux_out;
+
+  vc_Mux2#(c_nbits) rslt_mux
+  (
+    .sel   (cs.result_mux_sel),
+    .in0   (add_mux_out),
+    .in1   (0),             //FIX
+    .out   (rslt_mux_out)
+  );
+
+  // Result register
+
+  vc_EnReg#(c_nbits) rslt_reg
+  (
+    .clk   (clk),
+    .reset (reset),
+    .en    (cs.result_en),
+    .d     (rslt_mux_out),
+    .q     (rslt_reg_out)
+  );
+
+  // Right Shifter
+
+  logic [c_nbits-1:0] r_shift_out;
+
+  vc_RightLogicalShifter#(c_nbits) r_shift
+  (  
+    //Default shamt val is fine; still need to/should specify??
+    .in     (b_reg_out),
+    .out    (r_shift_out)
+  );
+
+  // Left Shifter
+
+  logic [c_nbits-1:0] l_shift_out;
+
+  vc_LeftLogicalShifter#(c_nbits) l_shift
+  (
+    //Default shamt val is fine; still need to/should specify?
+    .in     (a_reg_out),
+    .out    (l_shift_out)
+  );
+  
+  // Adder
+
+  logic [c_nbits-1:0] adder_out;
+
+  vc_SimpleAdder#(c_nbits) adder  //simple or regular?
+  (
+    //
+    .in0    (a_reg_out),
+    .in1    (rslt_reg_out),
+    .out    (add_out)
+  );
+
+  // Add Mux
+ 
+  logic [c_nbits-1:0] add_mux_out;
+
+  vc_Mux2#(c_nbits) add_mux
+  (
+    .sel   (cs.add_mux_sel),
+    .in0   (adder_out),
+    .in1   (rslt_reg_out),
+    .out   (add_mux_out)
+  );
+
+  // Set response message
+
+  assign resp_msg.result = rslt_reg_out;
 
 endmodule
 
