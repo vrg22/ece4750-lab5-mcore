@@ -63,9 +63,14 @@ module lab1_imul_IntMulBaseDpath
 
   // A Mux
 
-  logic [c_nbits-1:0] b_reg_out;      //Why listed up here and not with unit?
+  logic [c_nbits-1:0] b_reg_out;      //How to organize to avoid implicit def?
   logic [c_nbits-1:0] sub_out;
   logic [c_nbits-1:0] a_mux_out;
+  logic [c_nbits-1:0] l_shift_out;
+  logic [c_nbits-1:0] r_shift_out; 
+  logic [c_nbits-1:0] rslt_mux_out;
+  logic [c_nbits-1:0] add_mux_out;
+  logic [c_nbits-1:0] rslt_reg_out;
 
   vc_Mux2#(c_nbits) a_mux
   (
@@ -113,8 +118,7 @@ module lab1_imul_IntMulBaseDpath
 
   // Result Mux
 
-  logic [c_nbits-1:0] rslt_mux_out;
-
+  //
   vc_Mux2#(c_nbits) rslt_mux
   (
     .sel   (cs.result_mux_sel),
@@ -125,6 +129,7 @@ module lab1_imul_IntMulBaseDpath
 
   // Result register
 
+  //rslt_reg_out defined above
   vc_EnReg#(c_nbits) rslt_reg
   (
     .clk   (clk),
@@ -136,8 +141,7 @@ module lab1_imul_IntMulBaseDpath
 
   // Right Shifter
 
-  logic [c_nbits-1:0] r_shift_out;
-
+  //r_shift_out defined above
   vc_RightLogicalShifter#(c_nbits) r_shift
   (  
     //Default shamt val is fine; still need to/should specify??
@@ -147,8 +151,7 @@ module lab1_imul_IntMulBaseDpath
 
   // Left Shifter
 
-  logic [c_nbits-1:0] l_shift_out;
-
+  //l_shift_out defined above
   vc_LeftLogicalShifter#(c_nbits) l_shift
   (
     //Default shamt val is fine; still need to/should specify?
@@ -165,13 +168,12 @@ module lab1_imul_IntMulBaseDpath
     //
     .in0    (a_reg_out),
     .in1    (rslt_reg_out),
-    .out    (add_out)
+    .out    (adder_out)
   );
 
   // Add Mux
  
-  logic [c_nbits-1:0] add_mux_out;
-
+  //add_mux_out defined above
   vc_Mux2#(c_nbits) add_mux
   (
     .sel   (cs.add_mux_sel),
@@ -281,7 +283,7 @@ module lab1_imul_IntMulBaseCtrl
     input logic       cs_a_mux_sel,
     input logic       cs_b_mux_sel,
     input logic       cs_result_mux_sel,
-    input logic       cs_add_mux_sel,
+    input logic       cs_add_mux_sel
   );
   begin
     req_rdy      = cs_req_rdy;
