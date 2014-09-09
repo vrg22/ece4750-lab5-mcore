@@ -204,11 +204,7 @@ module top;
     init( 2, 32'd00, -32'd01, 32'd00 );
     init( 3, -32'd01, 32'd00, 32'd00 );
     init( 4, 32'd01, -32'd01, -32'd01);
-<<<<<<< HEAD
     init( 5, -32'd01, 32'd01, -32'd01);
-=======
-    init( 4, -32'd01, 32'd01, -32'd01);
->>>>>>> d0fa5c9ff1d3d757ebcd782902bf9c708a996851
     run_test;
   end
   `VC_TEST_CASE_END
@@ -256,19 +252,11 @@ module top;
   begin
     init_rand_delays( 0, 0 );
     init( 0, 32'hab, 32'hbc, 32'h7d94         );
-<<<<<<< HEAD
     init( 1, 32'h2c, 32'h88, 32'h1760         );
     init( 2, 32'hfff, 32'hfff, 32'hffe001     );
     init( 3, 32'ha882, 32'he21, 32'h94cd4c2   );
     init( 4, 32'he8cd, 32'hd190, 32'hbe925050 );
     init( 5, 32'h5fc2, 32'h9c3b, 32'h3a7049b6 );
-=======
-    init( 1, 32'h2c, 32'd88, 32'd1760         );
-    init( 2, 32'hfff, 32'hfff, 32'hffe001     );
-    init( 2, 32'ha882, 32'he21, 32'h94cd4c2   );
-    init( 3, 32'he8cd, 32'hd190, 32'hbe925050 );
-    init( 4, 32'h5fc2, 32'h9c3b, 32'h3a7049b6 );
->>>>>>> d0fa5c9ff1d3d757ebcd782902bf9c708a996851
     run_test;
   end
   `VC_TEST_CASE_END
@@ -282,19 +270,11 @@ module top;
   begin
     init_rand_delays( 0, 0 );
     init( 0, 32'hab, -32'hbc, -32'h7d94         );
-<<<<<<< HEAD
     init( 1, 32'h2c, -32'h88, -32'h1760         );
     init( 2, 32'hfff, -32'hfff, -32'hffe001     );
     init( 3, 32'ha882, -32'he21, -32'h94cd4c2   );
     init( 4, 32'he8cd, -32'hd190, -32'hbe925050 );
     init( 5, 32'h5fc2, -32'h9c3b, -32'h3a7049b6 );
-=======
-    init( 1, 32'h2c, -32'd88, -32'd1760         );
-    init( 2, 32'hfff, -32'hfff, -32'hffe001     );
-    init( 2, 32'ha882, -32'he21, -32'h94cd4c2   );
-    init( 3, 32'he8cd, -32'hd190, -32'hbe925050 );
-    init( 4, 32'h5fc2, -32'h9c3b, -32'h3a7049b6 );
->>>>>>> d0fa5c9ff1d3d757ebcd782902bf9c708a996851
     run_test;
   end
   `VC_TEST_CASE_END
@@ -308,19 +288,11 @@ module top;
   begin
     init_rand_delays( 0, 0 );
     init( 0, -32'hab, 32'hbc, -32'h7d94         );
-<<<<<<< HEAD
     init( 1, -32'h2c, 32'h88, -32'h1760         );
     init( 2, -32'hfff, 32'hfff, -32'hffe001     );
     init( 3, -32'ha882, 32'he21, -32'h94cd4c2   );
     init( 4, -32'he8cd, 32'hd190, -32'hbe925050 );
     init( 5, -32'h5fc2, 32'h9c3b, -32'h3a7049b6 );
-=======
-    init( 1, -32'h2c, 32'd88, -32'd1760         );
-    init( 2, -32'hfff, 32'hfff, -32'hffe001     );
-    init( 2, -32'ha882, 32'he21, -32'h94cd4c2   );
-    init( 3, -32'he8cd, 32'hd190, -32'hbe925050 );
-    init( 4, -32'h5fc2, 32'h9c3b, -32'h3a7049b6 );
->>>>>>> d0fa5c9ff1d3d757ebcd782902bf9c708a996851
     run_test;
   end
   `VC_TEST_CASE_END
@@ -334,24 +306,15 @@ module top;
   begin
     init_rand_delays( 0, 0 );
     init( 0, -32'hab, -32'hbc, 32'h7d94         );
-<<<<<<< HEAD
     init( 1, -32'h2c, -32'h88, 32'h1760         );
     init( 2, -32'hfff, -32'hfff, 32'hffe001     );
     init( 3, -32'ha882, -32'he21, 32'h94cd4c2   );
     init( 4, -32'he8cd, -32'hd190, 32'hbe925050 );
     init( 5, -32'h5fc2, -32'h9c3b, 32'h3a7049b6 );
-=======
-    init( 1, -32'h2c, -32'd88, 32'd1760         );
-    init( 2, -32'hfff, -32'hfff, 32'hffe001     );
-    init( 2, -32'ha882, -32'he21, 32'h94cd4c2   );
-    init( 3, -32'he8cd, -32'hd190, 32'hbe925050 );
-    init( 4, -32'h5fc2, -32'h9c3b, 32'h3a7049b6 );
->>>>>>> d0fa5c9ff1d3d757ebcd782902bf9c708a996851
     run_test;
   end
   `VC_TEST_CASE_END
 
-<<<<<<< HEAD
 /*
   //----------------------------------------------------------------------
   // Test Case: products with low order bits masked off
@@ -420,26 +383,6 @@ module top;
     run_test;
   end
   `VC_TEST_CASE_END
-=======
-
-//----------------------------------------------------------------------
-  // Test Case: products with low order bits masked off
-  //----------------------------------------------------------------------
-
-  /*`VC_TEST_CASE_BEGIN( 9, "products with low order bits masked off" )
-  begin
-    init_rand_delays( 0, 0 );
-    init( 0, -32'hax, -32'hbx, 32'h7d94         );
-    init( 1, -32'h2x, -32'd8x, 32'd1760         );
-    init( 2, -32'hffx, -32'hffx, 32'hffe001     );
-    init( 2, -32'ha88x, -32'he2x, 32'h94cd4c2   );
-    init( 3, -32'he8cx, -32'hd19x, 32'hbe925050 );
-    init( 4, -32'h5fcx, -32'h9c3x, 32'h3a7049b6 );
-    run_test;
-  end
-  `VC_TEST_CASE_END*/
-
->>>>>>> d0fa5c9ff1d3d757ebcd782902bf9c708a996851
 
   `VC_TEST_SUITE_END
 
