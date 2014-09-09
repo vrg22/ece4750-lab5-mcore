@@ -357,13 +357,46 @@ module lab1_imul_IntMulBase
     .msg   (req_msg)
   );
 
-  // Instantiate datapath and control models here and then connect them
-  // together. As a place holder, for now we simply pass input operand
-  // A through to the output, which obviously is not correct.
+  //----------------------------------------------------------------------
+  // Control and Status Signals
+  //----------------------------------------------------------------------
 
-  assign req_rdy         = resp_rdy;
-  assign resp_val        = req_val;
-  assign resp_msg.result = req_msg.a;
+  lab1_imul_cs_t cs;
+  lab1_imul_ss_t ss;
+
+  //----------------------------------------------------------------------
+  // Control Unit
+  //----------------------------------------------------------------------
+
+  lab1_imul_IntMulBaseCtrl ctrl
+  (
+    .clk      (clk),
+    .reset    (reset),
+
+    .req_val  (req_val),
+    .req_rdy  (req_rdy),
+    .resp_val (resp_val),
+    .resp_rdy (resp_rdy),
+
+    .cs       (cs),
+    .ss       (ss)
+  );
+
+  //----------------------------------------------------------------------
+  // Datapath
+  //----------------------------------------------------------------------
+
+  lab1_imul_IntMulBaseDpath dpath
+  (
+    .clk      (clk),
+    .reset    (reset),
+
+    .req_msg  (req_msg),
+    .resp_msg (resp_msg),
+
+    .cs       (cs),
+    .ss       (ss)
+  );
 
   //----------------------------------------------------------------------
   // Line Tracing
