@@ -236,18 +236,12 @@ module lab1_imul_IntMulBaseCtrl
       counter <= 0;
     end
     else begin
-      counter <= counter + 1;
+      if ( state_reg == STATE_CALC ) begin
+        counter <= counter + 1; //Enclose in if-statement for safety?
+      end
       state_reg <= state_next;
     end
   end
-
-  /*always @(*) begin   //???
-    if ( counter == 31 ) begin
-      state_reg <= STATE_IDLE;
-      counter <= 0;
-    end
-  end
-  */
 
   //----------------------------------------------------------------------
   // State Transitions
@@ -259,7 +253,7 @@ module lab1_imul_IntMulBaseCtrl
 
   assign req_go       = req_val  && req_rdy;
   assign resp_go      = resp_val && resp_rdy;
-  assign is_calc_done = (counter == 32);
+  assign is_calc_done = (counter == 31);  //was 32
 
   always @(*) begin
 
@@ -267,10 +261,13 @@ module lab1_imul_IntMulBaseCtrl
 
     case ( state_reg )
 
-      STATE_IDLE: if ( req_go    )    state_next = STATE_CALC;
-      STATE_CALC: if ( is_calc_done ) begin
-                    state_next = STATE_DONE;
+      STATE_IDLE: if ( req_go    ) begin
+                    state_next = STATE_CALC;
                     counter = 0;
+                  end
+      STATE_CALC: 
+                  if ( is_calc_done ) begin
+                    state_next = STATE_DONE;
                   end
       STATE_DONE: if ( resp_go   )    state_next = STATE_IDLE;
 
@@ -301,8 +298,6 @@ module lab1_imul_IntMulBaseCtrl
   begin
     req_rdy      = cs_req_rdy;
     resp_val     = cs_resp_val;
-    //cs.a_reg_en  = cs_a_reg_en;
-    //cs.b_reg_en  = cs_b_reg_en;
     cs.a_mux_sel = cs_a_mux_sel;
     cs.b_mux_sel = cs_b_mux_sel;
     cs.result_mux_sel = cs_result_mux_sel;
