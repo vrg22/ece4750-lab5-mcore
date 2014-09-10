@@ -86,10 +86,11 @@ a left shifter and right shifter synthesized by System Verilog.
 We split how the algorithm manipulates these registers along the control-datapath line. 
 Our control and datapath logic are placed in \textit{modules} and communicate
 via status and control signals. Control signals sent to datapath logic are highlighted in blue in our datapath diagram, shown in figure $2$. 
+Control signals are used to select data into our multiplexors %TODO
 \begin{figure}[b]
 \centering
 \includegraphics[scale=0.6]{Datapath}
-\caption{Datapath Diagram. Again, the structure mimics the pseudocode}
+\caption{Datapath Diagram. Again, the structure mimics the pseudocode.}
 \end{figure}
 There is a single bit status signal sent back to our control module, which is a sample of the least significant bit of the second operand.
 This information is used, if you look at the pseudo-code, to determine if a partial sum should be made. Again, we aim to emulate the structure of the code as much as possible.   
