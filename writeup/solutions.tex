@@ -63,7 +63,7 @@ in our variable multiplier, we expect a significant increase in area and energy.
 \section{Baseline Design}
 
 The baseline design works on the following interface: given a 64 bit message containing our operands, a clock signal,
-and required signals to conform to the val/rdy microprotocl, output the lower 32 bits of the multiplication to your consumer.
+and required signals to conform to the val/rdy microprotocol, output the lower 32 bits of the multiplication to your consumer.
 This interface is shown in figure $1$.
 \begin{figure}[b]
 \centering
@@ -83,8 +83,14 @@ def imul( a,b ):
 \end{python}
 Our implementation follows the structure of this pseudo-code very closely. We have three registers, one for $a$, $b$, and $result$ and we have 
 a left shifter and right shifter synthesized by System Verilog. 
-We split the logic of the algorithm along the control-datapath line. Our control and datapath logic are placed in \textit{modules} and communicate
+We split how the algorithm manipulates these registers along the control-datapath line. 
+Our control and datapath logic are placed in \textit{modules} and communicate
 via status and control signals. Control signals sent to datapath logic are highlighted in blue in our datapath diagram, shown in figure $2$. 
+\begin{figure}[b]
+\centering
+\includegraphics[scale=0.6]{Datapath}
+\caption{Datapath Diagram. Again, the structure mimics the pseudocode}
+\end{figure}
 There is a single bit status signal sent back to our control module, which is a sample of the least significant bit of the second operand.
 This information is used, if you look at the pseudo-code, to determine if a partial sum should be made. Again, we aim to emulate the structure of the code as much as possible.   
  
