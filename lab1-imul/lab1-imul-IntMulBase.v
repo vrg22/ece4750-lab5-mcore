@@ -228,18 +228,26 @@ module lab1_imul_IntMulBaseCtrl
 
   state_t state_reg;
   state_t state_next;
-  logic [5:0] counter; //DOES THIS GO HERE?
+  logic [5:0] counter; //CONSIDER USING ACTUAL MODULE
 
   always @( posedge clk ) begin
     if ( reset ) begin
       state_reg <= STATE_IDLE;
-      counter <= 1'b0; //0;
+      counter <= 0;
     end
     else begin
       counter <= counter + 1;
       state_reg <= state_next;
     end
   end
+
+  /*always @(*) begin   //???
+    if ( counter == 31 ) begin
+      state_reg <= STATE_IDLE;
+      counter <= 0;
+    end
+  end
+  */
 
   //----------------------------------------------------------------------
   // State Transitions
@@ -260,7 +268,10 @@ module lab1_imul_IntMulBaseCtrl
     case ( state_reg )
 
       STATE_IDLE: if ( req_go    )    state_next = STATE_CALC;
-      STATE_CALC: if ( is_calc_done ) state_next = STATE_DONE;
+      STATE_CALC: if ( is_calc_done ) begin
+                    state_next = STATE_DONE;
+                    counter = 0;
+                  end
       STATE_DONE: if ( resp_go   )    state_next = STATE_IDLE;
 
     endcase
@@ -273,7 +284,7 @@ module lab1_imul_IntMulBaseCtrl
   
   //CONVENTION: mux path's from diagram,
   //top to bottom go 0 to max value (???)
-  localparam x   = 1'dx;
+  localparam x   = 1'b0;//1'dx;
   localparam tmp   = 1'd0;
 
 
@@ -290,6 +301,8 @@ module lab1_imul_IntMulBaseCtrl
   begin
     req_rdy      = cs_req_rdy;
     resp_val     = cs_resp_val;
+    //cs.a_reg_en  = cs_a_reg_en;
+    //cs.b_reg_en  = cs_b_reg_en;
     cs.a_mux_sel = cs_a_mux_sel;
     cs.b_mux_sel = cs_b_mux_sel;
     cs.result_mux_sel = cs_result_mux_sel;
