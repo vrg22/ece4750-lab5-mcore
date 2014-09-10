@@ -78,7 +78,7 @@ endmodule
 // but it helps maintain the idea that we often use structs to create
 // message types.
 //
-//   15        0
+//   31        0
 //  +-----------+
 //  | result    |
 //  +-----------+
