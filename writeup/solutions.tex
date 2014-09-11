@@ -1,5 +1,5 @@
 \documentclass[11pt]{article}
-\usepackage[margin=0.75in]{geometry}
+\usepackage[margin=1in]{geometry}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{setspace}
@@ -56,7 +56,8 @@ iterative multiplier with bounds of 3 to 34 cycles.
 While we do not expect much additional overhead on clock frequency in our variable multiplier,
 we expect a significant increase in area and energy.
 Given the technology constraints we face today, (focus on energy, large die sizes, etc),
-we expect our variable multiplier to be superior in most implementations. 
+we expect our variable multiplier to be superior in most implementations.
+We also scale down our hardware use in an alternative case and determine the performance downgrade.  
 
 
 \section{Project Management}
@@ -72,8 +73,13 @@ Akshay came up with the designs for the multiple alternate designs and wrote mos
 Akshay also helped debug the Verilog code; Vivek figured out more than half the errors though.
 
 As far as implementing the lab, most of it was tested via an end to end fashion.
- 
+Vivek completed the baseline design while Avinash finished the directed test cases.
+After this was done, we spent a lot of time debugging the entire functionality of the multiplier.
+This process was repeated for the alternative design as well.
 
+Some lessons learned from this lab were definitely how not to test.
+We would like to have unit tests testing functionality across our modules, not our implementation.
+We will keep this in mind for the next lab assignment.
 
 \section{Baseline Design}
 
@@ -99,7 +105,7 @@ The control module sends control signals to the datapath module, altering the fl
 This occurs when we are accepting new values into our operand registers,
 writing/not-writing partial sums to $result$, and outputing a computed value.
 The datapath module sends the lsb of $b$ to the control module so it can compute the appropriate dataflow.
-It is shown in Figure~\ref{fig:datapath}.
+The datapath is shown in Figure~\ref{fig:datapath}.
 The lsb is directly used to determine whether to partially sum into $results$, a direct mapping to the pseudocode.
 
 As seen from the pseudocode, there is no escape from the \verb+for+ loop.
@@ -125,9 +131,9 @@ We propose several alternative designs and attempt to increase performance.
 Since we can't use concepts of indirection or caching, we instead will consider pipelineing our multiplier.
 We will also consider exploiting the underlying structure of our operands to increase performance.
 There are multiple ways to exploit structure in our operands; we will attempt to exploit structure in two ways.
-First, we will roll over consecutive zeros by shifting more than 1 bit if possible
-Second, we will convert small negative numbers (filled with 1's) to small positive numbers, multiply,
-and do a fast two's complement multiply by $-1$ on the product.
+First, we will roll over consecutive zeros by shifting more than 1 bit if possible.
+Second, we will reduce the granularity of how many zeros we shift over to powers of two, as this reduces hardware costs
+while still increasing performance over the fixed latency multiplier.
 
 Given the linear path of our FSM, it makes sense to pipeline our constructions.
 We can create stages between every state transition and have our val/rdy microprotocol mediate flow through the pipeline.
@@ -152,16 +158,13 @@ Therefore, our total overhead is 3 cycles: one for IDLE, one for CALC, and one f
 If the $b$ operand is all ones, we take our usual 34 cycles.
 That provides our range of multiply cycles we can take.
 
-However, we can multiply by $-1$ in two's complement easily by inverting the bits and adding 1. 
-For small negative numbers, we can optimize by converting the negative to a positive, increasing the number of consecutive zeros.
-We have yet to implement this, but we assume this will dramatically increase performance in a large set of cases. 
+However, instead of shifting by $n$ bits, let us shift by powers of two.
+This allows us to reduce the number of cases we need to check from 32 to 6.
+This is a five-fold reduction in hardware!
+We will evaluate the cycle execution time between these two setups and determine which design is better.   
 
 
 \section{Testing Strategy}
-
-In keeping with the incremental test-driven development methodology, we tested the control and datapath modules separately using directed and random tests before testing the full base and alternative designs. 
-
-(Details about control/datapath testing here)
 
 The base and alternative designs were tested using the provided test harness, to which were added additional directed and random test cases.
 The directed unit test cases covered all types of possible inputs, including zeros and ones,
@@ -171,25 +174,24 @@ In order to identify the problem, we refined the control and datapath unit tests
 We also used line traces and GTKWave to do more granular testing.
 Ultimately both the base and alternative designs, as well as the functional model, worked correctly with the directed unit tests. 
 
+
 \section{Evaluations and Conclusion}
 
 Forcing images to the bottom, for now
 
-\begin{figure}
+\begin{figure}[b]
 \centering
 \includegraphics[scale=0.5]{gantt}
 \caption{The initial Gantt chart postulating progress}
 \label{fig:gantt}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[b]
 \centering
 \includegraphics[scale=0.5]{gantt_actual}
 \caption{Our actual progress on the lab}
 \label{fig:gantt_actual}
 \end{figure}
-
-
 
 \begin{figure}[b]
 \centering
@@ -211,6 +213,15 @@ Forcing images to the bottom, for now
 \caption{Datapath Diagram. Again, the structure mimics the pseudocode.}
 \label{fig:datapath}
 \end{figure}
+
+\begin{figure}[b]
+\centering
+\includegraphics[scale=0.6]{BaseFSM}
+\caption{FSM capturing control logic.}
+\label{fig:BaseFSM}
+\end{figure}
+
+
 
 
 \end{document}
