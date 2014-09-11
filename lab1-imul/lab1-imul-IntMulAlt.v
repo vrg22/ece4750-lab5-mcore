@@ -25,6 +25,7 @@ typedef struct packed {
   logic       b_mux_sel;        // sel for mux in front of B reg
   logic       result_mux_sel;   // sel for mux in front of result reg
   logic       add_mux_sel;      // sel for mux in back of adder
+  logic [5:0] shift_amt;        // shift amount for shifters
 
 } lab1_imul_cs_t;
 
@@ -32,7 +33,7 @@ typedef struct packed {
 
 typedef struct packed {
 
-  logic       b_lsb;      // value of B's least-sig-bit
+  logic [31:0] b_out;           // B
 
 } lab1_imul_ss_t;
 
@@ -61,9 +62,14 @@ module lab1_imul_IntMulBaseDpath
 
   // A Mux
 
-  logic [c_nbits-1:0] b_reg_out;      //Why listed up here and not with unit?
+  logic [c_nbits-1:0] b_reg_out;      //How to organize to avoid implicit def?
   logic [c_nbits-1:0] sub_out;
   logic [c_nbits-1:0] a_mux_out;
+  logic [c_nbits-1:0] l_shift_out;
+  logic [c_nbits-1:0] r_shift_out; 
+  logic [c_nbits-1:0] rslt_mux_out;
+  logic [c_nbits-1:0] add_mux_out;
+  logic [c_nbits-1:0] rslt_reg_out;
 
   vc_Mux2#(c_nbits) a_mux
   (
@@ -77,7 +83,7 @@ module lab1_imul_IntMulBaseDpath
 
   logic [c_nbits-1:0] a_reg_out;
 
-  vc_Reg#(c_nbits) a_reg
+  vc_ResetReg#(c_nbits) a_reg
   (
     .clk   (clk),
     .reset (reset),
@@ -99,7 +105,7 @@ module lab1_imul_IntMulBaseDpath
 
   // B register
 
-  vc_Reg#(c_nbits) b_reg
+  vc_ResetReg#(c_nbits) b_reg
   (
     .clk   (clk),
     .reset (reset),
@@ -111,18 +117,18 @@ module lab1_imul_IntMulBaseDpath
 
   // Result Mux
 
-  logic [c_nbits-1:0] rslt_mux_out;
-
+  //rslt_mux_out defined above
   vc_Mux2#(c_nbits) rslt_mux
   (
     .sel   (cs.result_mux_sel),
     .in0   (add_mux_out),
-    .in1   (0),             //FIX
+    .in1   (32'b0),
     .out   (rslt_mux_out)
   );
 
   // Result register
 
+  //rslt_reg_out defined above
   vc_EnReg#(c_nbits) rslt_reg
   (
     .clk   (clk),
@@ -134,24 +140,24 @@ module lab1_imul_IntMulBaseDpath
 
   // Right Shifter
 
-  logic [c_nbits-1:0] r_shift_out;
-
-  vc_RightLogicalShifter#(c_nbits) r_shift
+  //r_shift_out defined above
+  vc_RightLogicalShifter#(c_nbits, 1'b1) r_shift
   (  
-    .in0    (b_reg_out),
-    .in1    ()
-    .out    (r_shift_out)
+    //Default shamt val is fine; still need to/should specify??
+    .in     (b_reg_out),
+    .out    (r_shift_out),
+    .shamt  (1'b1)
   );
 
   // Left Shifter
 
-  logic [c_nbits-1:0] l_shift_out;
-
-  vc_LeftLogicalShifter#(c_nbits) l_shift
+  //l_shift_out defined above
+  vc_LeftLogicalShifter#(c_nbits, 1'b1) l_shift
   (
-    .in0    (a_reg_out),
-    .in1    ()
-    .out    (l_shift_out)
+    //Default shamt val is fine; still need to/should specify?
+    .in     (a_reg_out),
+    .out    (l_shift_out),
+    .shamt  (1'b1)
   );
   
   // Adder
@@ -163,13 +169,12 @@ module lab1_imul_IntMulBaseDpath
     //
     .in0    (a_reg_out),
     .in1    (rslt_reg_out),
-    .out    (add_out)
+    .out    (adder_out)
   );
 
   // Add Mux
  
-  logic [c_nbits-1:0] add_mux_out;
-
+  //add_mux_out defined above
   vc_Mux2#(c_nbits) add_mux
   (
     .sel   (cs.add_mux_sel),
@@ -222,7 +227,7 @@ module lab1_imul_IntMulBaseCtrl
 
   state_t state_reg;
   state_t state_next;
-  logic [5:0] counter; //DOES THIS GO HERE?
+  logic [5:0] counter; //CONSIDER USING ACTUAL MODULE
 
   always @( posedge clk ) begin
     if ( reset ) begin
@@ -230,7 +235,9 @@ module lab1_imul_IntMulBaseCtrl
       counter <= 0;
     end
     else begin
-      counter <= counter + 1;
+      if ( state_reg == STATE_CALC ) begin
+        counter <= counter + cs.shift_amt;             //Enclose in if-statement for safety?
+      end
       state_reg <= state_next;
     end
   end
@@ -245,7 +252,7 @@ module lab1_imul_IntMulBaseCtrl
 
   assign req_go       = req_val  && req_rdy;
   assign resp_go      = resp_val && resp_rdy;
-  assign is_calc_done = (counter == 32);
+  assign is_calc_done = (counter == 32);  
 
   always @(*) begin
 
@@ -253,8 +260,14 @@ module lab1_imul_IntMulBaseCtrl
 
     case ( state_reg )
 
-      STATE_IDLE: if ( req_go    )    state_next = STATE_CALC;
-      STATE_CALC: if ( is_calc_done ) state_next = STATE_DONE;
+      STATE_IDLE: if ( req_go    ) begin
+                    state_next = STATE_CALC;
+                    counter = 0;
+                  end
+      STATE_CALC: 
+                  if ( is_calc_done ) begin
+                    state_next = STATE_DONE;
+                  end
       STATE_DONE: if ( resp_go   )    state_next = STATE_IDLE;
 
     endcase
@@ -267,7 +280,7 @@ module lab1_imul_IntMulBaseCtrl
   
   //CONVENTION: mux path's from diagram,
   //top to bottom go 0 to max value (???)
-  localparam x   = 1'dx;
+  localparam x   = 1'b0;//1'dx;
   localparam tmp   = 1'd0;
 
 
@@ -275,46 +288,85 @@ module lab1_imul_IntMulBaseCtrl
   (
     input logic       cs_req_rdy,
     input logic       cs_resp_val,
-    input logic       cs_result_en,
     input logic       cs_a_mux_sel,
     input logic       cs_b_mux_sel,
     input logic       cs_result_mux_sel,
-    input logic       cs_add_mux_sel,
+    input logic       cs_result_en,
+    input logic       cs_add_mux_sel
   );
   begin
     req_rdy      = cs_req_rdy;
     resp_val     = cs_resp_val;
-    //cs.a_reg_en  = cs_a_reg_en;
-    //cs.b_reg_en  = cs_b_reg_en;
-    cs.result_en = cs_result_en;
     cs.a_mux_sel = cs_a_mux_sel;
     cs.b_mux_sel = cs_b_mux_sel;
     cs.result_mux_sel = cs_result_mux_sel;
+    cs.result_en = cs_result_en;
     cs.add_mux_sel = cs_add_mux_sel;
   end
   endtask
 
   // Labels for Mealy transistions
 
+  logic [5:0] shift_amt;
   logic do_add_shift;
   logic do_shift;
 
-  assign do_add_shift = (counter < 32) && (ss.b_lsb == 1);
-  assign do_shift  = (counter < 32) && (ss.b_lsb == 0);
+  assign do_add_shift = (counter < 32) && (ss.b_out[0] == 1);       //CHECK!!!!
+  assign do_shift  = (counter < 32);                                //&& (ss.b_out[0] == 0);
 
   // Set outputs using a control signal "table"
 
   always @(*) begin
 
-    set_cs( 0, 0, x, x, x, 0, x );                         //CHECK!!!!
+    set_cs( 0, 0, x, x, x, 0, 6'bxxxxxx );                         //CHECK!!!!
+
+    case ( b_out )
+
+      32'hxxxxxxxC     :     shift_amt = 6'd2;
+      32'hxxxxxxx8     :     shift_amt = 6'd3;
+      32'hxxxxxxx0     :     shift_amt = 6'd4;
+      32'hxxxxxxE0     :     shift_amt = 6'd5;
+      32'hxxxxxxC0     :     shift_amt = 6'd6;
+      32'hxxxxxx80     :     shift_amt = 6'd7;
+      32'hxxxxxx00     :     shift_amt = 6'd8;
+      32'hxxxxxE00     :     shift_amt = 6'd9;
+      32'hxxxxxC00     :     shift_amt = 6'd10;
+      32'hxxxxx800     :     shift_amt = 6'd11;
+      32'hxxxxx000     :     shift_amt = 6'd12;
+      32'hxxxxE000     :     shift_amt = 6'd13;
+      32'hxxxxC000     :     shift_amt = 6'd14;
+      32'hxxxx8000     :     shift_amt = 6'd15;
+      32'hxxxx0000     :     shift_amt = 6'd16;
+      32'hxxxE0000     :     shift_amt = 6'd17;
+      32'hxxxC0000     :     shift_amt = 6'd18;
+      32'hxxx80000     :     shift_amt = 6'd19;
+      32'hxxx00000     :     shift_amt = 6'd20;
+      32'hxxE00000     :     shift_amt = 6'd21;
+      32'hxxC00000     :     shift_amt = 6'd22;
+      32'hxx800000     :     shift_amt = 6'd23;
+      32'hxx000000     :     shift_amt = 6'd24;
+      32'hxE000000     :     shift_amt = 6'd25;
+      32'hxC000000     :     shift_amt = 6'd26;
+      32'hx8000000     :     shift_amt = 6'd27;
+      32'hx0000000     :     shift_amt = 6'd28;
+      32'hE0000000     :     shift_amt = 6'd29;
+      32'hC0000000     :     shift_amt = 6'd30;
+      32'h80000000     :     shift_amt = 6'd31;
+      32'h00000000     :     shift_amt = 6'd32;
+      default          :     shift_amt = 6'd1;
+
+    endcase
+
+
+
     case ( state_reg )
-      //req resp a mux b mux result mux result add mux
-      //rdy val  sel   sel   sel        en     sel
-      STATE_IDLE:               set_cs( 1,  0,  1,  1,  1,  1,  x ); //x?
+      //req resp a mux b mux result mux result add mux shift
+      //rdy val  sel   sel   sel        en     sel     amt
+      STATE_IDLE:               set_cs( 1,  0,  1,  1,  1,  1,  x, shift_amt ); //x?
       STATE_CALC: 
-        if ( do_add_shift )     set_cs( 0,  0,  0,  0,  0,  1,  0 );
-        else if ( do_shift )    set_cs( 0,  0,  0,  0,  0,  0,  1 );
-      STATE_DONE:               set_cs( 0,  1,  x,  x,  x,  0,  x );
+        if ( do_add_shift )     set_cs( 0,  0,  0,  0,  0,  1,  0, shift_amt );
+        else if ( do_shift )    set_cs( 0,  0,  0,  0,  0,  0,  1, shift_amt );
+      STATE_DONE:               set_cs( 0,  1,  x,  x,  x,  0,  x, shift_amt );
 
     endcase
 
