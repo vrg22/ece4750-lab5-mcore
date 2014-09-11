@@ -151,12 +151,17 @@ We are likely to have some repeated set of zeros of length $n$ in our second ope
 Our algorithm in these cases does nothing to our result register, wasting $n$ cycles.
 So, we will instead shift $n$ bits, saving us $n-1$ cycles in our computation.
 We need one cycle to actually determine that there are $n$ bits we can skip.
+Our state machine for this logic is show in Figure~\ref{fig:AltFSM}.
 We implement this change using the \verb+casez+ construct.
 If there are multiple zeros in the lsb, we increment our counter by $n-1$ and shift the appropriate amount.
 So, if there is a zero in $b$, we shift 32 bits and spend only one cycle in the calc stage.
 Therefore, our total overhead is 3 cycles: one for IDLE, one for CALC, and one for DONE.
 If the $b$ operand is all ones, we take our usual 34 cycles.
 That provides our range of multiply cycles we can take.
+
+An advantage to this design is that the datapath gets modified only slightly.
+We only add one more control signal to our shifters, and instead of taking the lsb of $b$, we look at all 32 bits.
+This allowed us to rapidly implement the alternative design.
 
 However, instead of shifting by $n$ bits, let us shift by powers of two.
 This allows us to reduce the number of cases we need to check from 32 to 6.
@@ -219,6 +224,13 @@ Forcing images to the bottom, for now
 \includegraphics[scale=0.6]{BaseFSM}
 \caption{FSM capturing control logic.}
 \label{fig:BaseFSM}
+\end{figure}
+
+\begin{figure}[b]
+\centering
+\includegraphics[scale=0.6]{AltFSM}
+\caption{FSM capturing control logic for the alternative design.}
+\label{fig:AltFSM}
 \end{figure}
 
 
