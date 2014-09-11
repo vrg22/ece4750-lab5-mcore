@@ -82,7 +82,17 @@ We have an equivalent multiplexor for the clause that adds to our accumulator if
 However, the control logic and the data flow are not implemented as a monolithic design.
 Instead, we implement a \textit{control-datapath split.}
 The control module sends control signals to the datapath module, altering the flow of data into the registers.
+This occurs when we are accepting new values into our operand registers,
+writing/not-writing partial sums to $result$, and outputing a computed value.
+The datapath module sends the lsb of $b$ to the control module so it can compute the appropriate dataflow.
 
+As seen from the pseudocode, there is no escape from the \verb+for+ loop.
+Therefore, this implementation \textbf{must} take at least 32 cycles.
+In fact, our implementation takes 34 cycles, as we have one cycle to accept data and one cycle to state we are done.
+The state machine capturing this logic is shown in Figure 4. 
+This implementation, therefore, does exploit patterns in the underlying data.
+In the most extreme case where $b$ is zero, the hardware checks every bit of $b$ and decides 32 times not to add to $result$.
+We can reduce that down to one decision not to write to $result$.  
   
 
 \section{Alternative Design}
