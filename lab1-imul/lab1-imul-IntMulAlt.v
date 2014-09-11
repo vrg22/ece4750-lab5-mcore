@@ -116,7 +116,7 @@ module lab1_imul_IntMulAltDpath
     .q     (b_reg_out)
   );
 
-  assign ss.b_out = b_reg_out[0]; //CHECK
+  assign ss.b_out = b_reg_out;    //status signal
 
   // Result Mux
 
@@ -315,15 +315,15 @@ module lab1_imul_IntMulAltCtrl
   logic do_shift;
 
   //assign shift_amt = cs.shift_amt;
-  assign do_add_shift = (counter < 32) && (ss.b_out[0] == 1);       //CHECK!!!!
-  assign do_shift  = (counter < 32);                                //&& (ss.b_out[0] == 0);
+  assign do_add_shift = (counter < 32) && (ss.b_out[0] == 1);       //CHECK
+  assign do_shift  = (counter < 32); //&& (ss.b_out[0] == 0);
 
   // Set outputs using a control signal "table"
 
   always @(*) begin
 
-    set_cs( 0, 0, x, x, x, 0, x, 6'bxxxxxx );             //CHECK!!!!
-    casez ( ss.b_out )  //case?
+    set_cs( 0, 0, x, x, x, 0, x, 6'bxxxxxx );             //CHECK
+    casez ( ss.b_out )
 
       32'b_????_????_????_????_????_????_????_?100_     :     shift_amt = 6'd2;
       32'b_????_????_????_????_????_????_????_1000_     :     shift_amt = 6'd3;
@@ -355,7 +355,7 @@ module lab1_imul_IntMulAltCtrl
       32'b_??10_0000_0000_0000_0000_0000_0000_0000_     :     shift_amt = 6'd29;
       32'b_?100_0000_0000_0000_0000_0000_0000_0000_     :     shift_amt = 6'd30;
       32'b_1000_0000_0000_0000_0000_0000_0000_0000_     :     shift_amt = 6'd31;
-      //32'b_0000_0000_0000_0000_0000_0000_0000_0000_     :     shift_amt = 6'd32;  //comment out!
+      //32'b_0000_0000_0000_0000_0000_0000_0000_0000_     :     shift_amt = 6'd32;  //comment out?
       default          :     shift_amt = 6'd1;
 
       /*
