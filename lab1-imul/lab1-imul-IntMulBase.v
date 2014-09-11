@@ -237,7 +237,7 @@ module lab1_imul_IntMulBaseCtrl
     end
     else begin
       if ( state_reg == STATE_CALC ) begin
-        counter <= counter + 1; //Enclose in if-statement for safety?
+        counter <= counter + 1; //Enclose in if-statement for safety
       end
       state_reg <= state_next;
     end
@@ -253,7 +253,7 @@ module lab1_imul_IntMulBaseCtrl
 
   assign req_go       = req_val  && req_rdy;
   assign resp_go      = resp_val && resp_rdy;
-  assign is_calc_done = (counter == 31);  //was 32
+  assign is_calc_done = (counter == 32);  //31 wrong?
 
   always @(*) begin
 
