@@ -6,8 +6,11 @@
 `define LAB1_IMUL_INT_MUL_ALT_V
 
 `include "lab1-imul-msgs.v"
+`include "vc-assert.v"
+`include "vc-muxes.v"
+`include "vc-regs.v"
+`include "vc-arithmetic.v"
 `include "vc-trace.v"
-
 
 
 // Define datapath and control unit here
@@ -33,7 +36,7 @@ typedef struct packed {
 
 typedef struct packed {
 
-  logic [31:0] b_out;           // B
+  logic [31:0] b_out;           // B register output
 
 } lab1_imul_ss_t;
 
@@ -42,7 +45,7 @@ typedef struct packed {
 // Datapath
 //========================================================================
 
-module lab1_imul_IntMulBaseDpath
+module lab1_imul_IntMulAltDpath
 (
   input  logic             clk,
   input  logic             reset,
@@ -113,7 +116,7 @@ module lab1_imul_IntMulBaseDpath
     .q     (b_reg_out)
   );
 
-  assign ss.b_lsb = b_reg_out[0]; //CHECK
+  assign ss.b_out = b_reg_out[0]; //CHECK
 
   // Result Mux
 
@@ -191,7 +194,7 @@ endmodule
 // Control Unit
 //========================================================================
 
-module lab1_imul_IntMulBaseCtrl
+module lab1_imul_IntMulAltCtrl
 (
   input  logic                 clk,
   input  logic                 reset,     
@@ -234,7 +237,7 @@ module lab1_imul_IntMulBaseCtrl
     end
     else begin
       if ( state_reg == STATE_CALC ) begin
-        counter <= counter + cs.shift_amt;             //Enclose in if-statement for safety?
+        counter <= counter + cs.shift_amt;  // + 1          //Enclose in if-statement for safety?
       end
       state_reg <= state_next;
     end
@@ -250,7 +253,7 @@ module lab1_imul_IntMulBaseCtrl
 
   assign req_go       = req_val  && req_rdy;
   assign resp_go      = resp_val && resp_rdy;
-  assign is_calc_done = (counter == 32);  
+  assign is_calc_done = (counter == 32);  //should be ==, can test w/>=
 
   always @(*) begin
 
@@ -277,9 +280,9 @@ module lab1_imul_IntMulBaseCtrl
   //----------------------------------------------------------------------
   
   //CONVENTION: mux path's from diagram,
-  //top to bottom go 0 to max value (???)
-  localparam x   = 1'b0;//1'dx;
-  localparam tmp   = 1'd0;
+  //top to bottom go 0 to max value => good practice?
+  localparam x   = 1'bx; //1'b0;
+  //localparam tmp   = 1'd0;
 
 
   task set_cs
@@ -290,7 +293,8 @@ module lab1_imul_IntMulBaseCtrl
     input logic       cs_b_mux_sel,
     input logic       cs_result_mux_sel,
     input logic       cs_result_en,
-    input logic       cs_add_mux_sel
+    input logic       cs_add_mux_sel,
+    input logic [5:0] cs_shift_amt
   );
   begin
     req_rdy      = cs_req_rdy;
@@ -300,6 +304,7 @@ module lab1_imul_IntMulBaseCtrl
     cs.result_mux_sel = cs_result_mux_sel;
     cs.result_en = cs_result_en;
     cs.add_mux_sel = cs_add_mux_sel;
+    cs.shift_amt   = cs_shift_amt;
   end
   endtask
 
@@ -309,6 +314,7 @@ module lab1_imul_IntMulBaseCtrl
   logic do_add_shift;
   logic do_shift;
 
+  //assign shift_amt = cs.shift_amt;
   assign do_add_shift = (counter < 32) && (ss.b_out[0] == 1);       //CHECK!!!!
   assign do_shift  = (counter < 32);                                //&& (ss.b_out[0] == 0);
 
@@ -316,55 +322,88 @@ module lab1_imul_IntMulBaseCtrl
 
   always @(*) begin
 
-    set_cs( 0, 0, x, x, x, 0, 6'bxxxxxx );                         //CHECK!!!!
+    set_cs( 0, 0, x, x, x, 0, x, 6'bxxxxxx );             //CHECK!!!!
+    casez ( ss.b_out )  //case?
 
-    case ( b_out )
+      32'b_????_????_????_????_????_????_????_?100_     :     shift_amt = 6'd2;
+      32'b_????_????_????_????_????_????_????_1000_     :     shift_amt = 6'd3;
+      32'b_????_????_????_????_????_????_???1_0000_     :     shift_amt = 6'd4;
+      32'b_????_????_????_????_????_????_??10_0000_     :     shift_amt = 6'd5;
+      32'b_????_????_????_????_????_????_?100_0000_     :     shift_amt = 6'd6;
+      32'b_????_????_????_????_????_????_1000_0000_     :     shift_amt = 6'd7;
+      32'b_????_????_????_????_????_???1_0000_0000_     :     shift_amt = 6'd8;
+      32'b_????_????_????_????_????_??10_0000_0000_     :     shift_amt = 6'd9;
+      32'b_????_????_????_????_????_?100_0000_0000_     :     shift_amt = 6'd10;
+      32'b_????_????_????_????_????_1000_0000_0000_     :     shift_amt = 6'd11;
+      32'b_????_????_????_????_???1_0000_0000_0000_     :     shift_amt = 6'd12;
+      32'b_????_????_????_????_??10_0000_0000_0000_     :     shift_amt = 6'd13;
+      32'b_????_????_????_????_?100_0000_0000_0000_     :     shift_amt = 6'd14;
+      32'b_????_????_????_????_1000_0000_0000_0000_     :     shift_amt = 6'd15;
+      32'b_????_????_????_???1_0000_0000_0000_0000_     :     shift_amt = 6'd16;
+      32'b_????_????_????_??10_0000_0000_0000_0000_     :     shift_amt = 6'd17;
+      32'b_????_????_????_?100_0000_0000_0000_0000_     :     shift_amt = 6'd18;
+      32'b_????_????_????_1000_0000_0000_0000_0000_     :     shift_amt = 6'd19;
+      32'b_????_????_???1_0000_0000_0000_0000_0000_     :     shift_amt = 6'd20;
+      32'b_????_????_??10_0000_0000_0000_0000_0000_     :     shift_amt = 6'd21;
+      32'b_????_????_?100_0000_0000_0000_0000_0000_     :     shift_amt = 6'd22;
+      32'b_????_????_1000_0000_0000_0000_0000_0000_     :     shift_amt = 6'd23;
+      32'b_????_???1_0000_0000_0000_0000_0000_0000_     :     shift_amt = 6'd24;
+      32'b_????_??10_0000_0000_0000_0000_0000_0000_     :     shift_amt = 6'd25;
+      32'b_????_?100_0000_0000_0000_0000_0000_0000_     :     shift_amt = 6'd26;
+      32'b_????_1000_0000_0000_0000_0000_0000_0000_     :     shift_amt = 6'd27;
+      32'b_???1_0000_0000_0000_0000_0000_0000_0000_     :     shift_amt = 6'd28;
+      32'b_??10_0000_0000_0000_0000_0000_0000_0000_     :     shift_amt = 6'd29;
+      32'b_?100_0000_0000_0000_0000_0000_0000_0000_     :     shift_amt = 6'd30;
+      32'b_1000_0000_0000_0000_0000_0000_0000_0000_     :     shift_amt = 6'd31;
+      //32'b_0000_0000_0000_0000_0000_0000_0000_0000_     :     shift_amt = 6'd32;  //comment out!
+      default          :     shift_amt = 6'd1;
 
-      32'hxxxxxxxC     :     shift_amt = 6'd2;
-      32'hxxxxxxx8     :     shift_amt = 6'd3;
-      32'hxxxxxxx0     :     shift_amt = 6'd4;
-      32'hxxxxxxE0     :     shift_amt = 6'd5;
-      32'hxxxxxxC0     :     shift_amt = 6'd6;
-      32'hxxxxxx80     :     shift_amt = 6'd7;
-      32'hxxxxxx00     :     shift_amt = 6'd8;
-      32'hxxxxxE00     :     shift_amt = 6'd9;
-      32'hxxxxxC00     :     shift_amt = 6'd10;
-      32'hxxxxx800     :     shift_amt = 6'd11;
-      32'hxxxxx000     :     shift_amt = 6'd12;
-      32'hxxxxE000     :     shift_amt = 6'd13;
-      32'hxxxxC000     :     shift_amt = 6'd14;
-      32'hxxxx8000     :     shift_amt = 6'd15;
-      32'hxxxx0000     :     shift_amt = 6'd16;
-      32'hxxxE0000     :     shift_amt = 6'd17;
-      32'hxxxC0000     :     shift_amt = 6'd18;
-      32'hxxx80000     :     shift_amt = 6'd19;
-      32'hxxx00000     :     shift_amt = 6'd20;
-      32'hxxE00000     :     shift_amt = 6'd21;
-      32'hxxC00000     :     shift_amt = 6'd22;
-      32'hxx800000     :     shift_amt = 6'd23;
-      32'hxx000000     :     shift_amt = 6'd24;
-      32'hxE000000     :     shift_amt = 6'd25;
-      32'hxC000000     :     shift_amt = 6'd26;
-      32'hx8000000     :     shift_amt = 6'd27;
-      32'hx0000000     :     shift_amt = 6'd28;
+      /*
+      32'h???????C     :     shift_amt = 6'd2;
+      32'h???????8     :     shift_amt = 6'd3;
+      32'h???????0     :     shift_amt = 6'd4;
+      32'h??????E0     :     shift_amt = 6'd5;
+      32'h??????C0     :     shift_amt = 6'd6;
+      32'h??????80     :     shift_amt = 6'd7;
+      32'h??????00     :     shift_amt = 6'd8;
+      32'h?????E00     :     shift_amt = 6'd9;
+      32'h?????C00     :     shift_amt = 6'd10;
+      32'h?????800     :     shift_amt = 6'd11;
+      32'h?????000     :     shift_amt = 6'd12;
+      32'h????E000     :     shift_amt = 6'd13;
+      32'h????C000     :     shift_amt = 6'd14;
+      32'h????8000     :     shift_amt = 6'd15;
+      32'h????0000     :     shift_amt = 6'd16;
+      32'h???E0000     :     shift_amt = 6'd17;
+      32'h???C0000     :     shift_amt = 6'd18;
+      32'h???80000     :     shift_amt = 6'd19;
+      32'h???00000     :     shift_amt = 6'd20;
+      32'h??E00000     :     shift_amt = 6'd21;
+      32'h??C00000     :     shift_amt = 6'd22;
+      32'h??800000     :     shift_amt = 6'd23;
+      32'h??000000     :     shift_amt = 6'd24;
+      32'h?E000000     :     shift_amt = 6'd25;
+      32'h?C000000     :     shift_amt = 6'd26;
+      32'h?8000000     :     shift_amt = 6'd27;
+      32'h?0000000     :     shift_amt = 6'd28;
       32'hE0000000     :     shift_amt = 6'd29;
       32'hC0000000     :     shift_amt = 6'd30;
       32'h80000000     :     shift_amt = 6'd31;
       32'h00000000     :     shift_amt = 6'd32;
       default          :     shift_amt = 6'd1;
+      */
 
     endcase
-
 
 
     case ( state_reg )
       //req resp a mux b mux result mux result add mux shift
       //rdy val  sel   sel   sel        en     sel     amt
-      STATE_IDLE:               set_cs( 1,  0,  1,  1,  1,  1,  x, shift_amt ); //x?
+      STATE_IDLE:               set_cs( 1,  0,  1,  1,  1,  1,  x, shift_amt/*1*/ ); //shift_amt should be 1)dont care or 2)1?
       STATE_CALC: 
-        if ( do_add_shift )     set_cs( 0,  0,  0,  0,  0,  1,  0, shift_amt );
-        else if ( do_shift )    set_cs( 0,  0,  0,  0,  0,  0,  1, shift_amt );
-      STATE_DONE:               set_cs( 0,  1,  x,  x,  x,  0,  x, shift_amt );
+        if ( do_add_shift )     set_cs( 0,  0,  0,  0,  0,  1,  0, shift_amt /*1*/ ); //shift_amt should be 1
+        else if ( do_shift )    set_cs( 0,  0,  0,  0,  x,  0,  x, shift_amt /*1*/ ); //shift_amt should be determined by casez statement
+      STATE_DONE:               set_cs( 0,  1,  x,  x,  x,  0,  x, 6'bxxxxxx/*shift_amt*/ ); //shift_amt should be don't care
 
     endcase
 
@@ -394,10 +433,6 @@ module lab1_imul_IntMulAlt
   output lab1_imul_resp_msg_t resp_msg
 );
 
-
-
-
-
   //----------------------------------------------------------------------
   // Trace request message
   //----------------------------------------------------------------------
@@ -411,13 +446,46 @@ module lab1_imul_IntMulAlt
     .msg   (req_msg)
   );
 
-  // Instantiate datapath and control models here and then connect them
-  // together. As a place holder, for now we simply pass input operand
-  // A through to the output, which obviously is not / correct.
+  //----------------------------------------------------------------------
+  // Control and Status Signals
+  //----------------------------------------------------------------------
 
-  assign req_rdy         = resp_rdy;
-  assign resp_val        = req_val;
-  assign resp_msg.result = req_msg.a;
+  lab1_imul_cs_t cs;
+  lab1_imul_ss_t ss;
+
+  //----------------------------------------------------------------------
+  // Control Unit
+  //----------------------------------------------------------------------
+
+  lab1_imul_IntMulAltCtrl ctrl
+  (
+    .clk      (clk),
+    .reset    (reset),
+
+    .req_val  (req_val),
+    .req_rdy  (req_rdy),
+    .resp_val (resp_val),
+    .resp_rdy (resp_rdy),
+
+    .cs       (cs),
+    .ss       (ss)
+  );
+
+  //----------------------------------------------------------------------
+  // Datapath
+  //----------------------------------------------------------------------
+
+  lab1_imul_IntMulAltDpath dpath
+  (
+    .clk      (clk),
+    .reset    (reset),
+
+    .req_msg  (req_msg),
+    .resp_msg (resp_msg),
+
+    .cs       (cs),
+    .ss       (ss)
+  );
 
   //----------------------------------------------------------------------
   // Line Tracing
