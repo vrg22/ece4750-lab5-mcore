@@ -105,23 +105,36 @@ As a consequence, we ran into a Verilog bug that took several hours to fix even 
 
 \section{Alternative Design}
 
+The primary downside to our baseline implementation is the large latency in computing the product.
+We propose several alternative designs and attempt to increase performance.
+Since we can't use concepts of indirection or caching, we instead will consider pipelineing our multiplier.
+We will also consider exploiting the underlying structure of our operands to increase performance.
+There are multiple ways to exploit structure in our operands; we will attempt to exploit structure in two ways.
+First, we will roll over consecutive zeros by shifting more than 1 bit if possible
+Second, we will convert small negative numbers (filled with 1's) to small positive numbers, multiply,
+and do a fast two's complement multiply by $-1$ on the product.
+
+
+
 \section{Testing Strategy}
 
 \section{Evaluations and Conclusion}
 
-\begin{figure}
+Forcing images to the bottom, for now
+
+\begin{figure}[b]
 \centering
 \includegraphics[scale=0.5]{FLmodel}
 \caption{Interface for our model. Notice that req/resp,val/rdy signals are part of the val/rdy microprotocol}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[b]
 \centering
 \includegraphics[scale=0.9]{imul}
 \caption{Pseudocode for our baseline multiply algorithm}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[b]
 \centering
 \includegraphics[scale=0.6]{Datapath}
 \caption{Datapath Diagram. Again, the structure mimics the pseudocode.}
