@@ -141,23 +141,21 @@ module lab1_imul_IntMulBaseDpath
   // Right Shifter
 
   //r_shift_out defined above
-  vc_RightLogicalShifter#(c_nbits, 1'b1) r_shift
+  vc_RightLogicalShifter#(c_nbits, 6) r_shift
   (  
-    //Default shamt val is fine; still need to/should specify??
     .in     (b_reg_out),
     .out    (r_shift_out),
-    .shamt  (1'b1)
+    .shamt  (cs.shift_amt)
   );
 
   // Left Shifter
 
   //l_shift_out defined above
-  vc_LeftLogicalShifter#(c_nbits, 1'b1) l_shift
+  vc_LeftLogicalShifter#(c_nbits, 6) l_shift
   (
-    //Default shamt val is fine; still need to/should specify?
     .in     (a_reg_out),
     .out    (l_shift_out),
-    .shamt  (1'b1)
+    .shamt  (cs.shift_amt)
   );
   
   // Adder
