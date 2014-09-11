@@ -63,14 +63,17 @@ we expect our variable multiplier to be superior in most implementations.
 
 Given our group's various skill levels, we assigned Avinash to be verification lead, Vivek to be the architect, and Akshay to be the design lead.
 Our initial project roadmap was fairly aggressive and required us to be finished by Wednesday, September $10^{th}$.
-The intial Gantt Chart is shown below.
+The intial Gantt Chart is shown in Figure~\ref{fig:gantt}.
 
-\begin{figure}[b]
-\centering
-\includegraphics[scale=0.5]{gantt}
-\caption{The initial Gantt chart postulating progress}
-\label{fig:gantt}
-\end{figure}
+The breakdown of work in our group followed as such:
+Vivek implemented most of the baseline design and some of the alternate design in Verilog. 
+Avinash implemented some of the alternate design and created our testing suite for lab 1.
+Akshay came up with the designs for the multiple alternate designs and wrote most of the writeup.
+Akshay also helped debug the Verilog code; Vivek figured out more than half the errors though.
+
+As far as implementing the lab, most of it was tested via an end to end fashion.
+ 
+
 
 \section{Baseline Design}
 
@@ -127,12 +130,66 @@ Second, we will convert small negative numbers (filled with 1's) to small positi
 and do a fast two's complement multiply by $-1$ on the product.
 
 Given the linear path of our FSM, it makes sense to pipeline our constructions.
+We can create stages between every state transition and have our val/rdy microprotocol mediate flow through the pipeline.
+However, consider the hardware required. We need $34 \times 3 = 102$ registers, $34 \times 4 = 136$ two way multiplexors,
+and $34$ logical left and right shifters.
+This does not include the $34$ full adders we need. 
+The cost of this design is enormous!
+Additionaly, this design only achieves high throughput if we get repeated multiplications.
+Consider single cycle processors.
+This design will add exactly zero improvement in those processors, as we cannot pipeline instructions. 
+Also, since we are assuming we are going to get instructrions from a canonical C program, this design seems impractical.
+
+Instead, we can exploit the structure of the 32 bit operands we get.
+We are likely to have some repeated set of zeros of length $n$ in our second operand.
+Our algorithm in these cases does nothing to our result register, wasting $n$ cycles.
+So, we will instead shift $n$ bits, saving us $n-1$ cycles in our computation.
+We need one cycle to actually determine that there are $n$ bits we can skip.
+We implement this change using the \verb+casez+ construct.
+If there are multiple zeros in the lsb, we increment our counter by $n-1$ and shift the appropriate amount.
+So, if there is a zero in $b$, we shift 32 bits and spend only one cycle in the calc stage.
+Therefore, our total overhead is 3 cycles: one for IDLE, one for CALC, and one for DONE.
+If the $b$ operand is all ones, we take our usual 34 cycles.
+That provides our range of multiply cycles we can take.
+
+However, we can multiply by $-1$ in two's complement easily by inverting the bits and adding 1. 
+For small negative numbers, we can optimize by converting the negative to a positive, increasing the number of consecutive zeros.
+We have yet to implement this, but we assume this will dramatically increase performance in a large set of cases. 
+
 
 \section{Testing Strategy}
+
+In keeping with the incremental test-driven development methodology, we tested the control and datapath modules separately using directed and random tests before testing the full base and alternative designs. 
+
+(Details about control/datapath testing here)
+
+The base and alternative designs were tested using the provided test harness, to which were added additional directed and random test cases.
+The directed unit test cases covered all types of possible inputs, including zeros and ones,
+small and large numbers, positive and negative numbers, numbers with masked lower/middle bits, and combinations of these.
+At first the only the functional model and base design worked correctly with these unit tests, while the alternative design failed most of them.
+In order to identify the problem, we refined the control and datapath unit tests to clarify the source of error.
+We also used line traces and GTKWave to do more granular testing.
+Ultimately both the base and alternative designs, as well as the functional model, worked correctly with the directed unit tests. 
 
 \section{Evaluations and Conclusion}
 
 Forcing images to the bottom, for now
+
+\begin{figure}
+\centering
+\includegraphics[scale=0.5]{gantt}
+\caption{The initial Gantt chart postulating progress}
+\label{fig:gantt}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[scale=0.5]{gantt_actual}
+\caption{Our actual progress on the lab}
+\label{fig:gantt_actual}
+\end{figure}
+
+
 
 \begin{figure}[b]
 \centering

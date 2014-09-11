@@ -123,7 +123,7 @@ module lab1_imul_IntMulBaseDpath
   (
     .sel   (cs.result_mux_sel),
     .in0   (add_mux_out),
-    .in1   (32'b0),
+    .in1   (32'b0), //d0?
     .out   (rslt_mux_out)
   );
 
@@ -253,7 +253,7 @@ module lab1_imul_IntMulBaseCtrl
 
   assign req_go       = req_val  && req_rdy;
   assign resp_go      = resp_val && resp_rdy;
-  assign is_calc_done = (counter == 32);  //31 wrong?
+  assign is_calc_done = (counter == 32);  //is 31 wrong?
 
   always @(*) begin
 
@@ -281,8 +281,8 @@ module lab1_imul_IntMulBaseCtrl
   
   //CONVENTION: mux path's from diagram,
   //top to bottom go 0 to max value (???)
-  localparam x   = 1'b0;//1'dx;
-  localparam tmp   = 1'd0;
+  localparam x   = 1'bx;//1'b0;
+  //localparam tmp   = 1'd0;
 
 
   task set_cs
@@ -322,10 +322,10 @@ module lab1_imul_IntMulBaseCtrl
     case ( state_reg )
       //req resp a mux b mux result mux result add mux
       //rdy val  sel   sel   sel        en     sel
-      STATE_IDLE:               set_cs( 1,  0,  1,  1,  1,  1,  x ); //x?
+      STATE_IDLE:               set_cs( 1,  0,  1,  1,  1,  1,  x ); //should result en be 0 instead of 1? Are the result mux/add mux sels BOTH dont cares?
       STATE_CALC: 
         if ( do_add_shift )     set_cs( 0,  0,  0,  0,  0,  1,  0 );
-        else if ( do_shift )    set_cs( 0,  0,  0,  0,  0,  0,  1 );
+        else if ( do_shift )    set_cs( 0,  0,  0,  0,  x,  0,  x );  //correct? or should result-sel = 0 & addmux-sel = 1?
       STATE_DONE:               set_cs( 0,  1,  x,  x,  x,  0,  x );
 
     endcase
