@@ -228,15 +228,17 @@ module lab1_imul_IntMulBaseCtrl
 
   state_t state_reg;
   state_t state_next;
-  logic [5:0] counter; //DOES THIS GO HERE?
+  logic [5:0] counter; //CONSIDER USING ACTUAL MODULE
 
   always @( posedge clk ) begin
     if ( reset ) begin
       state_reg <= STATE_IDLE;
-      counter <= 1'b0; //0;
+      counter <= 0;
     end
     else begin
-      counter <= counter + 1;
+      if ( state_reg == STATE_CALC ) begin
+        counter <= counter + 1; //Enclose in if-statement for safety
+      end
       state_reg <= state_next;
     end
   end
@@ -251,7 +253,7 @@ module lab1_imul_IntMulBaseCtrl
 
   assign req_go       = req_val  && req_rdy;
   assign resp_go      = resp_val && resp_rdy;
-  assign is_calc_done = (counter == 32);
+  assign is_calc_done = (counter == 32);  //31 wrong?
 
   always @(*) begin
 
@@ -259,8 +261,14 @@ module lab1_imul_IntMulBaseCtrl
 
     case ( state_reg )
 
-      STATE_IDLE: if ( req_go    )    state_next = STATE_CALC;
-      STATE_CALC: if ( is_calc_done ) state_next = STATE_DONE;
+      STATE_IDLE: if ( req_go    ) begin
+                    state_next = STATE_CALC;
+                    counter = 0;
+                  end
+      STATE_CALC: 
+                  if ( is_calc_done ) begin
+                    state_next = STATE_DONE;
+                  end
       STATE_DONE: if ( resp_go   )    state_next = STATE_IDLE;
 
     endcase
@@ -273,7 +281,7 @@ module lab1_imul_IntMulBaseCtrl
   
   //CONVENTION: mux path's from diagram,
   //top to bottom go 0 to max value (???)
-  localparam x   = 1'dx;
+  localparam x   = 1'b0;//1'dx;
   localparam tmp   = 1'd0;
 
 
