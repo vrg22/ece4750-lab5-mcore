@@ -253,7 +253,7 @@ module lab1_imul_IntMulAltCtrl
 
   assign req_go       = req_val  && req_rdy;
   assign resp_go      = resp_val && resp_rdy;
-  assign is_calc_done = (counter == 32);  //should be ==, can test w/>=
+  assign is_calc_done = (counter >= 32);  //should this be == or >= ?
 
   always @(*) begin
 
@@ -355,7 +355,7 @@ module lab1_imul_IntMulAltCtrl
       32'b_??10_0000_0000_0000_0000_0000_0000_0000_     :     shift_amt = 6'd29;
       32'b_?100_0000_0000_0000_0000_0000_0000_0000_     :     shift_amt = 6'd30;
       32'b_1000_0000_0000_0000_0000_0000_0000_0000_     :     shift_amt = 6'd31;
-      //32'b_0000_0000_0000_0000_0000_0000_0000_0000_     :     shift_amt = 6'd32;  //comment out?
+      32'b_0000_0000_0000_0000_0000_0000_0000_0000_     :     shift_amt = 6'd32;  //doesnt fail when comment out, BUT can yield info!
       default          :     shift_amt = 6'd1;
 
       /*
