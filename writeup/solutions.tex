@@ -159,6 +159,18 @@ We have yet to implement this, but we assume this will dramatically increase per
 
 \section{Testing Strategy}
 
+In keeping with the incremental test-driven development methodology, we tested the control and datapath modules separately using directed and random tests before testing the full base and alternative designs. 
+
+(Details about control/datapath testing here)
+
+The base and alternative designs were tested using the provided test harness, to which were added additional directed and random test cases.
+The directed unit test cases covered all types of possible inputs, including zeros and ones,
+small and large numbers, positive and negative numbers, numbers with masked lower/middle bits, and combinations of these.
+At first the only the functional model and base design worked correctly with these unit tests, while the alternative design failed most of them.
+In order to identify the problem, we refined the control and datapath unit tests to clarify the source of error.
+We also used line traces and GTKWave to do more granular testing.
+Ultimately both the base and alternative designs, as well as the functional model, worked correctly with the directed unit tests. 
+
 \section{Evaluations and Conclusion}
 
 Forcing images to the bottom, for now
