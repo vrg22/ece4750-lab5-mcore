@@ -85,6 +85,7 @@ The control module sends control signals to the datapath module, altering the fl
 This occurs when we are accepting new values into our operand registers,
 writing/not-writing partial sums to $result$, and outputing a computed value.
 The datapath module sends the lsb of $b$ to the control module so it can compute the appropriate dataflow.
+The lsb is directly used to determine whether to partially sum into $results$, a direct mapping to the pseudocode.
 
 As seen from the pseudocode, there is no escape from the \verb+for+ loop.
 Therefore, this implementation \textbf{must} take at least 32 cycles.
@@ -92,8 +93,15 @@ In fact, our implementation takes 34 cycles, as we have one cycle to accept data
 The state machine capturing this logic is shown in Figure 4. 
 This implementation, therefore, does exploit patterns in the underlying data.
 In the most extreme case where $b$ is zero, the hardware checks every bit of $b$ and decides 32 times not to add to $result$.
-We can reduce that down to one decision not to write to $result$.  
-  
+We should reduce that down to one decision not to write to $result$.
+
+Another slight disadvantage to our baseline design was the failure to identify and exploit repeated structures into modularity.
+Notice that each register has a multiplexor in front of it directing output.
+We should have wrapped that structure into a module and reused it three times. 
+This would have allowed us to test incrementally and unit-by-unit.
+Instead, we were forced to rely on end-to-end testing and test all functionality at once.
+As a consequence, we ran into a Verilog bug that took several hours to fix even with help.  
+ 
 
 \section{Alternative Design}
 
