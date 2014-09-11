@@ -68,17 +68,22 @@ given a 64 bit message containing our operands, a clock signal,
 and required signals to conform to the val/rdy microprotocol,
 output the lower 32 bits of the multiplication to your consumer.
 This interface is shown in Figure $1$.
-Our algorithm for computing the multiplication consists of repeated adds and shifts on 32 bit values, shown in pseudocode in Figure 2.
+Our algorithm for computing the multiplication is as follows.
+If the least significant bit (lsb) of the second operand (call it $b$) is 1, add it to an accumulator.
+Then, shift your first operand (call it $a$) left by one bit and the second operand to the right logically by one bit.
+This is the first algorithm we are taught when we learn to multiply.
+The pseudocode for this is shown in Figure 2. 
 
 Our implementation follows the structure of this pseudo-code very closely.
-We have three registers, one each for $a$, $b$, and $result$.
+We have three registers, one each for $a$, $b$, and $result$ (our accumulator).
 We have 2 shifters, one logical left shifter and one logical right shifter. 
-We have an equivalent multiplexor for the clause adding to our accumulator.
+We have an equivalent multiplexor for the clause that adds to our accumulator if the lsb of $b$ is $1$.
 
-There is a single bit status signal sent back to our control module, which is a sample of the least significant bit of the second operand.
-This information is used, if you look at the pseudo-code, to determine if a partial sum should be made. 
-Again, we aim to emulate the structure of the code as much as possible.   
- 
+However, the control logic and the data flow are not implemented as a monolithic design.
+Instead, we implement a \textit{control-datapath split.}
+The control module sends control signals to the datapath module, altering the flow of data into the registers.
+
+  
 
 \section{Alternative Design}
 
