@@ -171,33 +171,30 @@ The base and alternative designs were tested using the provided test harness, to
 
 The directed and random test cases were made to cover all types of possible inputs, including (decimal) zeros and ones, small and large numbers, positive and negative numbers, numbers with masked lower/middle bits, and combinations of these. The magnitude of the inputs was also varied considerably from 0 to 32 bits (even though the bit width of all the inputs is 32). Furthermore, test source/sink delays were also added to random tests to test the val/rdy microprotocol. A summary of all the different types of test cases is given in the table below.
 
+\begin{center}
 \begin{table}[h]
-\begin{tabular}{l}
-\textbf{Test Case}                                \\
-products of zero, one, and negative one           \\
-small positive * positive                         \\
-small positive * negative                         \\
-small negative * positive                         \\
-large positive * positive                         \\
-large positive * negative                         \\
-large negative * positive                         \\
-large negative * negative                         \\
-products with low order bits masked               \\
-products with middle bits masked                  \\
-sparse number * sparse number                     \\
-dense number * dense number                       \\
-random small                                      \\
-random small w/ random delays                     \\
-random large                                      \\
-random large w/ random delays                     \\
-random small w/ low bits masked                   \\
-random small w/ low bits masked and random delays \\
-random large w/ middle bits masked                \\
+\begin{tabular}{c | c | c}
+$\times$ of 0, 1, and $-1$ & small $(+) \times (+)$ & small $(-) \times (+)$ \\
+small $(-) \times (+)$ & small $(-) \times (-)$ & large $(+) \times (+)$      \\
+large $(+) \times (-)$               &
+large $(-) \times (+)$               &
+large $(-) \times (-)$               \\
+$\times$ with low bits msk              &
+$\times$ with mid bits mks              &
+sparse $(+/-) \times (+/-)$          \\
+dense  $(+/-) \times (+/-)$          &
+RS $\times$ RS                       &
+RS $\times$ with RD                  \\
+RL $\times$ RS                       &
+RL $\times$ RL with RD                  &
+RS $\times$ RS with low bits msk           \\
+RS $\times$ RS with low bits msk w/RD      &
+RL $\times$ RL with mid bits msk           &  \\
                                                  
 \end{tabular}
-\caption{Test Harness Detail}
+\caption{Test Cases we ran. msk = masked, RS = Random Small, RL = Random Large, RD = Random Delays}
 \end{table}
-
+\end{center}
 
 At first only the functional model and base design worked correctly with these unit tests, while the alternative design failed most of them. At this point, we also used line traces and GTKWave to do more granular testing to ensure outputs were actually being generated and at the expected times. 
 
@@ -209,17 +206,18 @@ Ultimately both the base and alternative designs, as well as the functional mode
 As soon as the base and alternative designs were completed, the next step was to test the performance of the models. In order to achieve this, the simulator harness was built and run (using the given random dataset of small numbers) to generate the total number of cycles and the average number of cycles per transaction for the base and alternative designs. To expand on this, we added three more random datasets to the simulator harness to check the performance of the designs with different inputs: large numbers, low bits masked, and middle bits masked. The results of the simulator for each dataset and design are summarized in the table below.
 
 \begin{table}[h]
-\begin{tabular} {p{2cm} | p{3cm} | p{3cm} | p{3cm} | p{3cm} }
+\begin{tabular} {|l | r  | r | r | r|}
 
 \hline
-\textbf{Design}    & \textbf{Dataset: Small Inputs} & \textbf{Dataset: Large Inputs} & \textbf{Dataset: Low Bits Masked} & \textbf{Dataset: Middle Bits Masked} \\
-Baseline: Total Cycles                    & 1751                           & 1751                           & 1751                       & 1751    \\
-Baseline: Avg. Cycles / Transaction       & 35.02                          & 35.02                          & 35.02                      & 35.02   \\
-Alternative: Total Cycles                 & 444                            & 783                            & 666                        & 574     \\
-Alternative: Avg. Cycles / Transaction    & 8.88                           & 15.66                          & 13.32                      & 11.48   \\
+\textbf{Design}    & \textbf{DS: SI} & \textbf{DS: LI} & \textbf{DS: LB masked} & \textbf{DS: MB masked} \\
+\hline
+Baseline:    Total Cycles                 & 1751.00                        & 1751.00                        & 1751.00                 & 1751.00    \\
+Baseline:    Avg. Cycles / Transaction    & 35.02                          & 35.02                          & 35.02                   & 35.02   \\
+Alternative: Total Cycles                 & 444.00                         & 783.00                         & 666.00                  & 574.00     \\
+Alternative: Avg. Cycles / Transaction    & 8.88                           & 15.66                          & 13.32                   & 11.48   \\
 \hline                    
 \end{tabular}
-\caption{Baseline vs. Alternative Design Performance}
+\caption{Baseline v. Alternative Design Performance. DS = Dataset. SI = Small Inputs. LI = Large Inputs. LB = Low Bits. MB = Middle Bits.}
 \end{table}
 
 
