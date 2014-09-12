@@ -221,11 +221,6 @@ module top;
       `include "lab1-imul-gen-input_large.py.v"
     end
 
-    // negative numbers
-    else if ( input_dataset == "negative" ) begin
-      `include "lab1-imul-gen-input_negative.py.v"
-    end
-
     // low bits masked
     else if ( input_dataset == "lowmask" ) begin
       `include "lab1-imul-gen-input_lowmask.py.v"

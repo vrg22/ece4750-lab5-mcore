@@ -67,34 +67,6 @@ elif sys.argv[1] == "large":
 
   print_dataset( in0, in1, out )
 
-# negative numbers
-elif sys.argv[1] == "negative":
-  for i in xrange(size/2):
-
-    a = random.randint(0x0000,0xffff)
-    b = random.randint(0x0000,0xffff)
-
-    a = -a
-    b = b
-
-    in0.append( a )
-    in1.append( b )
-    out.append( a * b )
-
-  for i in xrange(size/2):
-
-    a = random.randint(0x0000,0xffff)
-    b = random.randint(0x0000,0xffff)
-
-    a = a 
-    b = -b 
-
-    in0.append( a )
-    in1.append( b )
-    out.append( a * b )
-
-  print_dataset( in0, in1, out )
-
 # low bits masked
 elif sys.argv[1] == "lowmask":
   for i in xrange(size/2):
