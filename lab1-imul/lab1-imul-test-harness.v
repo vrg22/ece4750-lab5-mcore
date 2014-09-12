@@ -409,6 +409,30 @@ module top;
   end
   `VC_TEST_CASE_END
 
+  //----------------------------------------------------------------------
+  // Test Case: random large
+  //----------------------------------------------------------------------
+
+  `VC_TEST_CASE_BEGIN( 13, "random large" )
+  begin
+    init_rand_delays( 0, 0 );
+    `include "lab1-imul-gen-input_large.py.v"
+    run_test;
+  end
+  `VC_TEST_CASE_END
+
+  //----------------------------------------------------------------------
+  // Test Case: random large w/ random delays
+  //----------------------------------------------------------------------
+
+  `VC_TEST_CASE_BEGIN( 14, "random large w/ random delays" )
+  begin
+    init_rand_delays( 20, 5 );
+    `include "lab1-imul-gen-input_large.py.v"
+    run_test;
+  end
+  `VC_TEST_CASE_END
+
 
 
   `VC_TEST_SUITE_END

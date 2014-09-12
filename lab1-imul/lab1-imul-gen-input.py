@@ -51,6 +51,19 @@ if sys.argv[1] == "small":
 
 # Add code to generate other random datasets here
 
+elif sys.argv[1] == "large":
+  for i in xrange(size):
+
+    a = random.randint(0x0000,0xffff)
+    b = random.randint(0x0000,0xffff)
+
+    in0.append( a )
+    in1.append( b )
+    out.append( a * b )
+
+  print_dataset( in0, in1, out )
+
+
 #-------------------------------------------------------------------------
 # Unrecognized dataset
 #-------------------------------------------------------------------------

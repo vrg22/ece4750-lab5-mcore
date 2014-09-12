@@ -215,6 +215,10 @@ module top;
 
     // Add additional datasets for evaluation here
 
+    else if ( input_dataset == "large" ) begin
+      `include "lab1-imul-gen-input_large.py.v"
+    end
+
     else begin
       $display( "" );
       $display( " ERROR: Unrecognized input dataset specified with +input!" );
