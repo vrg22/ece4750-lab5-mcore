@@ -13,9 +13,5 @@
 
 subprojs = \
   vc \
-  ex-basics \
-  ex-regincr \
-  ex-sorter \
-  ex-gcd \
   lab1-imul \
 
