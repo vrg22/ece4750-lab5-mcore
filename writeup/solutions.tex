@@ -155,12 +155,13 @@ If the $b$ operand is all ones, we take our usual 34 cycles.
 That provides our range of multiply cycles we can take.
 
 An advantage to this design is that the datapath gets modified only slightly.
-We only add one more control signal to our shifters, and instead of taking the lsb of $b$, we look at all 32 bits.
+We only add one more control signal to our shifters, and the lone status signal from the base design (the lsb of $b$) is now expanded to the full 32 bits of $b$.
+In other words, \textbf{the datapath components for the alternative design are the same as for the base design (Figure~\ref{fig:datapath})}. 
 This allowed us to rapidly implement the alternative design.
 
 However, instead of shifting by $n$ bits, let us shift by powers of two.
 This allows us to reduce the number of cases we need to check from 32 to 6.
-This is a five-fold reduction in hardware! As mentioned in the introduction, this hardware reduction comes with little performance loss, and thus may be more appropriate in applications with technology constraints.   
+This is a five-fold reduction in hardware! As mentioned in the introduction, this hardware reduction comes with little performance loss, and thus may be more appropriate in applications with technology constraints. 
 
 
 \section{Testing Strategy}
