@@ -155,12 +155,13 @@ If the $b$ operand is all ones, we take our usual 34 cycles.
 That provides our range of multiply cycles we can take.
 
 An advantage to this design is that the datapath gets modified only slightly.
-We only add one more control signal to our shifters, and instead of taking the lsb of $b$, we look at all 32 bits.
+We only add one more control signal to our shifters, and the lone status signal from the base design (the lsb of $b$) is now expanded to the full 32 bits of $b$.
+In other words, \textbf{the datapath components for the alternative design are the same as for the base design (Figure~\ref{fig:datapath})}. 
 This allowed us to rapidly implement the alternative design.
 
 However, instead of shifting by $n$ bits, let us shift by powers of two.
 This allows us to reduce the number of cases we need to check from 32 to 6.
-This is a five-fold reduction in hardware! As mentioned in the introduction, this hardware reduction comes with little performance loss, and thus may be more appropriate in applications with technology constraints.   
+This is a five-fold reduction in hardware! As mentioned in the introduction, this hardware reduction comes with little performance loss, and thus may be more appropriate in applications with technology constraints. 
 
 
 \section{Testing Strategy}
@@ -169,33 +170,30 @@ The base and alternative designs were tested using the provided test harness, to
 
 The directed and random test cases were made to cover all types of possible inputs, including (decimal) zeros and ones, small and large numbers, positive and negative numbers, numbers with masked lower/middle bits, and combinations of these. The magnitude of the inputs was also varied considerably from 0 to 32 bits (even though the bit width of all the inputs is 32). Furthermore, test source/sink delays were also added to random tests to test the val/rdy microprotocol. A summary of all the different types of test cases is given in the table below.
 
+\begin{center}
 \begin{table}[h]
-\begin{tabular}{l}
-\textbf{Test Case}                                \\
-products of zero, one, and negative one           \\
-small positive * positive                         \\
-small positive * negative                         \\
-small negative * positive                         \\
-large positive * positive                         \\
-large positive * negative                         \\
-large negative * positive                         \\
-large negative * negative                         \\
-products with low order bits masked               \\
-products with middle bits masked                  \\
-sparse number * sparse number                     \\
-dense number * dense number                       \\
-random small                                      \\
-random small w/ random delays                     \\
-random large                                      \\
-random large w/ random delays                     \\
-random small w/ low bits masked                   \\
-random small w/ low bits masked and random delays \\
-random large w/ middle bits masked                \\
+\begin{tabular}{c | c | c}
+$\times$ of 0, 1, and $-1$ & small $(+) \times (+)$ & small $(-) \times (+)$ \\
+small $(-) \times (+)$ & small $(-) \times (-)$ & large $(+) \times (+)$      \\
+large $(+) \times (-)$               &
+large $(-) \times (+)$               &
+large $(-) \times (-)$               \\
+$\times$ with low bits msk              &
+$\times$ with mid bits mks              &
+sparse $(+/-) \times (+/-)$          \\
+dense  $(+/-) \times (+/-)$          &
+RS $\times$ RS                       &
+RS $\times$ with RD                  \\
+RL $\times$ RS                       &
+RL $\times$ RL with RD                  &
+RS $\times$ RS with low bits msk           \\
+RS $\times$ RS with low bits msk w/RD      &
+RL $\times$ RL with mid bits msk           &  \\
                                                  
 \end{tabular}
-\caption{Test Harness Detail}
+\caption{Test Cases we ran. msk = masked, RS = Random Small, RL = Random Large, RD = Random Delays}
 \end{table}
-
+\end{center}
 
 At first only the functional model and base design worked correctly with these unit tests, while the alternative design failed most of them. At this point, we also used line traces and GTKWave to do more granular testing to ensure outputs were actually being generated and at the expected times. 
 
