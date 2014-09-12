@@ -208,15 +208,20 @@ Baseline:    Total Cycles                 & 1751.00                        & 175
 Baseline:    Avg. Cycles / Transaction    & 35.02                          & 35.02                          & 35.02                   & 35.02   \\
 Alternative: Total Cycles                 & 444.00                         & 783.00                         & 666.00                  & 574.00     \\
 Alternative: Avg. Cycles / Transaction    & 8.88                           & 15.66                          & 13.32                   & 11.48   \\
+Alternative-Powers of 2:	Total Cycles  & 455						       & 817
+& 723					  & 654
+Alternative-Powers of 2:    Avg. Cycles / Transaction     & 9.1			   & 16.34
+& 14.46					  & 13.08
 \hline                    
 \end{tabular}
 \caption{Baseline v. Alternative Design Performance. DS = Dataset. SI = Small Inputs. LI = Large Inputs. LB = Low Bits. MB = Middle Bits.}
 \end{table}
 
 
-From the above table, we can see that the baseline design performs the same for all datasets, which is to be expected since it is a fixed-latency design. However, the alternative design performs far better than the baseline design for all input datasets as it capitalizes on inputs with consecutive zeroes to reduce latency. Interestingly, the alternative design performed better for the small inputs dataset than it did for the large inputs dataset, perhaps due to the large inputs dataset containing less consecutive zeroes and relatively denser inputs. It also performed better for the masked datasets than it did for the large inputs dataset due to the guaranteed presence of consecutive zeroes.
+From the above table, we can see that the baseline design performs the same for all datasets, which is to be expected since it is a fixed-latency design. However, the alternative design performs far better than the baseline design for all input datasets as it capitalizes on inputs with consecutive zeroes to reduce latency. Interestingly, the alternative design performed better for the small inputs dataset than it did for the large inputs dataset, perhaps due to the large inputs dataset containing less consecutive zeroes and relatively denser inputs. It also performed better for the masked datasets than it did for the large inputs dataset due to the guaranteed presence of consecutive zeroes. The "powers of 2" alternative design (that only capitalized on numbers of consecutive zeroes that are powers of 2) did better than the baseline design but only slightly worse than the alternative design as expected since it didn't account for numbers of consecutive zeroes that aren't powers of 3 (1, 3, 5, 6, etc.). 
 
-The possible alternative implementations discussed in the alternative design section could be used to further reduce latency and improve performance, especially by taking advantage of data-level parallelism even more.
+One area of improvement we considered but couldn't implement due to time constraints was capitalizing on consecutive ones in negative numbers. The idea was to convert negative inputs to their positive equivalents by flipping the bits and adding 1, multiplying the positive numbers together, and finally converting the product back to its negative equivalent. By converting the inputs to positive numbers, we can use the alternative design to capitalize on the consecutive zeroes (it doesn't work with consecutive ones). 
+The possible alternative implementations discussed in the alternative design section could be used to further reduce latency and improve performance, especially by taking advantage of data-level parallelism even more. 
 
 
 \begin{figure}[b]
