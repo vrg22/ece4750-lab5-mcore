@@ -13,7 +13,6 @@
 `include "vc-trace.v"
 
 
-// Define datapath and control unit here
 //========================================================================
 // Control and status signal structs
 //========================================================================
@@ -34,7 +33,7 @@ typedef struct packed {
 
 typedef struct packed {
 
-  logic       b_lsb;      // value of B's least-sig-bit
+  logic       b_lsb;            // value of B's least-sig-bit
 
 } lab1_imul_ss_t;
 
@@ -63,7 +62,7 @@ module lab1_imul_IntMulBaseDpath
 
   // A Mux
 
-  logic [c_nbits-1:0] b_reg_out;      //How to organize to avoid implicit def?
+  logic [c_nbits-1:0] b_reg_out;
   logic [c_nbits-1:0] sub_out;
   logic [c_nbits-1:0] a_mux_out;
   logic [c_nbits-1:0] l_shift_out;
@@ -75,7 +74,7 @@ module lab1_imul_IntMulBaseDpath
   vc_Mux2#(c_nbits) a_mux
   (
     .sel   (cs.a_mux_sel),
-    .in0   (l_shift_out),    //NAME? <<
+    .in0   (l_shift_out),
     .in1   (req_msg.a),
     .out   (a_mux_out)
   );
@@ -99,7 +98,7 @@ module lab1_imul_IntMulBaseDpath
   vc_Mux2#(c_nbits) b_mux
   (
     .sel   (cs.b_mux_sel),
-    .in0   (r_shift_out),     //NAME? >>
+    .in0   (r_shift_out),
     .in1   (req_msg.b),
     .out   (b_mux_out)
   );
@@ -114,7 +113,7 @@ module lab1_imul_IntMulBaseDpath
     .q     (b_reg_out)
   );
 
-  assign ss.b_lsb = b_reg_out[0]; //CHECK
+  assign ss.b_lsb = b_reg_out[0];
 
   // Result Mux
 
@@ -123,7 +122,7 @@ module lab1_imul_IntMulBaseDpath
   (
     .sel   (cs.result_mux_sel),
     .in0   (add_mux_out),
-    .in1   (32'b0), //d0?
+    .in1   (32'b0),
     .out   (rslt_mux_out)
   );
 
@@ -144,7 +143,6 @@ module lab1_imul_IntMulBaseDpath
   //r_shift_out defined above
   vc_RightLogicalShifter#(c_nbits, 1'b1) r_shift
   (  
-    //Default shamt val is fine; still need to/should specify??
     .in     (b_reg_out),
     .out    (r_shift_out),
     .shamt  (1'b1)
@@ -155,7 +153,6 @@ module lab1_imul_IntMulBaseDpath
   //l_shift_out defined above
   vc_LeftLogicalShifter#(c_nbits, 1'b1) l_shift
   (
-    //Default shamt val is fine; still need to/should specify?
     .in     (a_reg_out),
     .out    (l_shift_out),
     .shamt  (1'b1)
@@ -165,9 +162,8 @@ module lab1_imul_IntMulBaseDpath
 
   logic [c_nbits-1:0] adder_out;
 
-  vc_SimpleAdder#(c_nbits) adder  //simple or regular?
+  vc_SimpleAdder#(c_nbits) adder
   (
-    //
     .in0    (a_reg_out),
     .in1    (rslt_reg_out),
     .out    (adder_out)
@@ -228,7 +224,7 @@ module lab1_imul_IntMulBaseCtrl
 
   state_t state_reg;
   state_t state_next;
-  logic [5:0] counter; //CONSIDER USING ACTUAL MODULE
+  logic [5:0] counter; //using wires here
 
   always @( posedge clk ) begin
     if ( reset ) begin
@@ -237,7 +233,7 @@ module lab1_imul_IntMulBaseCtrl
     end
     else begin
       if ( state_reg == STATE_CALC ) begin
-        counter <= counter + 1; //Enclose in if-statement for safety
+        counter <= counter + 1; //Counter increment
       end
       state_reg <= state_next;
     end
@@ -253,7 +249,7 @@ module lab1_imul_IntMulBaseCtrl
 
   assign req_go       = req_val  && req_rdy;
   assign resp_go      = resp_val && resp_rdy;
-  assign is_calc_done = (counter == 32);  //is 31 wrong?
+  assign is_calc_done = (counter == 32);
 
   always @(*) begin
 
@@ -279,11 +275,9 @@ module lab1_imul_IntMulBaseCtrl
   // State Outputs
   //----------------------------------------------------------------------
   
-  //CONVENTION: mux path's from diagram,
-  //top to bottom go 0 to max value (???)
-  localparam x   = 1'bx;//1'b0;
-  //localparam tmp   = 1'd0;
-
+  // CONVENTION FROM DATAPATH DIAGRAM:
+  // top mux line selected by 0, bottom line by max mux-sel value
+  localparam x   = 1'bx;
 
   task set_cs
   (
@@ -318,14 +312,14 @@ module lab1_imul_IntMulBaseCtrl
 
   always @(*) begin
 
-    set_cs( 0, 0, x, x, x, 0, x );                         //CHECK!!!!
+    set_cs( 0, 0, x, x, x, 0, x );
     case ( state_reg )
       //req resp a mux b mux result mux result add mux
       //rdy val  sel   sel   sel        en     sel
-      STATE_IDLE:               set_cs( 1,  0,  1,  1,  1,  1,  x ); //should result en be 0 instead of 1? Are the result mux/add mux sels BOTH dont cares?
+      STATE_IDLE:               set_cs( 1,  0,  1,  1,  1,  1,  x ); //prepare result register
       STATE_CALC: 
         if ( do_add_shift )     set_cs( 0,  0,  0,  0,  0,  1,  0 );
-        else if ( do_shift )    set_cs( 0,  0,  0,  0,  x,  0,  x );  //correct? or should result-sel = 0 & addmux-sel = 1?
+        else if ( do_shift )    set_cs( 0,  0,  0,  0,  x,  0,  x );
       STATE_DONE:               set_cs( 0,  1,  x,  x,  x,  0,  x );
 
     endcase
@@ -438,4 +432,3 @@ module lab1_imul_IntMulBase
 endmodule
 
 `endif /* LAB1_IMUL_INT_MUL_BASE_V */
-
