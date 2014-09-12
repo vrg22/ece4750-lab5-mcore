@@ -205,17 +205,17 @@ Ultimately both the base and alternative designs, as well as the functional mode
 As soon as the base and alternative designs were completed, the next step was to test the performance of the models. In order to achieve this, the simulator harness was built and run (using the given random dataset of small numbers) to generate the total number of cycles and the average number of cycles per transaction for the base and alternative designs. To expand on this, we added three more random datasets to the simulator harness to check the performance of the designs with different inputs: large numbers, low bits masked, and middle bits masked. The results of the simulator for each dataset and design are summarized in the table below.
 
 \begin{table}[h]
-\begin{tabular} {p{2cm} | p{3cm} | p{3cm} | p{3cm} | p{3cm} }
+\begin{tabular} {l | r  | r | r | r }
 
 \hline
-\textbf{Design}    & \textbf{Dataset: Small Inputs} & \textbf{Dataset: Large Inputs} & \textbf{Dataset: Low Bits Masked} & \textbf{Dataset: Middle Bits Masked} \\
-Baseline: Total Cycles                    & 1751                           & 1751                           & 1751                       & 1751    \\
-Baseline: Avg. Cycles / Transaction       & 35.02                          & 35.02                          & 35.02                      & 35.02   \\
-Alternative: Total Cycles                 & 444                            & 783                            & 666                        & 574     \\
-Alternative: Avg. Cycles / Transaction    & 8.88                           & 15.66                          & 13.32                      & 11.48   \\
+\textbf{Design}    & \textbf{DS: SI} & \textbf{DS: LI} & \textbf{DS: LB masked} & \textbf{DS: MB masked} \\
+Baseline:    Total Cycles                 & 1751.00                        & 1751.00                        & 1751.00                 & 1751.00    \\
+Baseline:    Avg. Cycles / Transaction    & 35.02                          & 35.02                          & 35.02                   & 35.02   \\
+Alternative: Total Cycles                 & 444.00                         & 783.00                         & 666.00                  & 574.00     \\
+Alternative: Avg. Cycles / Transaction    & 8.88                           & 15.66                          & 13.32                   & 11.48   \\
 \hline                    
 \end{tabular}
-\caption{Baseline vs. Alternative Design Performance}
+\caption{Baseline v. Alternative Design Performance. DS = Dataset. SI = Small Inputs. LI = Large Inputs. LB = Low Bits. MB = Middle Bits.}
 \end{table}
 
 
