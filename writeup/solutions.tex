@@ -172,26 +172,20 @@ The directed and random test cases were made to cover all types of possible inpu
 
 \begin{center}
 \begin{table}[h]
-\begin{tabular}{c | c | c}
-$\times$ of 0, 1, and $-1$ & small $(+) \times (+)$ & small $(-) \times (+)$ \\
-small $(-) \times (+)$ & small $(-) \times (-)$ & large $(+) \times (+)$      \\
-large $(+) \times (-)$               &
-large $(-) \times (+)$               &
-large $(-) \times (-)$               \\
-$\times$ with low bits msk              &
-$\times$ with mid bits mks              &
-sparse $(+/-) \times (+/-)$          \\
-dense  $(+/-) \times (+/-)$          &
-RS $\times$ RS                       &
-RS $\times$ with RD                  \\
-RL $\times$ RS                       &
-RL $\times$ RL with RD                  &
-RS $\times$ RS with low bits msk           \\
-RS $\times$ RS with low bits msk w/RD      &
-RL $\times$ RL with mid bits msk           &  \\
-                                                 
+\begin{tabular}{|c | c | c|}
+\hline
+\textbf{Test Case}                    & \textbf{Test Case}                   & \textbf{Test Case}               \\
+\hline
+$\times$ of 0, 1, and $-1$            & small $(+) \times (+)$               & small $(-) \times (+)$           \\
+small $(-) \times (+)$                & small $(-) \times (-)$               & large $(+) \times (+)$           \\
+large $(+) \times (-)$                & large $(-) \times (+)$               & large $(-) \times (-)$           \\
+$\times$ with low bits msk            & $\times$ with mid bits mks           & sparse $(+/-) \times (+/-)$      \\
+dense  $(+/-) \times (+/-)$           & RS $\times$ RS                       & RS $\times$ with RD              \\
+RL $\times$ RS                        & RL $\times$ RL with RD               & RS $\times$ RS with low bits msk \\
+RS $\times$ RS with low bits msk w/RD & RL $\times$ RL with mid bits msk     &                                  \\
+\hline                                                 
 \end{tabular}
-\caption{Test Cases we ran. msk = masked, RS = Random Small, RL = Random Large, RD = Random Delays}
+\caption{RS = Random Small, RL = Random Large, RD = Random Delays, msk = masked} 
 \end{table}
 \end{center}
 
