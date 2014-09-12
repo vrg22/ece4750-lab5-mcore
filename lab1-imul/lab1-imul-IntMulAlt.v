@@ -361,7 +361,7 @@ module lab1_imul_IntMulAltCtrl
     case ( state_reg )
       //req resp a mux b mux result mux result add mux shift
       //rdy val  sel   sel   sel        en     sel     amt
-      STATE_IDLE:               set_cs( 1,  0,  1,  1,  1,  1,  x, 6'bxxxxxx ); //shift_amt is a don't care (or shift_amt?)
+      STATE_IDLE:               set_cs( 1,  0,  1,  1,  1,  1,  x, 6'bxxxxxx ); //shift_amt is a don't care
       STATE_CALC: 
         if ( do_add_shift )     set_cs( 0,  0,  0,  0,  0,  1,  0, shift_amt ); //shift_amt should be 1
         else if ( do_shift )    set_cs( 0,  0,  0,  0,  x,  0,  x, shift_amt ); //shift_amt should be determined by casez statement
