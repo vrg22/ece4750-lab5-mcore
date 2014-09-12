@@ -75,7 +75,7 @@ Vivek corrected the majority of errors in the RTL code.
 Implementation of the RTL code progressed fairly smoothly with the exception of a few logical errors that were somewhat difficult to catch.
 Vivek completed the baseline design while Avinash finished the directed test cases. We then tested the baseline design with these tests until it passed. This was one milestone in our agile development approach. Similarly, Akshay, Vivek, and Avinash completed the alternate design while Avinash finished the random test cases and added datasets for evaluation. After this was done, we spent a lot of time debugging the entire functionality of each design individually. We relied on the variety of tests in the testing suite to provide verification for this lab.
 
-Some lessons learned from this lab were how to use tools such as GTKwave and line tracing to catch logic errors. 
+Some lessons learned from this lab were how to use tools such as GTKWave and line tracing to catch logic errors. 
 Another idea for testing in future assignments is unit tests for the functionality of major modules within our implementation in addition to end-to-end tests of our overall implementation.
 
 \section{Baseline Design}
@@ -177,7 +177,7 @@ small positive * positive                         \\
 small positive * negative                         \\
 small negative * positive                         \\
 large positive * positive                         \\
-large positive *negative                          \\
+large positive * negative                         \\
 large negative * positive                         \\
 large negative * negative                         \\
 products with low order bits masked               \\
@@ -193,10 +193,11 @@ random small w/ low bits masked and random delays \\
 random large w/ middle bits masked                \\
                                                  
 \end{tabular}
+\caption{Test Harness Detail}
 \end{table}
-\caption{}
 
-At first the only the functional model and base design worked correctly with these unit tests, while the alternative design failed most of them. At this point, we also used line traces and GTKWave to do more granular testing to ensure outputs were actually being generated and at the expected times. 
+
+At first only the functional model and base design worked correctly with these unit tests, while the alternative design failed most of them. At this point, we also used line traces and GTKWave to do more granular testing to ensure outputs were actually being generated and at the expected times. 
 
 Ultimately both the base and alternative designs, as well as the functional model, worked correctly with all test cases. Although the tests were comprehensive and were developed in accordance with the increasing complexity of the control and datapath modules, we could have targeted the control and datapath modules separately with specific tests to ensure correct functionality before incorporating them together. However, this lab was simple enough for the test suite we wrote to be more than sufficient, especially since development of the baseline design was aided by comparison with the GCD model from Tutorial 3. 
 
@@ -206,22 +207,24 @@ Ultimately both the base and alternative designs, as well as the functional mode
 As soon as the base and alternative designs were completed, the next step was to test the performance of the models. In order to achieve this, the simulator harness was built and run (using the given random dataset of small numbers) to generate the total number of cycles and the average number of cycles per transaction for the base and alternative designs. To expand on this, we added three more random datasets to the simulator harness to check the performance of the designs with different inputs: large numbers, low bits masked, and middle bits masked. The results of the simulator for each dataset and design are summarized in the table below.
 
 \begin{table}[h]
-\begin{tabular}{lllll}
-\textbf{Design}                           & \textbf{Dataset: Small Inputs} & \textbf{Dataset: Large Inputs} & \textbf{Dataset: Low Bits Masked} & \textbf{Dataset: Middle Bits Masked} \\
-Baseline: Total Cycles                    & 1751                           & 1751                           & 1751                              & 1751                                 \\
-Baseline: Average Cycles / Transaction    & 35.02                          & 35.02                          & 35.02                             & 35.02                                \\
-Alternative: Total Cycles                 & 444                            & 783                            & 666                               & 574                                  \\
-Alternative: Average Cycles / Transaction &                                & 15.66                          & 13.32                             & 11.48                               
+\begin{tabular} {p{2cm} | p{3cm} | p{3cm} | p{3cm} | p{3cm} }
+
+\hline
+\textbf{Design}    & \textbf{Dataset: Small Inputs} & \textbf{Dataset: Large Inputs} & \textbf{Dataset: Low Bits Masked} & \textbf{Dataset: Middle Bits Masked} \\
+Baseline: Total Cycles                    & 1751                           & 1751                           & 1751                       & 1751    \\
+Baseline: Avg. Cycles / Transaction       & 35.02                          & 35.02                          & 35.02                      & 35.02   \\
+Alternative: Total Cycles                 & 444                            & 783                            & 666                        & 574     \\
+Alternative: Avg. Cycles / Transaction    & 8.88                           & 15.66                          & 13.32                      & 11.48   \\
+\hline                    
 \end{tabular}
+\caption{Baseline vs. Alternative Design Performance}
 \end{table}
-\caption{}
+
 
 From the above table, we can see that the baseline design performs the same for all datasets, which is to be expected since it is a fixed-latency design. However, the alternative design performs far better than the baseline design for all input datasets as it capitalizes on inputs with consecutive zeroes to reduce latency. Interestingly, the alternative design performed better for the small inputs dataset than it did for the large inputs dataset, perhaps due to the large inputs dataset containing less consecutive zeroes and relatively denser inputs. It also performed better for the masked datasets than it did for the large inputs dataset due to the guaranteed presence of consecutive zeroes.
 
-The possible alternative implementations discussed in the alternative design section could be used to further reduce latency and improve performance, especially by taking advantage of data-level parallelism even more. 
+The possible alternative implementations discussed in the alternative design section could be used to further reduce latency and improve performance, especially by taking advantage of data-level parallelism even more.
 
-
-Forcing images to the bottom, for now
 
 \begin{figure}[b]
 \centering
