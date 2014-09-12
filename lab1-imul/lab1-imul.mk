@@ -28,6 +28,8 @@ lab1_imul_sim_srcs = \
 lab1_imul_pyv_srcs = \
   lab1-imul-gen-input_small.py.v \
   lab1-imul-gen-input_large.py.v \
+  lab1-imul-gen-input_lowmask.py.v \
+  lab1-imul-gen-input_midmask.py.v \
 
 #-------------------------------------------------------------------------
 # Evaluation
