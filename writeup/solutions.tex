@@ -1,10 +1,11 @@
-\documentclass[11pt]{article}
+\documentclass[10pt]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{setspace}
 \usepackage{graphicx}
-
+\usepackage{caption}
+\usepackage{subcaption}
 \usepackage{color}
 \definecolor{deepblue}{rgb}{0,0,0.5}
 \definecolor{deepred}{rgb}{0.6,0,0}
@@ -63,7 +64,15 @@ We also scale down our hardware use in the variable design and determine that th
 
 Given our group's various skill levels, we assigned Avinash to be verification lead, Vivek to be the architect, and Akshay to be the design lead.
 Our initial project roadmap was fairly aggressive and required us to be finished by Wednesday, September $10^{th}$.
-The intial Gantt Chart is shown in Figure~\ref{fig:gantt}. The actual roadmap is shown as a separate Gantt Chart (Figure~\ref{fig:gantt_actual}).
+The intial Gantt Chart is shown in Figure~\ref{fig:gantt}.
+The actual roadmap is shown as a separate Gantt Chart at the end of the document in Figure~\ref{fig:gantt_actual}.
+
+\begin{figure}
+\centering
+\includegraphics[scale=0.45]{gantt}
+\caption{The initial Gantt chart postulating progress}
+\label{fig:gantt}
+\end{figure}
 
 The breakdown of work follows:
 Vivek implemented most of the baseline design and some of the alternate design in Verilog. 
@@ -77,6 +86,8 @@ Vivek completed the baseline design while Avinash finished the directed test cas
 
 Some lessons learned from this lab were how to use tools such as GTKWave and line tracing to catch logic errors. 
 Another idea for testing in future assignments is unit tests for the functionality of major modules within our implementation in addition to end-to-end tests of our overall implementation.
+We ran into CMS troubles towards the end, requiring us to take a late day.
+Next time, we will be more vigilant in this department.
 
 \section{Baseline Design}
 
@@ -95,6 +106,23 @@ Our implementation follows the structure of this pseudo-code very closely.
 We have three registers, one each for $a$, $b$, and $result$ (our accumulator).
 We have 2 shifters, one logical left shifter and one logical right shifter. 
 We have an equivalent multiplexor for the clause that adds to our accumulator if the lsb of $b$ is $1$.
+
+\begin{figure}[b]
+    \centering
+    \begin{minipage}{.5\textwidth}
+        \includegraphics[scale=0.6]{FLmodel} %width=.4\linewidth
+        \caption{Interface for our model\\
+        Inclusive of val/rdy microprotocol}
+        \label{fig:model}
+   \end{minipage}%
+\begin{minipage}{.5\textwidth}
+    \centering
+    \includegraphics[scale=0.55]{imul}
+    \caption{Pseudocode for our baseline multiply algorithm}
+    \label{fig:code}
+    \end{minipage}
+\label{fig:test}
+\end{figure}
 
 However, the control logic and the data flow are not implemented as a monolithic design.
 Instead, we implement a \textit{control-datapath split.}
@@ -169,8 +197,6 @@ This is a five-fold reduction in hardware! As mentioned in the introduction, thi
 The base and alternative designs were tested using the provided test harness, to which were added additional directed and random test cases.
 
 The directed and random test cases were made to cover all types of possible inputs, including (decimal) zeros and ones, small and large numbers, positive and negative numbers, numbers with masked lower/middle bits, and combinations of these. The magnitude of the inputs was also varied considerably from 0 to 32 bits (even though the bit width of all the inputs is 32). Furthermore, test source/sink delays were also added to random tests to test the val/rdy microprotocol. A summary of all the different types of test cases is given in the table below.
-
-\begin{center}
 \begin{table}[h]
 \begin{tabular}{|c | c | c|}
 \hline
@@ -187,8 +213,6 @@ RS $\times$ RS with low bits msk w/RD & RL $\times$ RL with mid bits msk     &  
 \end{tabular}
 \caption{RS = Random Small, RL = Random Large, RD = Random Delays, msk = masked} 
 \end{table}
-\end{center}
-
 At first only the functional model and base design worked correctly with these unit tests, while the alternative design failed most of them. At this point, we also used line traces and GTKWave to do more granular testing to ensure outputs were actually being generated and at the expected times. 
 
 Ultimately both the base and alternative designs, as well as the functional model, worked correctly with all test cases. Although the tests were comprehensive and were developed in accordance with the increasing complexity of the control and datapath modules, we could have targeted the control and datapath modules separately with specific tests to ensure correct functionality before incorporating them together. However, this lab was simple enough for the test suite we wrote to be more than sufficient, especially since development of the baseline design was aided by comparison with the GCD model from Tutorial 3. 
@@ -221,33 +245,13 @@ From the above table, we can see that the baseline design performs the same for 
 One area of improvement we considered but couldn't implement due to time constraints was capitalizing on consecutive ones in negative numbers. The idea was to convert negative inputs to their positive equivalents by flipping the bits and adding 1, multiplying the positive numbers together, and finally converting the product back to its negative equivalent. By converting the inputs to positive numbers, we can use the alternative design to capitalize on the consecutive zeroes (it doesn't work with consecutive ones). 
 The possible alternative implementations discussed in the alternative design section could be used to further reduce latency and improve performance, especially by taking advantage of data-level parallelism even more. 
 
+\section{Additional Figures}
 
-\begin{figure}[b]
+\begin{figure}[h]
 \centering
-\includegraphics[scale=0.5]{gantt}
-\caption{The initial Gantt chart postulating progress}
-\label{fig:gantt}
-\end{figure}
-
-\begin{figure}[b]
-\centering
-\includegraphics[scale=0.5]{gantt_actual}
+\includegraphics[scale=0.4]{gantt_actual}
 \caption{Our actual progress on the lab}
 \label{fig:gantt_actual}
-\end{figure}
-
-\begin{figure}[b]
-\centering
-\includegraphics[scale=0.5]{FLmodel}
-\caption{Interface for our model. Notice that req/resp,val/rdy signals are part of the val/rdy microprotocol}
-\label{fig:model}
-\end{figure}
-
-\begin{figure}[b]
-\centering
-\includegraphics[scale=0.9]{imul}
-\caption{Pseudocode for our baseline multiply algorithm}
-\label{fig:code}
 \end{figure}
 
 \begin{figure}[b]
