@@ -209,14 +209,26 @@ module top;
 
     #1;
 
+    // small numbers
     if ( input_dataset == "small" ) begin
       `include "lab1-imul-gen-input_small.py.v"
     end
 
     // Add additional datasets for evaluation here
 
+    // large numbers
     else if ( input_dataset == "large" ) begin
       `include "lab1-imul-gen-input_large.py.v"
+    end
+
+    // low bits masked
+    else if ( input_dataset == "lowmask" ) begin
+      `include "lab1-imul-gen-input_lowmask.py.v"
+    end
+
+    // middle bits masked
+    else if ( input_dataset == "midmask" ) begin
+      `include "lab1-imul-gen-input_midmask.py.v"
     end
 
     else begin

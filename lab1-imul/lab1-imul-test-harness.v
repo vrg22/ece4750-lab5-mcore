@@ -315,7 +315,7 @@ module top;
   end
   `VC_TEST_CASE_END
 
-/*
+
   //----------------------------------------------------------------------
   // Test Case: products with low order bits masked off
   //----------------------------------------------------------------------
@@ -323,12 +323,13 @@ module top;
   `VC_TEST_CASE_BEGIN( 9, "products with low order bits masked off" )
   begin
     init_rand_delays( 0, 0 );
-    init( 0, 32'hax, 32'hbx, 32'h7d94           );
-    init( 1, 32'hax, 32'hbx, 32'h7d94           );
-    init( 3, -32'ha88x, -32'he2x, 32'h94cd4c2   );
-    init( 2, -32'hffx, 32'hffx, 32'hffe001      );
-    init( 4, 32'he8cx, 32'hd19x, 32'hbe925050   );
-    init( 5, 32'h5fcx, -32'h9c3x, 32'h3a7049b6  );
+    init( 0, 32'd12, 32'd24, 32'd288            );
+    init( 1, -32'he0, -32'hc0, 32'ha800         );
+    init( 2, 32'h9c0, 32'hb60, 32'h6ee800       );
+    init( 3, -32'h108, 32'hf30, -32'hfa980      );
+    init( 4, 32'ha880, 32'hf00, 32'h9df8000     );
+    init( 5, 32'h1800, -32'h4500, -32'h6780000  );
+    init( 6, -32'hef00, -32'hdc00, 32'hcd640000 );
     run_test;
   end
   `VC_TEST_CASE_END
@@ -341,28 +342,30 @@ module top;
   `VC_TEST_CASE_BEGIN( 10, "products with middle bits masked off" )
   begin
     init_rand_delays( 0, 0 );
-    init( 0, 32'hxa, 32'hbx, 32'h7d94          );
-    init( 1, -32'h2x, 32'h8x, 32'h1760         );
-    init( 2, -32'hffx, -32'hffx, 32'hffe001    );
-    init( 3, 32'ha88x, 32'he2x, 32'h94cd4c2    );
-    init( 4, 32'he8cx, -32'hd19x, 32'hbe925050 );
+    init( 1, 32'd9, 32'd35, 32'd315             );
+    init( 2, -32'hc1, -32'hc1, 32'h9181         );
+    init( 3, 32'h90c, 32'hb06, 32'h63ba48       );
+    init( 4, -32'h70f, 32'hf03, -32'h69f62d     );
+    init( 5, 32'ha808, 32'hf0f, 32'h9e25078     );
+    init( 6, 32'h1008, -32'h4005, -32'h4025028  );
+    init( 7, -32'he0f0, -32'hd0c0, 32'hb76bb400 );
     run_test;
   end
-  `VC_TEST_CASE_END */
+  `VC_TEST_CASE_END 
 
 
   //----------------------------------------------------------------------
   // Test Case: sparse number * sparse number
   //----------------------------------------------------------------------
 
-  `VC_TEST_CASE_BEGIN( 9, "sparse number * sparse number" )
+  `VC_TEST_CASE_BEGIN( 11, "sparse number * sparse number" )
   begin
     init_rand_delays( 0, 0 );
     init( 0, 32'h82, 32'h01, 32'h82             );
     init( 1, -32'h20, 32'd08, -32'h100          );
     init( 2, -32'h808, -32'h4201, 32'h2121808   );
     init( 3, 32'h1001, 32'h0101, 32'h101101     );
-    init( 4, 32'h4020, -32'h0110, -32'h442200    );
+    init( 4, 32'h4020, -32'h0110, -32'h442200   );
     run_test;
   end
   `VC_TEST_CASE_END
@@ -372,7 +375,7 @@ module top;
   // Test Case: dense number * dense number
   //----------------------------------------------------------------------
 
-  `VC_TEST_CASE_BEGIN( 10, "dense number * dense number" )
+  `VC_TEST_CASE_BEGIN( 12, "dense number * dense number" )
   begin
     init_rand_delays( 0, 0 );
     init( 0, 32'hf7, 32'hbf, 32'hb849           );
@@ -389,7 +392,7 @@ module top;
   // Test Case: random small
   //----------------------------------------------------------------------
 
-  `VC_TEST_CASE_BEGIN( 11, "random small" )
+  `VC_TEST_CASE_BEGIN( 13, "random small" )
   begin
     init_rand_delays( 0, 0 );
     `include "lab1-imul-gen-input_small.py.v"
@@ -401,7 +404,7 @@ module top;
   // Test Case: random small w/ random delays
   //----------------------------------------------------------------------
 
-  `VC_TEST_CASE_BEGIN( 12, "random small w/ random delays" )
+  `VC_TEST_CASE_BEGIN( 14, "random small w/ random delays" )
   begin
     init_rand_delays( 3, 14 );
     `include "lab1-imul-gen-input_small.py.v"
@@ -413,7 +416,7 @@ module top;
   // Test Case: random large
   //----------------------------------------------------------------------
 
-  `VC_TEST_CASE_BEGIN( 13, "random large" )
+  `VC_TEST_CASE_BEGIN( 15, "random large" )
   begin
     init_rand_delays( 0, 0 );
     `include "lab1-imul-gen-input_large.py.v"
@@ -425,7 +428,7 @@ module top;
   // Test Case: random large w/ random delays
   //----------------------------------------------------------------------
 
-  `VC_TEST_CASE_BEGIN( 14, "random large w/ random delays" )
+  `VC_TEST_CASE_BEGIN( 16, "random large w/ random delays" )
   begin
     init_rand_delays( 20, 5 );
     `include "lab1-imul-gen-input_large.py.v"
@@ -433,6 +436,53 @@ module top;
   end
   `VC_TEST_CASE_END
 
+  //----------------------------------------------------------------------
+  // Test Case: random small w/ low bits masked
+  //----------------------------------------------------------------------
+
+  `VC_TEST_CASE_BEGIN( 17, "random small w/ low bits masked" )
+  begin
+    init_rand_delays( 0, 0 );
+    `include "lab1-imul-gen-input_lowmask.py.v"
+    run_test;
+  end
+  `VC_TEST_CASE_END
+
+  //----------------------------------------------------------------------
+  // Test Case: random small w/ low bits masked and random delays
+  //----------------------------------------------------------------------
+
+  `VC_TEST_CASE_BEGIN( 18, "rnd small w/ low bits masked, rnd delays" )
+  begin
+    init_rand_delays( 20, 5 );
+    `include "lab1-imul-gen-input_lowmask.py.v"
+    run_test;
+  end
+  `VC_TEST_CASE_END
+
+  //----------------------------------------------------------------------
+  // Test Case: random large w/ middle bits masked 
+  //----------------------------------------------------------------------
+
+  `VC_TEST_CASE_BEGIN( 19, "random large w/ middle bits masked" )
+  begin
+    init_rand_delays( 0, 0 );
+    `include "lab1-imul-gen-input_midmask.py.v"
+    run_test;
+  end
+  `VC_TEST_CASE_END
+
+  //----------------------------------------------------------------------
+  // Test Case: random large w/ middle bits masked and random delays
+  //----------------------------------------------------------------------
+
+  `VC_TEST_CASE_BEGIN( 20, "rnd. large w/ mid. bits masked, rnd delays" )
+  begin
+    init_rand_delays( 20, 5 );
+    `include "lab1-imul-gen-input_midmask.py.v"
+    run_test;
+  end
+  `VC_TEST_CASE_END
 
 
   `VC_TEST_SUITE_END
