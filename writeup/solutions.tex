@@ -128,7 +128,7 @@ As a consequence, we ran into a Verilog bug that took several hours to fix even 
 
 The primary downside to our baseline implementation is the large latency in computing the product.
 We propose several alternative designs and attempt to increase performance.
-Since we can't use concepts of indirection or caching, we instead will consider pipelineing our multiplier.
+Since we can't use concepts of indirection or caching, we instead will consider pipelining our multiplier.
 We will also consider exploiting the underlying structure of our operands to increase performance.
 There are multiple ways to exploit structure in our operands; we will attempt to exploit structure in two ways.
 First, we will roll over consecutive zeros by shifting more than 1 bit if possible.
@@ -137,14 +137,14 @@ while still increasing performance over the fixed latency multiplier.
 
 Given the linear path of our FSM, it makes sense to pipeline our constructions.
 We can create stages between every state transition and have our val/rdy microprotocol mediate flow through the pipeline.
-However, consider the hardware required. We need $34 \times 3 = 102$ registers, $34 \times 4 = 136$ two way multiplexors,
+However, consider the hardware required. We need $34 \times 3 = 102$ registers, $34 \times 4 = 136$ two way multiplexers,
 and $34$ logical left and right shifters.
 This does not include the $34$ full adders we need. 
 The cost of this design is enormous!
-Additionaly, this design only achieves high throughput if we get repeated multiplications.
+Additionally, this design only achieves high throughput if we get repeated multiplications.
 Consider single cycle processors.
 This design will add exactly zero improvement in those processors, as we cannot pipeline instructions. 
-Also, since we are assuming we are going to get instructrions from a canonical C program, this design seems impractical.
+Also, since we are assuming we are going to get instructions from a canonical C program, this design seems impractical.
 
 Instead, we can exploit the structure of the 32 bit operands we get.
 We are likely to have some repeated set of zeros of length $n$ in our second operand.
@@ -172,15 +172,60 @@ We will evaluate the cycle execution time between these two setups and determine
 \section{Testing Strategy}
 
 The base and alternative designs were tested using the provided test harness, to which were added additional directed and random test cases.
-The directed unit test cases covered all types of possible inputs, including zeros and ones,
-small and large numbers, positive and negative numbers, numbers with masked lower/middle bits, and combinations of these.
-At first the only the functional model and base design worked correctly with these unit tests, while the alternative design failed most of them.
-In order to identify the problem, we refined the control and datapath unit tests to clarify the source of error.
-We also used line traces and GTKWave to do more granular testing.
-Ultimately both the base and alternative designs, as well as the functional model, worked correctly with the directed unit tests. 
+
+The directed and random test cases were made to cover all types of possible inputs, including (decimal) zeros and ones, small and large numbers, positive and negative numbers, numbers with masked lower/middle bits, and combinations of these. The magnitude of the inputs was also varied considerably from 0 to 32 bits (even though the bit width of all the inputs is 32). Furthermore, test source/sink delays were also added to random tests to test the val/rdy microprotocol. A summary of all the different types of test cases is given in the table below.
+
+\begin{table}[h]
+\begin{tabular}{l}
+\textbf{Test Case}                                \\
+products of zero, one, and negative one           \\
+small positive * positive                         \\
+small positive * negative                         \\
+small negative * positive                         \\
+large positive * positive                         \\
+large positive *negative                          \\
+large negative * positive                         \\
+large negative * negative                         \\
+products with low order bits masked               \\
+products with middle bits masked                  \\
+sparse number * sparse number                     \\
+dense number * dense number                       \\
+random small                                      \\
+random small w/ random delays                     \\
+random large                                      \\
+random large w/ random delays                     \\
+random small w/ low bits masked                   \\
+random small w/ low bits masked and random delays \\
+random large w/ middle bits masked                \\
+                                                 
+\end{tabular}
+\end{table}
+\caption{}
+
+At first the only the functional model and base design worked correctly with these unit tests, while the alternative design failed most of them. At this point, we also used line traces and GTKWave to do more granular testing to ensure outputs were actually being generated and at the expected times. 
+
+Ultimately both the base and alternative designs, as well as the functional model, worked correctly with all test cases. Although the tests were comprehensive and were developed in accordance with the increasing complexity of the control and datapath modules, we could have targeted the control and datapath modules separately with specific tests to ensure correct functionality before incorporating them together. However, this lab was simple enough for the test suite we wrote to be more than sufficient, especially since development of the baseline design was aided by comparison with the GCD model from Tutorial 3. 
 
 
 \section{Evaluations and Conclusion}
+
+As soon as the base and alternative designs were completed, the next step was to test the performance of the models. In order to achieve this, the simulator harness was built and run (using the given random dataset of small numbers) to generate the total number of cycles and the average number of cycles per transaction for the base and alternative designs. To expand on this, we added three more random datasets to the simulator harness to check the performance of the designs with different inputs: large numbers, low bits masked, and middle bits masked. The results of the simulator for each dataset and design are summarized in the table below.
+
+\begin{table}[h]
+\begin{tabular}{lllll}
+\textbf{Design}                           & \textbf{Dataset: Small Inputs} & \textbf{Dataset: Large Inputs} & \textbf{Dataset: Low Bits Masked} & \textbf{Dataset: Middle Bits Masked} \\
+Baseline: Total Cycles                    & 1751                           & 1751                           & 1751                              & 1751                                 \\
+Baseline: Average Cycles / Transaction    & 35.02                          & 35.02                          & 35.02                             & 35.02                                \\
+Alternative: Total Cycles                 & 444                            & 783                            & 666                               & 574                                  \\
+Alternative: Average Cycles / Transaction &                                & 15.66                          & 13.32                             & 11.48                               
+\end{tabular}
+\end{table}
+\caption{}
+
+From the above table, we can see that the baseline design performs the same for all datasets, which is to be expected since it is a fixed-latency design. However, the alternative design performs far better than the baseline design for all input datasets as it capitalizes on inputs with consecutive zeroes to reduce latency. Interestingly, the alternative design performed better for the small inputs dataset than it did for the large inputs dataset, perhaps due to the large inputs dataset containing less consecutive zeroes and relatively denser inputs. It also performed better for the masked datasets than it did for the large inputs dataset due to the guaranteed presence of consecutive zeroes.
+
+The possible alternative implementations discussed in the alternative design section could be used to further reduce latency and improve performance, especially by taking advantage of data-level parallelism even more. 
+
 
 Forcing images to the bottom, for now
 
