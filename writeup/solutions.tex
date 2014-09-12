@@ -158,6 +158,21 @@ First, we will roll over consecutive zeros by shifting more than 1 bit if possib
 Second, we will reduce the granularity of how many zeros we shift over to powers of two, as this reduces hardware costs
 while still increasing performance over the fixed latency multiplier.
 
+\begin{figure}[b]
+    \begin{minipage}{.5\textwidth}
+        \centering
+        \includegraphics[scale=0.4]{Datapath}
+        \caption{Datapath Diagram. Again, the structure mimics the pseudocode.}
+        \label{fig:datapath}
+    \end{minipage}%
+    \begin{minipage}{.5\textwidth}
+        \centering
+        \includegraphics[scale=0.4]{BaseFSM}
+        \caption{FSM capturing control logic.}
+        \label{fig:BaseFSM}
+    \end{minipage}
+\end{figure}
+
 Given the linear path of our FSM, it makes sense to pipeline our constructions.
 We can create stages between every state transition and have our val/rdy microprotocol mediate flow through the pipeline.
 However, consider the hardware required. We need $34 \times 3 = 102$ registers, $34 \times 4 = 136$ two way multiplexors,
@@ -249,24 +264,12 @@ The possible alternative implementations discussed in the alternative design sec
 
 \begin{figure}[h]
 \centering
-\includegraphics[scale=0.4]{gantt_actual}
+\includegraphics[scale=0.45]{gantt_actual}
 \caption{Our actual progress on the lab}
 \label{fig:gantt_actual}
 \end{figure}
 
-\begin{figure}[b]
-\centering
-\includegraphics[scale=0.6]{Datapath}
-\caption{Datapath Diagram. Again, the structure mimics the pseudocode.}
-\label{fig:datapath}
-\end{figure}
 
-\begin{figure}[b]
-\centering
-\includegraphics[scale=0.6]{BaseFSM}
-\caption{FSM capturing control logic.}
-\label{fig:BaseFSM}
-\end{figure}
 
 \begin{figure}[b]
 \centering
