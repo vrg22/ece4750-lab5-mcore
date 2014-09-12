@@ -186,25 +186,24 @@ Also, since we are assuming we are going to get instructions from a canonical C 
 
 Instead, we can exploit the structure of the 32 bit operands we get.
 We are likely to have some repeated set of zeros of length $n$ in our second operand.
-Our algorithm in these cases does nothing to our result register, wasting $n$ cycles.
+Our base design in these cases does nothing to our result register, wasting $n$ cycles.
 So, we will instead shift $n$ bits, saving us $n-1$ cycles in our computation.
 We need one cycle to actually determine that there are $n$ bits we can skip.
 Our state machine for this logic is show in Figure~\ref{fig:AltFSM}.
 We implement this change using the \verb+casez+ construct.
-If there are multiple zeros in the lsb, we increment our counter by $n-1$ and shift the appropriate amount.
-So, if there is a zero in $b$, we shift 32 bits and spend only one cycle in the calc stage.
+For example, if $b$ contains all zeros, we shift 32 bits and spend only one cycle in the calc stage.
 Therefore, our total overhead is 3 cycles: one for IDLE, one for CALC, and one for DONE.
 If the $b$ operand is all ones, we take our usual 34 cycles.
 That provides our range of multiply cycles we can take.
 
 An advantage to this design is that the datapath gets modified only slightly.
-We only add one more control signal to our shifters, and the lone status signal from the base design (the lsb of $b$) is now expanded to the full 32 bits of $b$.
+We only add one more control signal to our shifters (number of bits to shift), and the lone status signal from the base design (the lsb of $b$) is now expanded to the full 32 bits of $b$.
 In other words, \textbf{the datapath components for the alternative design are the same as for the base design (Figure~\ref{fig:datapath})}. 
 This allowed us to rapidly implement the alternative design.
 
-However, instead of shifting by $n$ bits, let us shift by powers of two.
+As a follow up, instead of always shifting by the precise number of consecutive zero-bits, we may shift in powers of two numbers of bits. For example, if we have a number such as 100000 in $b$, then our control unit will shift by the largest power of two number of zero-bits that it can (in this case, 4 zero bits).
 This allows us to reduce the number of cases we need to check from 32 to 6.
-This is a five-fold reduction in hardware! As mentioned in the introduction, this hardware reduction comes with little performance loss, and thus may be more appropriate in applications with technology constraints. 
+This is a five-fold reduction in hardware! As seen in our evaluation, this hardware reduction comes with little performance loss, and thus may be more appropriate in applications with technology constraints.
 
 
 \section{Testing Strategy}
@@ -213,21 +212,32 @@ The base and alternative designs were tested using the provided test harness, to
 
 The directed and random test cases were made to cover all types of possible inputs, including (decimal) zeros and ones, small and large numbers, positive and negative numbers, numbers with masked lower/middle bits, and combinations of these. The magnitude of the inputs was also varied considerably from 0 to 32 bits (even though the bit width of all the inputs is 32). Furthermore, test source/sink delays were also added to random tests to test the val/rdy microprotocol. A summary of all the different types of test cases is given in the table below.
 \begin{table}[h]
-\begin{tabular}{|c | c | c|}
-\hline
-\textbf{Test Case}                    & \textbf{Test Case}                   & \textbf{Test Case}               \\
-\hline
-$\times$ of 0, 1, and $-1$            & small $(+) \times (+)$               & small $(-) \times (+)$           \\
-small $(-) \times (+)$                & small $(-) \times (-)$               & large $(+) \times (+)$           \\
-large $(+) \times (-)$                & large $(-) \times (+)$               & large $(-) \times (-)$           \\
-$\times$ with low bits msk            & $\times$ with mid bits mks           & sparse $(+/-) \times (+/-)$      \\
-dense  $(+/-) \times (+/-)$           & RS $\times$ RS                       & RS $\times$ with RD              \\
-RL $\times$ RS                        & RL $\times$ RL with RD               & RS $\times$ RS with low bits msk \\
-RS $\times$ RS with low bits msk w/RD & RL $\times$ RL with mid bits msk     &                                  \\
-\hline                                                 
+\begin{tabular}{l}
+\textbf{Test Case}                                \\
+products of zero, one, and negative one           \\
+small positive * positive                         \\
+small positive * negative                         \\
+small negative * positive                         \\
+large positive * positive                         \\
+large positive * negative                         \\
+large negative * positive                         \\
+large negative * negative                         \\
+products with low order bits masked               \\
+products with middle bits masked                  \\
+sparse number * sparse number                     \\
+dense number * dense number                       \\
+random small                                      \\
+random small w/ random delays                     \\
+random large                                      \\
+random large w/ random delays                     \\
+random small w/ low bits masked                   \\
+random small w/ low bits masked and random delays \\
+random large w/ middle bits masked                \\
+                                                 
 \end{tabular}
-\caption{RS = Random Small, RL = Random Large, RD = Random Delays, msk = masked} 
+\caption{Test Harness Detail}
 \end{table}
+
 At first only the functional model and base design worked correctly with these unit tests, while the alternative design failed most of them. At this point, we also used line traces and GTKWave to do more granular testing to ensure outputs were actually being generated and at the expected times. 
 
 Ultimately both the base and alternative designs, as well as the functional model, worked correctly with all test cases. Although the tests were comprehensive and were developed in accordance with the increasing complexity of the control and datapath modules, we could have targeted the control and datapath modules separately with specific tests to ensure correct functionality before incorporating them together. However, this lab was simple enough for the test suite we wrote to be more than sufficient, especially since development of the baseline design was aided by comparison with the GCD model from Tutorial 3. 
@@ -238,7 +248,7 @@ Ultimately both the base and alternative designs, as well as the functional mode
 As soon as the base and alternative designs were completed, the next step was to test the performance of the models. In order to achieve this, the simulator harness was built and run (using the given random dataset of small numbers) to generate the total number of cycles and the average number of cycles per transaction for the base and alternative designs. To expand on this, we added three more random datasets to the simulator harness to check the performance of the designs with different inputs: large numbers, low bits masked, and middle bits masked. The results of the simulator for each dataset and design are summarized in the table below.
 
 \begin{table}[h]
-\begin{tabular} {|l | r  | r | r | r|}
+\begin{tabular} {p{2cm} | p{3cm} | p{3cm} | p{3cm} | p{3cm} }
 
 \hline
 \textbf{Design}    & \textbf{DS: SI} & \textbf{DS: LI} & \textbf{DS: LB masked} & \textbf{DS: MB masked} \\
@@ -247,15 +257,16 @@ Baseline:    Total Cycles                 & 1751.00                        & 175
 Baseline:    Avg. Cycles / Transaction    & 35.02                          & 35.02                          & 35.02                   & 35.02   \\
 Alternative: Total Cycles                 & 444.00                         & 783.00                         & 666.00                  & 574.00  \\
 Alternative: Avg. Cycles / Transaction    & 8.88                           & 15.66                          & 13.32                   & 11.48   \\
-Alt-$2^n$:	Total Cycles                  & 455.00				                 & 817.00                         & 723.00 					        & 654.00  \\
-Alt-$2^n$:  Avg. Cycles / Transaction     & 9.10  	                       & 16.34                          & 14.46					          & 13.08   \\
+Alt-$2^n$:	Total Cycles                  & 455.00				           & 817.00                         & 723.00 			      & 654.00  \\
+Alt-$2^n$:  Avg. Cycles / Transaction     & 9.10  	                       & 16.34                          & 14.46					  & 13.08   \\
 \hline                    
 \end{tabular}
 \caption{Baseline v. Alternative Design Performance. DS = Dataset. SI = Small Inputs. LI = Large Inputs. LB = Low Bits. MB = Middle Bits.}
+\label{tab:cycles}
 \end{table}
 
 
-From the above table, we can see that the baseline design performs the same for all datasets, which is to be expected since it is a fixed-latency design. However, the alternative design performs far better than the baseline design for all input datasets as it capitalizes on inputs with consecutive zeroes to reduce latency. Interestingly, the alternative design performed better for the small inputs dataset than it did for the large inputs dataset, perhaps due to the large inputs dataset containing less consecutive zeroes and relatively denser inputs. It also performed better for the masked datasets than it did for the large inputs dataset due to the guaranteed presence of consecutive zeroes. The "powers of 2" alternative design (that only capitalized on numbers of consecutive zeroes that are powers of 2) did better than the baseline design but only slightly worse than the alternative design as expected since it didn't account for numbers of consecutive zeroes that aren't powers of 3 (1, 3, 5, 6, etc.). 
+From Table~\ref{tab:cycles}, we can see that the baseline design performs the same for all datasets, which is to be expected since it is a fixed-latency design. However, the alternative design performs far better than the baseline design for all input datasets as it capitalizes on inputs with consecutive zeroes to reduce latency. Interestingly, the alternative design performed better for the small inputs dataset than it did for the large inputs dataset, perhaps due to the large inputs dataset containing less consecutive zeroes and relatively denser inputs. It also performed better for the masked datasets than it did for the large inputs dataset due to the guaranteed presence of consecutive zeroes. The "powers of 2" alternative design (that only capitalized on numbers of consecutive zeroes that are powers of 2) did better than the baseline design but only slightly worse than the alternative design as expected since it didn't account for numbers of consecutive zeroes that aren't powers of 3 (1, 3, 5, 6, etc.). 
 
 One area of improvement we considered but couldn't implement due to time constraints was capitalizing on consecutive ones in negative numbers. The idea was to convert negative inputs to their positive equivalents by flipping the bits and adding 1, multiplying the positive numbers together, and finally converting the product back to its negative equivalent. By converting the inputs to positive numbers, we can use the alternative design to capitalize on the consecutive zeroes (it doesn't work with consecutive ones). 
 The possible alternative implementations discussed in the alternative design section could be used to further reduce latency and improve performance, especially by taking advantage of data-level parallelism even more. 
