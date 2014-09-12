@@ -123,15 +123,14 @@ Nevertheless, our use of encapsulation (by way of the val/rdy microprotocol) was
 
 The primary downside to our baseline implementation is the large latency in computing the product.
 We propose several alternative designs and attempt to increase performance.
-Since we cannot use concepts of indirection or caching, we might consider pipelineing our multiplier.
-We could also consider exploiting the underlying structure of our operands to increase performance.
+Since we cannot use concepts of indirection or caching, we instead will consider pipelineing our multiplier.
+We will also consider exploiting the underlying structure of our operands to increase performance.
 There are multiple ways to exploit structure in our operands; we will attempt to exploit structure in two ways.
 First, we will roll over consecutive zeros by shifting more than 1 bit if possible.
 Second, we will reduce the granularity of how many zeros we shift over to powers of two, as this reduces hardware costs
 while still increasing performance over the fixed latency multiplier.
-Both of these techniques exploit the \textit{regularity} in our input operands.
 
-Let us first consider pipelining our multiplier, which seems to be applicable given the linear FSM used for the base design.
+Given the linear path of our FSM, it makes sense to pipeline our constructions.
 We can create stages between every state transition and have our val/rdy microprotocol mediate flow through the pipeline.
 However, consider the hardware required. We need $34 \times 3 = 102$ registers, $34 \times 4 = 136$ two way multiplexors,
 and $34$ logical left and right shifters.
@@ -147,9 +146,9 @@ We are likely to have some repeated set of zeros of length $n$ in our second ope
 Our algorithm in these cases does nothing to our result register, wasting $n$ cycles.
 So, we will instead shift $n$ bits, saving us $n-1$ cycles in our computation.
 We need one cycle to actually determine that there are $n$ bits we can skip.
-Our state machine for this logic is shown in Figure~\ref{fig:AltFSM}.
+Our state machine for this logic is show in Figure~\ref{fig:AltFSM}.
 We implement this change using the \verb+casez+ construct.
-If there are multiple zeros in the lsb, we increment our counter by $n-1$ and shift by the appropriate amount.
+If there are multiple zeros in the lsb, we increment our counter by $n-1$ and shift the appropriate amount.
 So, if there is a zero in $b$, we shift 32 bits and spend only one cycle in the calc stage.
 Therefore, our total overhead is 3 cycles: one for IDLE, one for CALC, and one for DONE.
 If the $b$ operand is all ones, we take our usual 34 cycles.
