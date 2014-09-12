@@ -51,34 +51,32 @@ Given our media heavy, highly connected Internet of Things (IoT), more signals w
 Therefore, we have synthesized an iterative multiplier that supports the mul instruction as defined in the PARCv1 Instruction Set Architecture (ISA).
 Eventually, this multiplier will be a module in a fully synthesizable multicore processor.
 
-We implemented two designs of an iterative multiplier: the base design is a fixed latency, 34 cycle iterative multiplier, while the alternative design is a variable latency iterative multiplier with bounds of 3 to 34 cycles.
-While we do not expect much additional overhead on clock frequency in our variable multiplier,
-we expect a significant increase in area and energy.
-Given the technology constraints we face today, (focus on energy, large die sizes, etc),
-we expect our variable multiplier to be superior in most implementations.
-We also scale down our hardware use in an alternative case and determine the performance downgrade.  
+We fully implemented two designs of an iterative multiplier: the base design is a fixed latency, 34 cycle iterative multiplier, while the alternative design is a variable latency iterative multiplier with bounds of 3 to 34 cycles.
+While we do not expect much additional overhead on clock frequency in our alternative design,
+we expect a significant increase in area and energy. Running our array of unit tests on both designs reveals that the variable design consumes far less clock cycles than does the base design (8.88 cycles/multiplication (alternative design) vs. 34 cycles/multiplication (base)).
+
+We also scale down our hardware use in the variable design and determine that the associated performance downgrade on the same unit tests (to 9.1 cycles/multiplication) is still far superior to the base design. We expect the alternative design to be used over the base in most implementations and potential applications while still meeting modern technology constraints (focus on energy, large die sizes, etc).
+  
 
 
 \section{Project Management}
 
 Given our group's various skill levels, we assigned Avinash to be verification lead, Vivek to be the architect, and Akshay to be the design lead.
 Our initial project roadmap was fairly aggressive and required us to be finished by Wednesday, September $10^{th}$.
-The intial Gantt Chart is shown in Figure~\ref{fig:gantt}.
+The intial Gantt Chart is shown in Figure~\ref{fig:gantt}. The actual roadmap is shown as a separate Gantt Chart (Figure~\ref{fig:gantt_actual}).
 
-The breakdown of work in our group followed as such:
+The breakdown of work follows:
 Vivek implemented most of the baseline design and some of the alternate design in Verilog. 
-Avinash implemented some of the alternate design and created our testing suite for lab 1.
-Akshay came up with the designs for the multiple alternate designs and wrote most of the writeup.
-Akshay also helped debug the Verilog code; Vivek figured out more than half the errors though.
+Avinash implemented some of the alternate design and created our testing suite for Lab 1.
+Akshay came up with the designs for the alternate design and wrote most of the writeup.
+Akshay helped debug the Verilog code.
+Vivek corrected the majority of errors in the RTL code.
 
-As far as implementing the lab, most of it was tested via an end to end fashion.
-Vivek completed the baseline design while Avinash finished the directed test cases.
-After this was done, we spent a lot of time debugging the entire functionality of the multiplier.
-This process was repeated for the alternative design as well.
+Implementation of the RTL code progressed fairly smoothly with the exception of a few logical errors that were somewhat difficult to catch.
+Vivek completed the baseline design while Avinash finished the directed test cases. We then tested the baseline design with these tests until it passed. This was one milestone in our agile development approach. Similarly, Akshay, Vivek, and Avinash completed the alternate design while Avinash finished the random test cases and added datasets for evaluation. After this was done, we spent a lot of time debugging the entire functionality of each design individually. We relied on the variety of tests in the testing suite to provide verification for this lab.
 
-Some lessons learned from this lab were definitely how not to test.
-We would like to have unit tests testing functionality across our modules, not our implementation.
-We will keep this in mind for the next lab assignment.
+Some lessons learned from this lab were how to use tools such as GTKwave and line tracing to catch logic errors. 
+Another idea for testing in future assignments is unit tests for the functionality of major modules within our implementation in addition to end-to-end tests of our overall implementation.
 
 \section{Baseline Design}
 
@@ -90,7 +88,7 @@ This interface is shown in Figure~\ref{fig:model}.
 Our algorithm for computing the multiplication is as follows.
 If the least significant bit (lsb) of the second operand (call it $b$) is 1, add it to an accumulator.
 Then, shift your first operand (call it $a$) left by one bit and the second operand to the right logically by one bit.
-This is the first algorithm we are taught when we learn to multiply.
+This is the first algorithm we are taught when we learn to multiply and is a good baseline for comparison because of the fact that a shift by one bit takes one cycle, making the design conceptually simple.
 The pseudocode for this is shown in Figure~\ref{fig:code}. 
 
 Our implementation follows the structure of this pseudo-code very closely.
@@ -105,29 +103,27 @@ This occurs when we are accepting new values into our operand registers,
 writing/not-writing partial sums to $result$, and outputing a computed value.
 The datapath module sends the lsb of $b$ to the control module so it can compute the appropriate dataflow.
 The datapath is shown in Figure~\ref{fig:datapath}.
-The lsb is directly used to determine whether to partially sum into $results$, a direct mapping to the pseudocode.
+The lsb is directly used to determine whether to partially sum into $result$, a direct mapping to the pseudocode.
 
 As seen from the pseudocode, there is no escape from the \verb+for+ loop.
 Therefore, this implementation \textbf{must} take at least 32 cycles.
 In fact, our implementation takes 34 cycles, as we have one cycle to accept data and one cycle to state we are done.
-The state machine capturing this logic is shown in Figure~\ref{fig:state}. 
+The state machine capturing this logic is shown in Figure~\ref{fig:BaseFSM}. 
 This implementation, therefore, does exploit patterns in the underlying data.
 In the most extreme case where $b$ is zero, the hardware checks every bit of $b$ and decides 32 times not to add to $result$.
 We should reduce that down to one decision not to write to $result$.
 
-Another slight disadvantage to our baseline design was the failure to identify and exploit repeated structures into modularity.
-Notice that each register has a multiplexor in front of it directing output.
-We should have wrapped that structure into a module and reused it three times. 
+While modularity was used in taking advantage of structures (such as shifters, registers, and adders) that were individually verified for correctness, we could have also used hierarchy. Notice that each register has a multiplexor in front of it directing output.
+We could have wrapped that structure into a module and reused it three times. 
 This would have allowed us to test incrementally and unit-by-unit.
-Instead, we were forced to rely on end-to-end testing and test all functionality at once.
-As a consequence, we ran into a Verilog bug that took several hours to fix even with help.  
- 
+Instead, we were forced to rely on end-to-end testing and test all functionality at once. This may have contributed to us not sooner catching RTL bugs.
+Nevertheless, our use of encapsulation (by way of the val/rdy microprotocol) was a major feature of our design.
 
 \section{Alternative Design}
 
 The primary downside to our baseline implementation is the large latency in computing the product.
 We propose several alternative designs and attempt to increase performance.
-Since we can't use concepts of indirection or caching, we instead will consider pipelining our multiplier.
+Since we cannot use concepts of indirection or caching, we instead will consider pipelineing our multiplier.
 We will also consider exploiting the underlying structure of our operands to increase performance.
 There are multiple ways to exploit structure in our operands; we will attempt to exploit structure in two ways.
 First, we will roll over consecutive zeros by shifting more than 1 bit if possible.
@@ -136,7 +132,7 @@ while still increasing performance over the fixed latency multiplier.
 
 Given the linear path of our FSM, it makes sense to pipeline our constructions.
 We can create stages between every state transition and have our val/rdy microprotocol mediate flow through the pipeline.
-However, consider the hardware required. We need $34 \times 3 = 102$ registers, $34 \times 4 = 136$ two way multiplexers,
+However, consider the hardware required. We need $34 \times 3 = 102$ registers, $34 \times 4 = 136$ two way multiplexors,
 and $34$ logical left and right shifters.
 This does not include the $34$ full adders we need. 
 The cost of this design is enormous!
@@ -164,8 +160,7 @@ This allowed us to rapidly implement the alternative design.
 
 However, instead of shifting by $n$ bits, let us shift by powers of two.
 This allows us to reduce the number of cases we need to check from 32 to 6.
-This is a five-fold reduction in hardware!
-We will evaluate the cycle execution time between these two setups and determine which design is better.   
+This is a five-fold reduction in hardware! As mentioned in the introduction, this hardware reduction comes with little performance loss, and thus may be more appropriate in applications with technology constraints.   
 
 
 \section{Testing Strategy}
