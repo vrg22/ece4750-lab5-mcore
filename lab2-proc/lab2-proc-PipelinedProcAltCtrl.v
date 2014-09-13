@@ -42,7 +42,7 @@ module lab2_proc_PipelinedProcAltCtrl
 
   // control signals (ctrl->dpath)
 
-  output logic        pc_sel_F,
+  output logic [1:0]  pc_sel_F,
   output logic        reg_en_F,
   output logic        reg_en_D,
   output logic        reg_en_X,
@@ -97,14 +97,17 @@ module lab2_proc_PipelinedProcAltCtrl
 
   // PC Mux select
 
-  localparam pm_x     = 1'dx; // Don't care
-  localparam pm_p     = 1'd0; // Use pc+4
-  localparam pm_b     = 1'd1; // Use branch address
+  localparam pm_x     = 2'dx; // Don't care
+  localparam pm_p     = 2'd0; // Use pc+4
+  localparam pm_b     = 2'd1; // Use branch address
+  localparam pm_j     = 2'd2; // Use jump address (imm)
 
-  logic  br_pc_sel_X;
+  logic [1:0] j_pc_sel_D;
+  logic [1:0] br_pc_sel_X;
 
   assign pc_sel_F = ( br_pc_sel_X ? br_pc_sel_X :
-                                    pm_p          );
+                    (  j_pc_sel_D ? j_pc_sel_D  :
+                                    pm_p          ) );
 
   logic stall_imem_F;
 
@@ -199,6 +202,12 @@ module lab2_proc_PipelinedProcAltCtrl
   localparam br_none  = 2'd0; // No branch
   localparam br_bne   = 2'd1; // bne
 
+  // Jump type
+
+  localparam j_x      = 1'bx; // Don't care
+  localparam j_n      = 1'b0; // No jump
+  localparam j_j      = 1'b1; // jump (imm)
+
   // Operand 1 Mux Select
 
   localparam bm_x     = 2'bx; // Don't care
@@ -238,6 +247,7 @@ module lab2_proc_PipelinedProcAltCtrl
   // Instruction Decode
 
   logic       inst_val_D;
+  logic       j_type_D;
   logic       br_type_D;
   logic       rs_en_D;
   logic [1:0] op0_sel_D;
@@ -253,6 +263,7 @@ module lab2_proc_PipelinedProcAltCtrl
   task cs
   (
     input logic       cs_val,
+    input logic       cs_j_type,
     input logic       cs_br_type,
     input logic       cs_rs_en,
     input logic [1:0] cs_op1_sel,
@@ -267,6 +278,7 @@ module lab2_proc_PipelinedProcAltCtrl
   );
   begin
     inst_val_D       = cs_val;
+    j_type_D         = cs_j_type;
     br_type_D        = cs_br_type;
     rs_en_D          = cs_rs_en;
     op1_sel_D        = cs_op1_sel;
@@ -286,26 +298,49 @@ module lab2_proc_PipelinedProcAltCtrl
 
     casez ( inst_D )
 
-      //                          br       rs op1      rt alu      dmm wbmux rf      thst fhst
-      //                      val type     en muxsel   en fn       typ sel   wen wa  val  rdy
-      `PISA_INST_NOP     :cs( y,  br_none, n, bm_x,    n, alu_x,   nr, wm_a, n,  rx, n,   n   );
+      //                          j    br       rs op1      rt alu      dmm wbmux rf      thst fhst
+      //                      val type type     en muxsel   en fn       typ sel   wen wa  val  rdy
+      `PISA_INST_NOP     :cs( y,  j_n, br_none, n, bm_x,    n, alu_x,   nr, wm_a, n,  rx, n,   n   );
 
-      `PISA_INST_ADDU    :cs( y,  br_none, y, bm_rdat, y, alu_add, nr, wm_a, y,  rd, n,   n   );
+      `PISA_INST_ADDU    :cs( y,  j_n, br_none, y, bm_rdat, y, alu_add, nr, wm_a, y,  rd, n,   n   );
 
-      `PISA_INST_BNE     :cs( y,  br_bne,  y, bm_rdat, y, alu_x,   nr, wm_a, n,  rx, n,   n   );
+      `PISA_INST_BNE     :cs( y,  j_n, br_bne,  y, bm_rdat, y, alu_x,   nr, wm_a, n,  rx, n,   n   );
 
-      `PISA_INST_LW      :cs( y,  br_none, y, bm_si,   n, alu_add, ld, wm_m, y,  rt, n,   n   );
+      `PISA_INST_J       :cs( y,  j_j, br_none, n, bm_x,    n, alu_x,   nr, wm_x, n,  rx, n,   n   );
 
-      `PISA_INST_MFC0    :cs( y,  br_none, n, bm_fhst, n, alu_cp1, nr, wm_a, y,  rt, n,   y   );
-      `PISA_INST_MTC0    :cs( y,  br_none, n, bm_rdat, y, alu_cp1, nr, wm_a, n,  rx, y,   n   );
+      `PISA_INST_LW      :cs( y,  j_n, br_none, y, bm_si,   n, alu_add, ld, wm_m, y,  rt, n,   n   );
 
-      default            :cs( n,  br_x,    n, bm_x,    n, alu_x,   nr, wm_x, n,  rx, n,   n   );
+      `PISA_INST_MFC0    :cs( y,  j_n, br_none, n, bm_fhst, n, alu_cp1, nr, wm_a, y,  rt, n,   y   );
+      `PISA_INST_MTC0    :cs( y,  j_n, br_none, n, bm_rdat, y, alu_cp1, nr, wm_a, n,  rx, y,   n   );
+
+      default            :cs( n,  j_x, br_x,    n, bm_x,    n, alu_x,   nr, wm_x, n,  rx, n,   n   );
 
     endcase
   end
 
   logic stall_from_mngr_D;
   logic stall_hazard_D;
+
+  // jump logic
+
+  logic      j_taken_D;
+  logic      squash_j_D;
+
+  always @(*) begin
+    if ( val_D ) begin
+
+      case ( j_type_D )
+        j_j:     j_pc_sel_D = pm_j;
+        default: j_pc_sel_D = pm_p;
+      endcase
+
+    end else
+      j_pc_sel_D = pm_p;
+  end
+
+  assign j_taken_D = ( j_pc_sel_D != pm_p );
+
+  assign squash_j_D = j_taken_D;
 
   // from mngr rdy signal for mfc0 instruction
 
@@ -342,7 +377,7 @@ module lab2_proc_PipelinedProcAltCtrl
 
 
   assign stall_D = stall_from_mngr_D || stall_hazard_D;
-  assign squash_D = 1'b0;
+  assign squash_D = squash_j_D;
 
   //----------------------------------------------------------------------
   // X stage

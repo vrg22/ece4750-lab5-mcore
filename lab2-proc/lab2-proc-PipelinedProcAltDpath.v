@@ -35,7 +35,7 @@ module lab2_proc_PipelinedProcAltDpath
 
   // control signals (ctrl->dpath)
 
-  input  logic        pc_sel_F,
+  input  logic [1:0]  pc_sel_F,
   input  logic        reg_en_F,
   input  logic        reg_en_D,
   input  logic        reg_en_X,
@@ -67,6 +67,7 @@ module lab2_proc_PipelinedProcAltDpath
   logic [31:0] pc_plus4_F;
   logic [31:0] pc_plus4_next_F;
   logic [31:0] br_target_X;
+  logic [31:0] j_target_D;
 
   vc_EnResetReg #(32, c_reset_vector) pc_plus4_reg_F
   (
@@ -83,10 +84,11 @@ module lab2_proc_PipelinedProcAltDpath
     .out  (pc_plus4_next_F)
   );
 
-  vc_Mux2 #(32) pc_sel_mux_F
+  vc_Mux3 #(32) pc_sel_mux_F
   (
     .in0  (pc_plus4_F),
     .in1  (br_target_X),
+    .in2  (j_target_D),
     .sel  (pc_sel_F),
     .out  (pc_next_F)
   );
@@ -197,6 +199,12 @@ module lab2_proc_PipelinedProcAltDpath
     .br_target (br_target_D)
   );
 
+  lab2_proc_JTarget j_target_calc_D
+  (
+    .pc_plus4   (pc_plus4_D),
+    .imm_target (inst_target_D),
+    .j_target   (j_target_D)
+  );
 
   //--------------------------------------------------------------------
   // X stage

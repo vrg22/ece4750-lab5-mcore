@@ -87,7 +87,7 @@ module lab2_proc_PipelinedProcBase
 
   // control signals (ctrl->dpath)
 
-  logic        pc_sel_F;
+  logic [1:0]  pc_sel_F;
   logic        reg_en_F;
   logic        reg_en_D;
   logic        reg_en_X;
