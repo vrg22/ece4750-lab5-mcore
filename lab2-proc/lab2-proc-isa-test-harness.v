@@ -3,6 +3,7 @@
 //=========================================================================
 // This harness is meant to be instantiated for the ISA simulator like this:
 //
+//  `define LAB2_PROC_IMPL_STR "lab2-proc-ISASimulator-%INST%"
 //  `define LAB2_PROC_TEST_CASES_FILE lab2-proc-test-cases-%INST%.v
 //
 //  `include "lab2-proc-ISASimulator.v"
@@ -137,7 +138,7 @@ endmodule
 //------------------------------------------------------------------------
 
 module top;
-  `VC_TEST_SUITE_BEGIN( `VC_PREPROCESSOR_TOSTR(lab2_proc_ISASimulator) )
+  `VC_TEST_SUITE_BEGIN( `LAB2_PROC_IMPL_STR )
 
   pisa_InstTasks pisa();
 

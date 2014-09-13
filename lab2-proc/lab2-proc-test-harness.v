@@ -5,6 +5,7 @@
 // of the multiplier using the special IMPL macro like this:
 //
 //  `define LAB2_PROC_IMPL     lab2_proc_Impl
+//  `define LAB2_PROC_IMPL_STR "lab2-proc-Impl-%INST%"
 //  `define LAB2_PROC_TEST_CASES_FILE lab2-proc-test-cases-%INST%.v
 //
 //  `include "lab2-proc-Impl.v"
@@ -198,7 +199,7 @@ endmodule
 //------------------------------------------------------------------------
 
 module top;
-  `VC_TEST_SUITE_BEGIN( `VC_PREPROCESSOR_TOSTR(`LAB2_PROC_IMPL) )
+  `VC_TEST_SUITE_BEGIN( `LAB2_PROC_IMPL_STR )
 
   pisa_InstTasks pisa();
 

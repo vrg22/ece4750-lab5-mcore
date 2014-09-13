@@ -5,6 +5,7 @@
 // of the multiplier using the special IMPL macro like this:
 //
 //  `define LAB2_PROC_IMPL     lab2_proc_Impl
+//  `define LAB2_PROC_IMPL_STR "lab2-proc-Impl"
 //
 //  `include "lab2-proc-Impl.v"
 //  `include "lab2-proc-sim-harness.v"

@@ -3,6 +3,8 @@
 //=========================================================================
 // This harness is meant to be instantiated for the ISA simulator like this:
 //
+//  `define LAB2_PROC_IMPL_STR "lab2-proc-ISASimulator"
+//
 //  `include "lab2-proc-ISASimulator.v"
 //  `include "lab2-proc-isa-sim-harness.v"
 //
