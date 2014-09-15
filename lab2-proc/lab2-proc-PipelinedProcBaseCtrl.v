@@ -103,11 +103,12 @@ module lab2_proc_PipelinedProcBaseCtrl
   localparam pm_j     = 2'd2; // Use jump address (imm)
 
   logic [1:0] j_pc_sel_D;
-  logic [1:0] br_pc_sel_X;
+  logic       j_taken_D;
+  logic       br_taken_X;
 
-  assign pc_sel_F = ( br_pc_sel_X ? br_pc_sel_X :
-                    (  j_pc_sel_D ? j_pc_sel_D  :
-                                    pm_p          ) );
+  assign pc_sel_F = ( br_taken_X ? pm_b       :
+                    ( j_taken_D  ? j_pc_sel_D :
+                                   pm_p       ) );
 
   logic stall_imem_F;
 
@@ -122,7 +123,6 @@ module lab2_proc_PipelinedProcBaseCtrl
 
   assign stall_F = stall_imem_F;
   assign squash_F = 1'b0;
-
 
   //----------------------------------------------------------------------
   // D stage
@@ -220,15 +220,6 @@ module lab2_proc_PipelinedProcBaseCtrl
   localparam alu_x    = 4'bx;
   localparam alu_add  = 4'd0;
   localparam alu_sub  = 4'd1;
-  localparam alu_sll  = 4'd2;
-  localparam alu_or   = 4'd3;
-  localparam alu_lt   = 4'd4;
-  localparam alu_ltu  = 4'd5;
-  localparam alu_and  = 4'd6;
-  localparam alu_xor  = 4'd7;
-  localparam alu_nor  = 4'd8;
-  localparam alu_srl  = 4'd9;
-  localparam alu_sra  = 4'd10;
   localparam alu_cp0  = 4'd11;
   localparam alu_cp1  = 4'd12;
 
@@ -301,18 +292,12 @@ module lab2_proc_PipelinedProcBaseCtrl
       //                          j    br       rs op1      rt alu      dmm wbmux rf      thst fhst
       //                      val type type     en muxsel   en fn       typ sel   wen wa  val  rdy
       `PISA_INST_NOP     :cs( y,  j_n, br_none, n, bm_x,    n, alu_x,   nr, wm_a, n,  rx, n,   n   );
-
       `PISA_INST_ADDU    :cs( y,  j_n, br_none, y, bm_rdat, y, alu_add, nr, wm_a, y,  rd, n,   n   );
-
       `PISA_INST_BNE     :cs( y,  j_n, br_bne,  y, bm_rdat, y, alu_x,   nr, wm_a, n,  rx, n,   n   );
-
       `PISA_INST_J       :cs( y,  j_j, br_none, n, bm_x,    n, alu_x,   nr, wm_x, n,  rx, n,   n   );
-
       `PISA_INST_LW      :cs( y,  j_n, br_none, y, bm_si,   n, alu_add, ld, wm_m, y,  rt, n,   n   );
-
       `PISA_INST_MFC0    :cs( y,  j_n, br_none, n, bm_fhst, n, alu_cp1, nr, wm_a, y,  rt, n,   y   );
       `PISA_INST_MTC0    :cs( y,  j_n, br_none, n, bm_rdat, y, alu_cp1, nr, wm_a, n,  rx, y,   n   );
-
       default            :cs( n,  j_x, br_x,    n, bm_x,    n, alu_x,   nr, wm_x, n,  rx, n,   n   );
 
     endcase
@@ -323,7 +308,6 @@ module lab2_proc_PipelinedProcBaseCtrl
 
   // jump logic
 
-  logic      j_taken_D;
   logic      squash_j_D;
 
   always @(*) begin
@@ -344,39 +328,58 @@ module lab2_proc_PipelinedProcBaseCtrl
 
   // from mngr rdy signal for mfc0 instruction
 
-  assign from_mngr_rdy =     ( val_D
-                            && from_mngr_rdy_D
-                            && !stall_FD );
+  assign from_mngr_rdy     = ( val_D && from_mngr_rdy_D && !stall_FD );
+  assign stall_from_mngr_D = ( val_D && from_mngr_rdy_D && !from_mngr_val );
 
-  assign stall_from_mngr_D = ( val_D
-                            && from_mngr_rdy_D
-                            && !from_mngr_val );
+  // Stall if write address in X matches rs in D
 
-  // Stall for data hazards if either of the operand read addresses are
-  // the same as the write addresses of instruction later in the pipeline
+  logic  stall_waddr_X_rs_D;
+  assign stall_waddr_X_rs_D
+    = ( rs_en_D && val_X && rf_wen_X
+        && ( inst_rs_D == rf_waddr_X ) && ( rf_waddr_X != 5'd0 ) );
 
-  assign stall_hazard_D     = val_D && (
-                            ( rs_en_D && val_X && rf_wen_X
-                              && ( inst_rs_D == rf_waddr_X )
-                              && ( rf_waddr_X != 5'd0 ) )
-                         || ( rs_en_D && val_M && rf_wen_M
-                              && ( inst_rs_D == rf_waddr_M )
-                              && ( rf_waddr_M != 5'd0 ) )
-                         || ( rs_en_D && val_W && rf_wen_W
-                              && ( inst_rs_D == rf_waddr_W )
-                              && ( rf_waddr_W != 5'd0 ) )
-                         || ( rt_en_D && val_X && rf_wen_X
-                              && ( inst_rt_D == rf_waddr_X )
-                              && ( rf_waddr_X != 5'd0 ) )
-                         || ( rt_en_D && val_M && rf_wen_M
-                              && ( inst_rt_D == rf_waddr_M )
-                              && ( rf_waddr_M != 5'd0 ) )
-                         || ( rt_en_D && val_W && rf_wen_W
-                              && ( inst_rt_D == rf_waddr_W )
-                              && ( rf_waddr_W != 5'd0 ) ) );
+  // Stall if write address in M matches rs in D
 
+  logic  stall_waddr_M_rs_D;
+  assign stall_waddr_M_rs_D
+    = ( rs_en_D && val_M && rf_wen_M
+        && ( inst_rs_D == rf_waddr_M ) && ( rf_waddr_M != 5'd0 ) );
 
-  assign stall_D = stall_from_mngr_D || stall_hazard_D;
+  // Stall if write address in W matches rs in D
+
+  logic  stall_waddr_W_rs_D;
+  assign stall_waddr_W_rs_D
+    = ( rs_en_D && val_W && rf_wen_W
+        && ( inst_rs_D == rf_waddr_W ) && ( rf_waddr_W != 5'd0 ) );
+
+  // Stall if write address in X matches rt in D
+
+  logic  stall_waddr_X_rt_D;
+  assign stall_waddr_X_rt_D
+    = ( rt_en_D && val_X && rf_wen_X
+        && ( inst_rt_D == rf_waddr_X ) && ( rf_waddr_X != 5'd0 ) );
+
+  // Stall if write address in M matches rt in D
+
+  logic  stall_waddr_M_rt_D;
+  assign stall_waddr_M_rt_D
+    = ( rt_en_D && val_M && rf_wen_M
+        && ( inst_rt_D == rf_waddr_M ) && ( rf_waddr_M != 5'd0 ) );
+
+  // Stall if write address in W matches rt in D
+
+  logic  stall_waddr_W_rt_D;
+  assign stall_waddr_W_rt_D
+    = ( rt_en_D && val_W && rf_wen_W
+        && ( inst_rt_D == rf_waddr_W ) && ( rf_waddr_W != 5'd0 ) );
+
+  // Put together final stall signal
+
+  assign stall_hazard_D = val_D &&
+    ( stall_waddr_X_rs_D || stall_waddr_M_rs_D || stall_waddr_W_rs_D ||
+      stall_waddr_X_rt_D || stall_waddr_M_rt_D || stall_waddr_W_rt_D );
+
+  assign stall_D  = stall_from_mngr_D || stall_hazard_D;
   assign squash_D = squash_j_D;
 
   //----------------------------------------------------------------------
@@ -435,7 +438,6 @@ module lab2_proc_PipelinedProcBaseCtrl
 
   // branch logic
 
-  logic        br_taken_X;
   logic        squash_br_X;
 
   always @(*) begin
@@ -449,8 +451,6 @@ module lab2_proc_PipelinedProcBaseCtrl
     end else
       br_taken_X = 1'b0;
   end
-
-  assign br_pc_sel_X = br_taken_X ? pm_b : pm_p;
 
   // squash the previous instructions on branch
 
@@ -466,7 +466,7 @@ module lab2_proc_PipelinedProcBaseCtrl
 
   // stall in X if dmem is not rdy
 
-  assign stall_X = stall_dmem_X;
+  assign stall_X  = stall_dmem_X;
   assign squash_X = squash_br_X;
 
   //----------------------------------------------------------------------
@@ -525,9 +525,9 @@ module lab2_proc_PipelinedProcBaseCtrl
   assign dmemresp_rdy = dmemreq_val_M && !stall_MW;
 
   assign dmemreq_val_M = val_M && ( dmemreq_type_M != nr );
-  assign stall_dmem_M = ( dmemreq_val_M && !dmemresp_val );
+  assign stall_dmem_M  = ( dmemreq_val_M && !dmemresp_val );
 
-  assign stall_M = stall_dmem_M;
+  assign stall_M  = stall_dmem_M;
   assign squash_M = 1'b0;
 
   //----------------------------------------------------------------------
@@ -577,15 +577,10 @@ module lab2_proc_PipelinedProcBaseCtrl
     end
   end
 
-  assign to_mngr_val = ( val_W
-                      && to_mngr_val_W
-                      && !stall_MW );
+  assign to_mngr_val     = ( val_W && to_mngr_val_W && !stall_MW );
+  assign stall_to_mngr_W = ( val_W && to_mngr_val_W && !to_mngr_rdy );
 
-  assign stall_to_mngr_W = ( val_W
-                          && to_mngr_val_W
-                          && !to_mngr_rdy );
-
-  assign stall_W = stall_to_mngr_W;
+  assign stall_W  = stall_to_mngr_W;
   assign squash_W = 1'b0;
 
 endmodule
