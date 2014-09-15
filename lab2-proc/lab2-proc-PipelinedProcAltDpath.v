@@ -12,7 +12,7 @@ module lab2_proc_PipelinedProcAltDpath
 )
 (
   input  logic        clk,
- input  logic        reset
+  input  logic        reset
 );
 
 // copy in the baseline design and start working on the alternative!

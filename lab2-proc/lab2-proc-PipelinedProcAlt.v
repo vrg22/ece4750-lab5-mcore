@@ -68,7 +68,7 @@ module lab2_proc_PipelinedProcAlt
   lab2_proc_PipelinedProcAltCtrl ctrl
   (
     .clk                    (clk),
-   .reset                  (reset)
+    .reset                  (reset)
   );
   //----------------------------------------------------------------------
   // Datapath
@@ -82,7 +82,7 @@ module lab2_proc_PipelinedProcAlt
   dpath
   (
     .clk                     (clk),
-   .reset                   (reset)
+    .reset                   (reset)
   );
 
   //----------------------------------------------------------------------

@@ -8,10 +8,14 @@
 module lab2_proc_PipelinedProcAltCtrl
 (
   input  logic        clk,
- input  logic        reset
+  input  logic        reset
 );
 
 // copy in the baseline design and start working on the alternative!
+
+// temporary dummy signal
+
+logic val_MW;
 
 endmodule
 
