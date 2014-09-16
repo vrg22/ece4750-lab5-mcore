@@ -9,6 +9,7 @@
 `include "lab2-proc-brj-target-calc.v"
 `include "lab2-proc-regfile.v"
 `include "vc-arithmetic.v"
+`include "vc-mem-msgs.v"
 `include "vc-muxes.v"
 `include "vc-regs.v"
 `include "pisa-inst.v"
@@ -20,8 +21,10 @@ module lab2_proc_PipelinedProcBaseDpath
 
   // Instruction Memory Port
 
-  output logic [31:0] imemreq_msg_addr,
-  input  logic [31:0] imemresp_msg_data,
+  output logic [31:0]                             imemreq_msg_addr,
+  input  logic [`VC_MEM_RESP_MSG_NBITS(8,32)-1:0] imemresp_msg,
+  input  logic                                    imemresp_val,
+  output logic                                    imemresp_rdy,
 
   // Data Memory Port
 
@@ -35,6 +38,9 @@ module lab2_proc_PipelinedProcBaseDpath
 
   // control signals (ctrl->dpath)
 
+  output logic        imemresp_val_drop,
+  input  logic        imemresp_rdy_drop,
+  input  logic        imemresp_drop,
   input  logic [1:0]  pc_sel_F,
   input  logic        reg_en_F,
   input  logic        reg_en_D,
@@ -57,6 +63,9 @@ module lab2_proc_PipelinedProcBaseDpath
   localparam c_reset_vector = 32'h1000;
   localparam c_reset_inst   = 32'h00000000;
 
+  // Fetch address
+
+  assign imemreq_msg_addr = pc_next_F;
 
   //--------------------------------------------------------------------
   // F stage
@@ -65,23 +74,22 @@ module lab2_proc_PipelinedProcBaseDpath
   logic [31:0] pc_F;
   logic [31:0] pc_next_F;
   logic [31:0] pc_plus4_F;
-  logic [31:0] pc_plus4_next_F;
   logic [31:0] br_target_X;
   logic [31:0] j_target_D;
 
-  vc_EnResetReg #(32, c_reset_vector) pc_plus4_reg_F
+  vc_EnResetReg #(32, c_reset_vector - 32'd4) pc_reg_F
   (
     .clk    (clk),
     .reset  (reset),
     .en     (reg_en_F),
-    .d      (pc_plus4_next_F),
-    .q      (pc_plus4_F)
+    .d      (pc_next_F),
+    .q      (pc_F)
   );
 
   vc_Incrementer #(32, 4) pc_incr_F
   (
-    .in   (pc_next_F),
-    .out  (pc_plus4_next_F)
+    .in   (pc_F),
+    .out  (pc_plus4_F)
   );
 
   vc_Mux3 #(32) pc_sel_mux_F
@@ -93,17 +101,37 @@ module lab2_proc_PipelinedProcBaseDpath
     .out  (pc_next_F)
   );
 
-  assign imemreq_msg_addr = pc_next_F;
+  // Imem Drop Unit
 
-  // note: we don't need pc_F except to draw the line tracing
+  logic [`VC_MEM_RESP_MSG_NBITS(8,32)-1:0] imemresp_msg_drop;
 
-  vc_EnResetReg #(32) pc_reg_F
+  vc_DropUnit #(`VC_MEM_RESP_MSG_NBITS(8,32)) imem_drop_unit
   (
-    .clk    (clk),
-    .reset  (reset),
-    .en     (reg_en_F),
-    .d      (pc_next_F),
-    .q      (pc_F)
+    .clk      (clk),
+    .reset    (reset),
+
+    .drop     (imemresp_drop),
+
+    .in_msg   (imemresp_msg),
+    .in_val   (imemresp_val),
+    .in_rdy   (imemresp_rdy),
+
+    .out_msg  (imemresp_msg_drop),
+    .out_val  (imemresp_val_drop),
+    .out_rdy  (imemresp_rdy_drop)
+  );
+
+  // Unpack Memory Response Message
+
+  logic [31:0] imemresp_msg_data;
+
+  vc_MemRespMsgUnpack#(8,32) imemresp_msg_unpack
+  (
+    .msg    (imemresp_msg_drop),
+    .opaque (),
+    .type_  (),
+    .len    (),
+    .data   (imemresp_msg_data)
   );
 
   //--------------------------------------------------------------------
@@ -231,7 +259,6 @@ module lab2_proc_PipelinedProcBaseDpath
     .q      (op1_X)
   );
 
-
   vc_EnResetReg #(32, 0) br_target_reg_X
   (
     .clk    (clk),
@@ -241,23 +268,18 @@ module lab2_proc_PipelinedProcBaseDpath
     .q      (br_target_X)
   );
 
-
-  vc_EqComparator #(32) br_cond_eq_comp_X
-  (
-    .in0  (op0_X),
-    .in1  (op1_X),
-    .out  (br_cond_eq_X)
-  );
-
   logic [31:0] alu_result_X;
   logic [31:0] ex_result_X;
 
   lab2_proc_alu alu
   (
-    .in0  (op0_X),
-    .in1  (op1_X),
-    .fn   (alu_fn_X),
-    .out  (alu_result_X)
+    .in0      (op0_X),
+    .in1      (op1_X),
+    .fn       (alu_fn_X),
+    .out      (alu_result_X),
+    .ops_eq   (br_cond_eq_X),
+    .op0_zero (),
+    .op0_neg  ()
   );
 
   assign ex_result_X = alu_result_X;

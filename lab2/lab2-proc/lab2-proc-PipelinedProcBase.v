@@ -70,7 +70,6 @@ module lab2_proc_PipelinedProcBase
   logic [31:0] dmemresp_msg_data;
 
   logic [31:0] imemreq_msg_addr;
-  logic [31:0] imemresp_msg_data;
 
   // imereq_enq signals coming in from the ctrl unit
   logic [`VC_MEM_REQ_MSG_NBITS(8,32,32)-1:0] imemreq_enq_msg;
@@ -79,9 +78,10 @@ module lab2_proc_PipelinedProcBase
 
   // imemresp signals after the dropping unit
 
-  logic [`VC_MEM_RESP_MSG_NBITS(8,32)-1:0] imemresp_msg_drop;
   logic                                    imemresp_val_drop;
   logic                                    imemresp_rdy_drop;
+
+  // imemresp drop signal
 
   logic                                    imemresp_drop;
 
@@ -137,15 +137,6 @@ module lab2_proc_PipelinedProcBase
   // Unpack Memory Response Messages
   //----------------------------------------------------------------------
 
-  vc_MemRespMsgUnpack#(8,32) imemresp_msg_unpack
-  (
-    .msg    (imemresp_msg),
-    .opaque (),
-    .type_  (),
-    .len    (),
-    .data   (imemresp_msg_data)
-  );
-
   vc_MemRespMsgUnpack#(8,32) dmemresp_msg_unpack
   (
     .msg    (dmemresp_msg),
@@ -153,26 +144,6 @@ module lab2_proc_PipelinedProcBase
     .type_  (),
     .len    (),
     .data   (dmemresp_msg_data)
-  );
-
-  //----------------------------------------------------------------------
-  // Imem Drop Unit
-  //----------------------------------------------------------------------
-
-  vc_DropUnit #(`VC_MEM_RESP_MSG_NBITS(8,32)) imem_drop_unit
-  (
-    .clk      (clk),
-    .reset    (reset),
-
-    .drop     (imemresp_drop),
-
-    .in_msg   (imemresp_msg),
-    .in_val   (imemresp_val),
-    .in_rdy   (imemresp_rdy),
-
-    .out_msg  (imemresp_msg_drop),
-    .out_val  (imemresp_val_drop),
-    .out_rdy  (imemresp_rdy_drop)
   );
 
   //----------------------------------------------------------------------
@@ -255,7 +226,9 @@ module lab2_proc_PipelinedProcBase
     // Instruction Memory Port
 
     .imemreq_msg_addr        (imemreq_msg_addr),
-    .imemresp_msg_data       (imemresp_msg_data),
+    .imemresp_msg            (imemresp_msg),
+    .imemresp_val            (imemresp_val),
+    .imemresp_rdy            (imemresp_rdy),
 
     // Data Memory Port
 
@@ -269,6 +242,9 @@ module lab2_proc_PipelinedProcBase
 
     // control signals (ctrl->dpath)
 
+    .imemresp_val_drop       (imemresp_val_drop),
+    .imemresp_rdy_drop       (imemresp_rdy_drop),
+    .imemresp_drop           (imemresp_drop),
     .pc_sel_F                (pc_sel_F),
     .reg_en_F                (reg_en_F),
     .reg_en_D                (reg_en_D),
