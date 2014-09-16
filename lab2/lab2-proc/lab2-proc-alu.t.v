@@ -15,15 +15,16 @@ module top;
   logic [31:0] t1_in0;
   logic [31:0] t1_in1;
   logic [ 3:0] t1_fn;
-
+  logic [ 4:0] t1_shamt;
   logic [31:0] t1_out;
 
   lab2_proc_alu t1_alu
   (
-    .in0  (t1_in0),
-    .in1  (t1_in1),
-    .fn   (t1_fn),
-    .out  (t1_out)
+    .in0    (t1_in0),
+    .in1    (t1_in1),
+    .fn     (t1_fn),
+    .shamt  (t1_shamt),
+    .out    (t1_out)
   );
 
   task t1
@@ -31,12 +32,13 @@ module top;
     input logic [31:0] in0,
     input logic [31:0] in1,
     input logic [ 3:0] fn,
-
+    input logic [ 4:0] shamt,
     input logic [31:0] out
   );
   begin
     t1_in0 = in0;
     t1_in1 = in1;
+    t1_shamt = shamt;
     t1_fn  = fn;
     #1;
     `VC_TEST_NOTE_INPUTS_3( in0, in1, fn );
@@ -67,6 +69,8 @@ module top;
     t1( 32'hfeeeeaa3, 32'hf4650000, 4'd1,  32'h0a89eaa3 );
 // add more test cases here for other ALU ops!
 
+    //sll test
+    t1( 32'h00000001, 32'h00000000, 4'd1,  32'h00000002 );
 
   end
   `VC_TEST_CASE_END
