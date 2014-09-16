@@ -11,12 +11,15 @@ module lab2_proc_alu
 (
   input  logic [31:0] in0,
   input  logic [31:0] in1,
+  input  logic [ 4:0] shamt, 
   input  logic [ 3:0] fn,
   output logic [31:0] out,
   output logic        ops_eq,
   output logic        op0_zero,
   output logic        op0_neg
 );
+  
+  logic sll_out;
 
   always @(*)
   begin
@@ -24,8 +27,7 @@ module lab2_proc_alu
     case ( fn )
       4'd0  : out = in0 + in1;                     // ADD
       4'd1  : out = in0 - in1;                     // SUB
-// add more functionality here for other ALU ops!
-
+      4'd2  : out = sll_out;                       // SLL
       4'd11 : out = in0;                           // CP OP0
       4'd12 : out = in1;                           // CP OP1
       default : out = 32'b0;
@@ -54,6 +56,12 @@ module lab2_proc_alu
     .in1  (1'b1),
     .out  (op0_neg)
   );
+
+  vc_LeftLogicalShifter #(32,5) left_log_shifter
+  (
+    .in     (in0)
+    .shamt  (shamt)
+    .out    (sll_out)
 
 endmodule
 
