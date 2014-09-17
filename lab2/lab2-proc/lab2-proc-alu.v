@@ -11,7 +11,6 @@ module lab2_proc_alu
 (
   input  logic [31:0] in0,
   input  logic [31:0] in1,
-  input  logic [ 4:0] shamt, 
   input  logic [ 3:0] fn,
   output logic [31:0] out,
   output logic        ops_eq,
@@ -19,7 +18,7 @@ module lab2_proc_alu
   output logic        op0_neg
 );
   
-  logic sll_out;
+  logic [31:0] sll_out;
 
   always @(*)
   begin
@@ -59,9 +58,10 @@ module lab2_proc_alu
 
   vc_LeftLogicalShifter #(32,5) left_log_shifter
   (
-    .in     (in0)
-    .shamt  (shamt)
+    .in     (in0),
+    .shamt  (in1[4:0]),
     .out    (sll_out)
+  );
 
 endmodule
 

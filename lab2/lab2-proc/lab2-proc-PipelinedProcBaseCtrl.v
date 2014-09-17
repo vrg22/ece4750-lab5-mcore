@@ -162,7 +162,7 @@ module lab2_proc_PipelinedProcBaseCtrl
   logic   [4:0] inst_rs_D;
   logic   [4:0] inst_rt_D;
   logic   [4:0] inst_rd_D;
-
+  logic   [4:0] inst_shamt_D;
   pisa_InstUnpack inst_unpack
   (
     .inst     (inst_D),
@@ -170,7 +170,7 @@ module lab2_proc_PipelinedProcBaseCtrl
     .rs       (inst_rs_D),
     .rt       (inst_rt_D),
     .rd       (inst_rd_D),
-    .shamt    (),
+    .shamt    (inst_shamt_D),
     .func     (),
     .imm      (),
     .target   ()
@@ -184,6 +184,8 @@ module lab2_proc_PipelinedProcBaseCtrl
   assign rt = inst_rt_D;
   logic [4:0] rd;
   assign rd = inst_rd_D;
+  logic [4:0] shamt;
+  assign shamt = inst_shamt_D;
 
   // Generic Parameters
 
@@ -293,6 +295,7 @@ module lab2_proc_PipelinedProcBaseCtrl
       //                      val type type     en muxsel   en fn       typ sel   wen wa  val  rdy
       `PISA_INST_NOP     :cs( y,  j_n, br_none, n, bm_x,    n, alu_x,   nr, wm_a, n,  rx, n,   n   );
       `PISA_INST_ADDU    :cs( y,  j_n, br_none, y, bm_rdat, y, alu_add, nr, wm_a, y,  rd, n,   n   );
+      `PISA_INST_ADDIU   :cs( y,  j_n, br_none, y, bm_si  , y, alu_add, nr, wm_a, y,  rd, n,   n   ); //TODO
       `PISA_INST_BNE     :cs( y,  j_n, br_bne,  y, bm_rdat, y, alu_x,   nr, wm_a, n,  rx, n,   n   );
       `PISA_INST_J       :cs( y,  j_j, br_none, n, bm_x,    n, alu_x,   nr, wm_x, n,  rx, n,   n   );
       `PISA_INST_LW      :cs( y,  j_n, br_none, y, bm_si,   n, alu_add, ld, wm_m, y,  rt, n,   n   );
