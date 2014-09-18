@@ -19,16 +19,19 @@ module lab2_proc_alu
 );
   
   logic [31:0] sll_out;
+  logic [31:0] lt_out;
 
   always @(*)
   begin
 
     case ( fn )
-      4'd0  : out = in0 + in1;                     // ADD
-      4'd1  : out = in0 - in1;                     // SUB
-      4'd2  : out = sll_out;                       // SLL
-      4'd11 : out = in0;                           // CP OP0
-      4'd12 : out = in1;                           // CP OP1
+      4'd0  : out = in0 + in1;          // ADD
+      4'd1  : out = in0 - in1;          // SUB
+      4'd2  : out = sll_out;            // SLL
+      4'd3  : out = in0 | in1;          // OR
+      4'd4  : out = lt_out;             // LT 
+      4'd11 : out = in0;                // CP OP0
+      4'd12 : out = in1;                // CP OP1
       default : out = 32'b0;
     endcase
 
@@ -61,6 +64,13 @@ module lab2_proc_alu
     .in     (in0),
     .shamt  (in1[4:0]),
     .out    (sll_out)
+  );
+
+  vc_LtComparator #(32) lt_comp
+  (
+    .in0    (in0),
+    .in1    (in1),
+    .out    (lt_out),
   );
 
 endmodule
