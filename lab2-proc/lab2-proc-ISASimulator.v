@@ -174,6 +174,10 @@ module lab2_proc_ISASimulator
       imm_sext = { {16{imm[15]}}, imm };
       imm_zext = { {16{1'b0}},    imm };
 
+      // Make sure any reads to R0 gets a zero.
+
+      R[ 5'd0 ] = 32'b0;
+
       // Basic settings every instruction defaults to
 
       basic_inst();

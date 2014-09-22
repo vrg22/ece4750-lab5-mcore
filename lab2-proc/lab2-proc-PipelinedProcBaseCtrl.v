@@ -198,9 +198,9 @@ module lab2_proc_PipelinedProcBaseCtrl
 
   // Branch type
 
-  localparam br_x     = 2'dx; // Don't care
-  localparam br_none  = 2'd0; // No branch
-  localparam br_bne   = 2'd1; // bne
+  localparam br_x     = 1'bx; // Don't care
+  localparam br_none  = 1'b0; // No branch
+  localparam br_bne   = 1'b1; // bne
 
   // Jump type
 
@@ -292,6 +292,7 @@ module lab2_proc_PipelinedProcBaseCtrl
       //                          j    br       rs op1      rt alu      dmm wbmux rf      thst fhst
       //                      val type type     en muxsel   en fn       typ sel   wen wa  val  rdy
       `PISA_INST_NOP     :cs( y,  j_n, br_none, n, bm_x,    n, alu_x,   nr, wm_a, n,  rx, n,   n   );
+      `PISA_INST_ADDIU   :cs( y,  j_n, br_none, y, bm_si,   n, alu_add, nr, wm_a, y,  rt, n,   n   );
       `PISA_INST_ADDU    :cs( y,  j_n, br_none, y, bm_rdat, y, alu_add, nr, wm_a, y,  rd, n,   n   );
       `PISA_INST_BNE     :cs( y,  j_n, br_bne,  y, bm_rdat, y, alu_x,   nr, wm_a, n,  rx, n,   n   );
       `PISA_INST_J       :cs( y,  j_j, br_none, n, bm_x,    n, alu_x,   nr, wm_x, n,  rx, n,   n   );
