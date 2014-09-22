@@ -364,6 +364,7 @@ begin
     // load the sources
     inst( "mfc0 r1, mngr2proc"); init_src( 0 ); // src0
     inst( "mfc0 r2, mngr2proc"); init_src( 1 ); // src1
+    inst( "mfc0 r3, mngr2proc"); init_src( 1 ); // helper
 
     // forward branch, if taken goto 2:
     inst( "bne r1, r2, [+4]" );
@@ -392,6 +393,7 @@ begin
     // load the sources
     inst( "mfc0 r1, mngr2proc"); init_src( 1 ); // src0
     inst( "mfc0 r2, mngr2proc"); init_src( 0 ); // src1
+    inst( "mfc0 r3, mngr2proc"); init_src( 1 ); // helper
 
     // forward branch, if taken goto 2:
     inst( "bne r1, r2, [+4]" );
@@ -420,6 +422,7 @@ begin
     // load the sources
     inst( "mfc0 r1, mngr2proc"); init_src( -1 ); // src0
     inst( "mfc0 r2, mngr2proc"); init_src(  1 ); // src1
+    inst( "mfc0 r3, mngr2proc"); init_src(  1 ); // helper
 
     // forward branch, if taken goto 2:
     inst( "bne r1, r2, [+4]" );
@@ -448,6 +451,7 @@ begin
     // load the sources
     inst( "mfc0 r1, mngr2proc"); init_src(  1 ); // src0
     inst( "mfc0 r2, mngr2proc"); init_src( -1 ); // src1
+    inst( "mfc0 r3, mngr2proc"); init_src(  1 ); // helper
 
     // forward branch, if taken goto 2:
     inst( "bne r1, r2, [+4]" );
@@ -476,6 +480,7 @@ begin
     // load the sources
     inst( "mfc0 r1, mngr2proc"); init_src( 0 ); // src0
     inst( "mfc0 r2, mngr2proc"); init_src( 0 ); // src1
+    inst( "mfc0 r3, mngr2proc"); init_src( 1 ); // helper
 
     // forward branch, if taken goto 2:
     inst( "bne r1, r2, [+4]" );
@@ -504,6 +509,7 @@ begin
     // load the sources
     inst( "mfc0 r1, mngr2proc"); init_src( 1 ); // src0
     inst( "mfc0 r2, mngr2proc"); init_src( 1 ); // src1
+    inst( "mfc0 r3, mngr2proc"); init_src( 1 ); // helper
 
     // forward branch, if taken goto 2:
     inst( "bne r1, r2, [+4]" );
@@ -532,6 +538,7 @@ begin
     // load the sources
     inst( "mfc0 r1, mngr2proc"); init_src( -1 ); // src0
     inst( "mfc0 r2, mngr2proc"); init_src( -1 ); // src1
+    inst( "mfc0 r3, mngr2proc"); init_src(  1 ); // helper
 
     // forward branch, if taken goto 2:
     inst( "bne r1, r2, [+4]" );
