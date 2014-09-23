@@ -169,61 +169,61 @@ begin
   inst( "addiu r2, r1, 0x8000   " );
   inst( "mtc0 r2, proc2mngr     " ); init_sink( 32'hffff8000 );
 
-  // Test "addiu", 0x00000000 (reg) + 0x8000 (imm) = 0xffff8000 (result)
+  // Test "addiu", 0x80000000 (reg) + 0x0000 (imm) = 0x80000000 (result)
 
   inst( "mfc0 r1, mngr2proc     " ); init_src(  32'h80000000 );
   inst( "addiu r2, r1, 0x0000   " );
   inst( "mtc0 r2, proc2mngr     " ); init_sink( 32'h80000000 );
 
-  // Test "addiu", 0x00000000 (reg) + 0x8000 (imm) = 0xffff8000 (result)
+  // Test "addiu", 0x80000000 (reg) + 0x8000 (imm) = 0x7fff8000 (result)
 
   inst( "mfc0 r1, mngr2proc     " ); init_src(  32'h80000000 );
   inst( "addiu r2, r1, 0x8000   " );
   inst( "mtc0 r2, proc2mngr     " ); init_sink( 32'h7fff8000 );
 
-  // Test "addiu", 0x00000000 (reg) + 0x8000 (imm) = 0xffff8000 (result)
+  // Test "addiu", 0x00000000 (reg) + 0x7fff (imm) = 0x00007fff (result)
 
   inst( "mfc0 r1, mngr2proc     " ); init_src(  32'h00000000 );
   inst( "addiu r2, r1, 0x7fff   " );
   inst( "mtc0 r2, proc2mngr     " ); init_sink( 32'h00007fff );
 
-  // Test "addiu", 0x00000000 (reg) + 0x8000 (imm) = 0xffff8000 (result)
+  // Test "addiu", 0x7fffffff (reg) + 0x0000 (imm) = 0x7fffffff (result)
 
   inst( "mfc0 r1, mngr2proc     " ); init_src(  32'h7fffffff );
   inst( "addiu r2, r1, 0x0000   " );
   inst( "mtc0 r2, proc2mngr     " ); init_sink( 32'h7fffffff );
 
-  // Test "addiu", 0x00000000 (reg) + 0x8000 (imm) = 0xffff8000 (result)
+  // Test "addiu", 0x7fffffff (reg) + 0x7fff (imm) = 0x80007ffe (result)
 
   inst( "mfc0 r1, mngr2proc     " ); init_src(  32'h7fffffff );
   inst( "addiu r2, r1, 0x7fff   " );
   inst( "mtc0 r2, proc2mngr     " ); init_sink( 32'h80007ffe );
 
-  // Test "addiu", 0x00000000 (reg) + 0x8000 (imm) = 0xffff8000 (result)
+  // Test "addiu", 0x80000000 (reg) + 0x7fff (imm) = 0x80007fff (result)
 
   inst( "mfc0 r1, mngr2proc     " ); init_src(  32'h80000000 );
   inst( "addiu r2, r1, 0x7fff   " );
   inst( "mtc0 r2, proc2mngr     " ); init_sink( 32'h80007fff );
 
-  // Test "addiu", 0x00000000 (reg) + 0x8000 (imm) = 0xffff8000 (result)
+  // Test "addiu", 0x7fffffff (reg) + 0x8000 (imm) = 0x7fff7fff (result)
 
   inst( "mfc0 r1, mngr2proc     " ); init_src(  32'h7fffffff );
   inst( "addiu r2, r1, 0x8000   " );
   inst( "mtc0 r2, proc2mngr     " ); init_sink( 32'h7fff7fff );
 
-  // Test "addiu", 0x00000000 (reg) + 0x8000 (imm) = 0xffff8000 (result)
+  // Test "addiu", 0x00000000 (reg) + 0xffff (imm) = 0xffffffff (result)
 
   inst( "mfc0 r1, mngr2proc     " ); init_src(  32'h00000000 );
   inst( "addiu r2, r1, 0xffff   " );
   inst( "mtc0 r2, proc2mngr     " ); init_sink( 32'hffffffff );
 
-  // Test "addiu", 0x00000000 (reg) + 0x8000 (imm) = 0xffff8000 (result)
+  // Test "addiu", 0xffffffff (reg) + 0x0001 (imm) = 0x00000000 (result)
 
   inst( "mfc0 r1, mngr2proc     " ); init_src(  32'hffffffff );
   inst( "addiu r2, r1, 0x0001   " );
   inst( "mtc0 r2, proc2mngr     " ); init_sink( 32'h00000000 );
 
-  // Test "addiu", 0x00000000 (reg) + 0x8000 (imm) = 0xffff8000 (result)
+  // Test "addiu", 0xffffffff (reg) + 0xffff (imm) = 0xfffffffe (result)
 
   inst( "mfc0 r1, mngr2proc     " ); init_src(  32'hffffffff );
   inst( "addiu r2, r1, 0xffff   " );
@@ -262,13 +262,13 @@ begin
   // create a long sequence of instructions to test stalls and bubbles
   for ( idx = 0; idx < 100; idx = idx + 1 ) begin
 
-    // Test "addiu", 0x00000000 (reg) + 0x8000 (imm) = 0xffff8000 (result)
+    // Test "addiu", 0x00000001 (reg) + 0x0001 (imm) = 0x00000002 (result)
 
     inst( "mfc0 r1, mngr2proc     " ); init_src(  32'h00000001 );
     inst( "addiu r2, r1, 0x0001   " );
     inst( "mtc0 r2, proc2mngr     " ); init_sink( 32'h00000002 );
 
-    // Test "addiu", 0x00000000 (reg) + 0x8000 (imm) = 0xffff8000 (result)
+    // Test "addiu", 0x00000003 (reg) + 0x0007 (imm) = 0x0000000a (result)
 
     inst( "mfc0 r1, mngr2proc     " ); init_src(  32'h00000003 );
     inst( "addiu r2, r1, 0x0007   " );
