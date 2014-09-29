@@ -37,7 +37,7 @@ module lab2_proc_alu
       4'd7  : out = in0 ~| in1;         // NOR
       4'd8  : out = in0 ^~ in1;         // XNOR
       4'd9  : out = srl_out;            // SRL
-      4'd10 : out = in0 >>> in1;        // SRA
+      4'd10 : out = $signed(in0) >>> in1;        // SRA
       4'd11 : out = in0;                // CP OP0
       4'd12 : out = in1;                // CP OP1
       default : out = 32'b0;
