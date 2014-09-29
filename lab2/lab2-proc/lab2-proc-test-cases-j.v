@@ -12,23 +12,31 @@ begin
 
   clear_mem;
 
+  // In jump/branch tests, a bitvector tracks the paths that are taken
+  // when the jumps/branches are taken / not taken. The bitvector starts
+  // at 32'b0, and we raise bits in the bitvector depending on which
+  // paths we take. At the end of the test, we send the bitvector to the
+  // sink to check whether we took the paths we expected to take.
+
   address( c_reset_vector );
-  inst( "mfc0  r3, mngr2proc"); init_src( 32'h00000001 );
-  inst( "j     [+8]         "); // goto 1:
-  // send zero if fail
-  inst( "mtc0  r0, proc2mngr"); // we don't expect a message here
+  // Initialize bitvector
+  inst( "addiu r5, r0, 0    " );
   inst( "nop                ");
   inst( "nop                ");
   inst( "nop                ");
   inst( "nop                ");
   inst( "nop                ");
-  inst( "nop                ");
-
-  // 1:
-  // pass
-  inst( "mtc0  r3, proc2mngr"); init_sink( 32'h00000001 );
-
-  inst( "nop                ");
+  inst( "j     [+7]         "); // goto 1:-.
+  inst( "addiu r5, r5, 0b01 "); //         |
+  inst( "nop                "); //         |
+  inst( "nop                "); //         |
+  inst( "nop                "); //         |
+  inst( "nop                "); //         |
+  inst( "nop                "); //         |
+                                //         |
+  // 1:                         //         |
+  inst( "addiu r5, r5, 0b10 "); // <- - - -'
+  inst( "mtc0  r5, proc2mngr"); init_sink( 32'b10 );
   inst( "nop                ");
   inst( "nop                ");
   inst( "nop                ");
@@ -49,47 +57,43 @@ begin
 
   address( c_reset_vector );
 
+  // Initialize some data
   inst( "mfc0  r3, mngr2proc"); init_src( 32'h00000001 );
-  inst( "j     [+11]        "); // goto 2:
-  // send zero if fail
-  inst( "mtc0  r0, proc2mngr"); // we don't expect a message here
-  inst( "nop                ");
-  inst( "nop                ");
-  inst( "nop                ");
-  inst( "nop                ");
-  inst( "nop                ");
-  inst( "nop                ");
 
-  // 1:
-  // pass
-  inst( "mtc0  r3, proc2mngr"); init_sink( 32'h00000001 );
-  inst( "j     [+5]         "); // goto 3:
-  // fail
-  inst( "mtc0  r0, proc2mngr");
+  // Initialize bitvector
+  inst( "addiu r5, r0, 0    ");
 
-  // 2:
-  // pass
-  inst( "mtc0  r3, proc2mngr"); init_sink( 32'h00000001 );
-  inst( "j     [-4]         "); // goto 1:
-  // fail
-  inst( "mtc0  r0, proc2mngr");
-  // 3:
-  // pass
-  inst( "mtc0  r3, proc2mngr"); init_sink( 32'h00000001 );
+  inst( "j     [+11]        ");    // goto 2:- -.
+  inst( "addiu r5, r5, 0b1  ");    //           |
+  inst( "nop                ");    //           |
+  inst( "nop                ");    //           |
+  inst( "nop                ");    //           |
+  inst( "nop                ");    //           |
+  inst( "nop                ");    //           |
+  inst( "nop                ");    //           |
+                                   //           |
+  // 1:                            //           |
+  inst( "addiu r5, r5, 0b10 ");    // <- - - -. |
+  inst( "j     [+5]         ");    // goto 3:-+-+-.
+  inst( "addiu r5, r5, 0b100 ");   //         | | |
+                                   //         | | |
+  // 2:                            //         | | |
+  inst( "addiu r5, r5, 0b1000 ");  // <- - - -+-' |
+  inst( "j     [-4]         ");    // goto 1:-'   |
+  inst( "addiu r5, r5, 0b10000 "); //             |
+                                   //             |
+  // 3:                            //             |
+  inst( "addiu r5, r5, 0b100000 ");// <- - - - - -'
 
   // test branch's priority over jump
-  inst( "bne   r3, r0, [+4] "); // goto 5:
-  inst( "j     [+2]         ");
-  inst( "mtc0  r0, proc2mngr");
+  inst( "bne   r3, r0, [+4] ");       // goto 4: -.
+  inst( "j     [+2]         ");       // - -.     |
+  inst( "addiu r5, r5, 0b1000000 ");  //    |     |
+  inst( "addiu r5, r5, 0b10000000 "); // <--'     |
+                                      //          |
+  // 4:                               // < - - - -'
+  inst( "mtc0  r5, proc2mngr"); init_sink( 32'b00101010 );
 
-  // 4:
-  // fail
-  inst( "mtc0  r0, proc2mngr");
-  // 5:
-  // pass
-  inst( "mtc0  r3, proc2mngr"); init_sink( 32'h00000001 );
-
-  inst( "nop                ");
   inst( "nop                ");
   inst( "nop                ");
   inst( "nop                ");
