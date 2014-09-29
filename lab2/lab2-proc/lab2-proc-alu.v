@@ -90,4 +90,4 @@ module lab2_proc_alu
 
 endmodule
 
-`endif
+`endif  /*LAB2_PROC_ALU_V */
