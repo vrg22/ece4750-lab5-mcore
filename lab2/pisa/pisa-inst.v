@@ -840,6 +840,8 @@ module pisa_InstTasks();
   begin
     s2i_16b_e = $sscanf( imm_s, "0x%x", s2i_16b );
     if ( s2i_16b_e == 0 )
+      s2i_16b_e = $sscanf( imm_s, "0b%b", s2i_16b );
+    if ( s2i_16b_e == 0 )
       s2i_16b_e = $sscanf( imm_s, "%d", s2i_16b );
     if ( s2i_16b_e == 0 )
       e = 0;
