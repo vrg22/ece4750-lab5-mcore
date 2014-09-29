@@ -27,19 +27,19 @@ module lab2_proc_alu
   begin
 
     case ( fn )
-      4'd0  : out = in0 + in1;          // ADD
-      4'd1  : out = in0 - in1;          // SUB
-      4'd2  : out = sll_out;            // SLL
-      4'd3  : out = in0 | in1;          // OR
-      4'd4  : out = { 31'd0, lt_out  }; // LT
-      4'd5  : out = in0 & in1;          // AND
-      4'd6  : out = in0 ^ in1;          // XOR
-      4'd7  : out = in0 ~| in1;         // NOR
-      4'd8  : out = in0 ^~ in1;         // XNOR
-      4'd9  : out = srl_out;            // SRL
-      4'd10 : out = $signed(in0) >>> in1;        // SRA
-      4'd11 : out = in0;                // CP OP0
-      4'd12 : out = in1;                // CP OP1
+      4'd0  : out = in0 + in1;              // ADD
+      4'd1  : out = in0 - in1;              // SUB
+      4'd2  : out = sll_out;                // SLL
+      4'd3  : out = in0 | in1;              // OR
+      4'd4  : out = { 31'd0, lt_out  };     // LT
+      4'd5  : out = in0 & in1;              // AND
+      4'd6  : out = in0 ^ in1;              // XOR
+      4'd7  : out = in0 ~| in1;             // NOR
+      4'd8  : out = in0 ^~ in1;             // XNOR
+      4'd9  : out = srl_out;                // SRL
+      4'd10 : out = $signed(in0) >>> in1;   // SRA
+      4'd11 : out = in0;                    // CP OP0
+      4'd12 : out = in1;                    // CP OP1
       default : out = 32'b0;
     endcase
 
