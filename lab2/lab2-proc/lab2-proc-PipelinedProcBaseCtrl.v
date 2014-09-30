@@ -222,6 +222,10 @@ module lab2_proc_PipelinedProcBaseCtrl
   localparam alu_x    = 4'bx;
   localparam alu_add  = 4'd0;
   localparam alu_sub  = 4'd1;
+  localparam alu_and  = 4'd5;
+  localparam alu_or   = 4'd3;
+  localparam alu_xor  = 4'd6;
+  localparam alu_nor  = 4'd7;
   localparam alu_cp0  = 4'd11;
   localparam alu_cp1  = 4'd12;
 
@@ -296,7 +300,11 @@ module lab2_proc_PipelinedProcBaseCtrl
       `PISA_INST_NOP     :cs( y,  j_n, br_none, n, bm_x,    n, alu_x,   nr, wm_a, n,  rx, n,   n   );
       `PISA_INST_ADDIU   :cs( y,  j_n, br_none, y, bm_si,   n, alu_add, nr, wm_a, y,  rt, n,   n   );
       `PISA_INST_ADDU    :cs( y,  j_n, br_none, y, bm_rdat, y, alu_add, nr, wm_a, y,  rd, n,   n   );
-      `PISA_INST_ADDIU   :cs( y,  j_n, br_none, y, bm_si  , y, alu_add, nr, wm_a, y,  rd, n,   n   ); //TODO
+      `PISA_INST_SUBU    :cs( y,  j_n, br_none, y, bm_rdat, y, alu_sub, nr, wm_a, y,  rd, n,   n   );
+      `PISA_INST_AND     :cs( y,  j_n, br_none, y, bm_rdat, y, alu_and, nr, wm_a, y,  rd, n,   n   );
+      `PISA_INST_OR      :cs( y,  j_n, br_none, y, bm_rdat, y, alu_or,  nr, wm_a, y,  rd, n,   n   );
+      `PISA_INST_XOR     :cs( y,  j_n, br_none, y, bm_rdat, y, alu_xor, nr, wm_a, y,  rd, n,   n   );
+      `PISA_INST_NOR     :cs( y,  j_n, br_none, y, bm_rdat, y, alu_nor, nr, wm_a, y,  rd, n,   n   );
       `PISA_INST_BNE     :cs( y,  j_n, br_bne,  y, bm_rdat, y, alu_x,   nr, wm_a, n,  rx, n,   n   );
       `PISA_INST_J       :cs( y,  j_j, br_none, n, bm_x,    n, alu_x,   nr, wm_x, n,  rx, n,   n   );
       `PISA_INST_LW      :cs( y,  j_n, br_none, y, bm_si,   n, alu_add, ld, wm_m, y,  rt, n,   n   );
