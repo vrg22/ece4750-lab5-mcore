@@ -216,7 +216,7 @@ module lab2_proc_PipelinedProcBaseDpath
     .out  (inst_imm_zext_D)
   );
 
-  vc_ZeroExtender #(5, 32) imm_zext_D
+  vc_ZeroExtender #(5, 32) shamt_zext_D
   (
     .in   (inst_shamt_D),
     .out  (inst_shift_zext_D)
