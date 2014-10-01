@@ -57,8 +57,9 @@ module lab2_proc_PipelinedProcBaseDpath
   // status signals (dpath->ctrl)
 
   output logic [31:0] inst_D,
-  output logic        br_cond_eq_X
-
+  output logic        br_cond_eq_X,
+  output logic        br_cond_neg_X,
+  output logic        br_cond_zero_X
 );
 
   localparam c_reset_vector = 32'h1000;
@@ -306,8 +307,8 @@ module lab2_proc_PipelinedProcBaseDpath
     .fn       (alu_fn_X),
     .out      (alu_result_X),
     .ops_eq   (br_cond_eq_X),
-    .op0_zero (),
-    .op0_neg  ()
+    .op0_zero (br_cond_zero_X),
+    .op0_neg  (br_cond_neg_X)
   );
 
   assign ex_result_X = alu_result_X;

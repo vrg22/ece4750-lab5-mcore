@@ -58,8 +58,9 @@ module lab2_proc_PipelinedProcBaseCtrl
   // status signals (dpath->ctrl)
 
   input  logic[31:0]  inst_D,
-  input  logic        br_cond_eq_X
-
+  input  logic        br_cond_eq_X,
+  input  logic        br_cond_neg_X,
+  input  logic        br_cond_zero_X
 );
 
   //----------------------------------------------------------------------
@@ -202,9 +203,14 @@ module lab2_proc_PipelinedProcBaseCtrl
 
   // Branch type
 
-  localparam br_x     = 1'bx; // Don't care
-  localparam br_none  = 1'b0; // No branch
-  localparam br_bne   = 1'b1; // bne
+  localparam br_x     = 3'bx; // Don't care
+  localparam br_none  = 3'd0; // No branch
+  localparam br_ne    = 3'd1; // bne
+  localparam br_eq    = 3'd2; // beq
+  localparam br_gtz   = 3'd3; // bgtz
+  localparam br_ltz   = 3'd4; // bltz
+  localparam br_gez   = 3'd5; // bgez
+  localparam br_lez   = 3'd6; // blez
 
   // Jump type
 
@@ -265,7 +271,7 @@ module lab2_proc_PipelinedProcBaseCtrl
 
   logic       inst_val_D;
   logic [1:0] j_type_D;
-  logic       br_type_D;
+  logic [2:0] br_type_D;
   logic       rs_en_D;
   logic       rt_en_D;
   logic [3:0] alu_fn_D;
@@ -280,7 +286,7 @@ module lab2_proc_PipelinedProcBaseCtrl
   (
     input logic       cs_val,
     input logic [1:0] cs_j_type,
-    input logic       cs_br_type,
+    input logic [2:0] cs_br_type,
     input logic [1:0] cs_op0_sel,
     input logic       cs_rs_en,
     input logic [2:0] cs_op1_sel,
@@ -340,7 +346,12 @@ module lab2_proc_PipelinedProcBaseCtrl
       `PISA_INST_SLTI    :cs( y,  j_n, br_none, am_rdat,  y, bm_si,   y, alu_lts, nr, wm_a, y,  rt, n,   n   );
       `PISA_INST_SLTIU   :cs( y,  j_n, br_none, am_rdat,  y, bm_si,   y, alu_ltu, nr, wm_a, y,  rt, n,   n   );
       `PISA_INST_LUI     :cs( y,  j_n, br_none, am_x,     n, bm_zi,   n, alu_lui, nr, wm_a, y,  rt, n,   n   );
-      `PISA_INST_BNE     :cs( y,  j_n, br_bne,  am_rdat,  y, bm_rdat, y, alu_x,   nr, wm_a, n,  rx, n,   n   );
+      `PISA_INST_BNE     :cs( y,  j_n, br_ne,   am_rdat,  y, bm_rdat, y, alu_x,   nr, wm_a, n,  rx, n,   n   );
+      `PISA_INST_BEQ     :cs( y,  j_n, br_eq,   am_rdat,  y, bm_rdat, y, alu_x,   nr, wm_a, n,  rx, n,   n   );
+      `PISA_INST_BGTZ    :cs( y,  j_n, br_gtz,  am_rdat,  y, bm_x,    n, alu_x,   nr, wm_a, n,  rx, n,   n   );
+      `PISA_INST_BLTZ    :cs( y,  j_n, br_ltz,  am_rdat,  y, bm_x,    n, alu_x,   nr, wm_a, n,  rx, n,   n   );
+      `PISA_INST_BGEZ    :cs( y,  j_n, br_gez,  am_rdat,  y, bm_x,    n, alu_x,   nr, wm_a, n,  rx, n,   n   );
+      `PISA_INST_BLEZ    :cs( y,  j_n, br_lez,  am_rdat,  y, bm_x,    n, alu_x,   nr, wm_a, n,  rx, n,   n   );
       `PISA_INST_J       :cs( y,  j_j, br_none, am_x,     n, bm_x,    n, alu_x,   nr, wm_x, n,  rx, n,   n   );
       `PISA_INST_JR      :cs( y,  j_r, br_none, am_rdat,  y, bm_x,    n, alu_x,   nr, wm_x, n,  rx, n,   n   );
       `PISA_INST_JAL     :cs( y,  j_l, br_none, am_x,     n, bm_pc4,  n, alu_cp1, nr, wm_a, y,  rL, n,   n   );
@@ -470,7 +481,7 @@ module lab2_proc_PipelinedProcBaseCtrl
   logic        rf_wen_X;
   logic [4:0]  rf_waddr_X;
   logic        to_mngr_val_X;
-  logic [0:0]  br_type_X;
+  logic [2:0]  br_type_X;
 
   always @(posedge clk) begin
     if (reset) begin
@@ -495,10 +506,14 @@ module lab2_proc_PipelinedProcBaseCtrl
     if ( val_X ) begin
 
       case ( br_type_X )
-        br_bne:  br_taken_X = !br_cond_eq_X;
+        br_ne:  br_taken_X = !br_cond_eq_X;
+        br_eq:  br_taken_X = br_cond_eq_X;
+        br_gtz: br_taken_X = !br_cond_zero_X && !br_cond_neg_X;
+        br_ltz: br_taken_X = br_cond_neg_X;
+        br_gez: br_taken_X = br_cond_zero_X || !br_cond_neg_X;
+        br_lez: br_taken_X = br_cond_zero_X || br_cond_neg_X;
         default: br_taken_X = 1'b0;
       endcase
-
     end else
       br_taken_X = 1'b0;
   end
