@@ -67,8 +67,8 @@ module lab2_proc_PipelinedProcBase
 
   logic [31:0] dmemreq_msg_addr;
   logic [31:0] dmemreq_msg_data;
+  logic [ 2:0] dmemreq_msg_type;
   logic [31:0] dmemresp_msg_data;
-
   logic [31:0] imemreq_msg_addr;
 
   // imereq_enq signals coming in from the ctrl unit
@@ -127,7 +127,7 @@ module lab2_proc_PipelinedProcBase
 
   vc_MemReqMsgPack#(8,32,32) dmemreq_msg_pack
   (
-    .type_  (`VC_MEM_REQ_MSG_TYPE_READ),
+    .type_  (dmemreq_msg_type),
     .opaque (8'b0),
     .addr   (dmemreq_msg_addr),
     .len    (2'd0),
@@ -170,8 +170,10 @@ module lab2_proc_PipelinedProcBase
 
     .dmemreq_val            (dmemreq_val),
     .dmemreq_rdy            (dmemreq_rdy),
+    .dmemreq_msg_type       (dmemreq_msg_type)
     .dmemresp_val           (dmemresp_val),
     .dmemresp_rdy           (dmemresp_rdy),
+
 
     // mngr communication ports
 
