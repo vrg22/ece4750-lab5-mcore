@@ -77,6 +77,7 @@ module lab2_proc_PipelinedProcBaseDpath
   logic [31:0] pc_plus4_F;
   logic [31:0] br_target_X;
   logic [31:0] j_target_D;
+  logic [31:0] jr_target_D;
 
   vc_EnResetReg #(32, c_reset_vector - 32'd4) pc_reg_F
   (
@@ -93,11 +94,12 @@ module lab2_proc_PipelinedProcBaseDpath
     .out  (pc_plus4_F)
   );
 
-  vc_Mux3 #(32) pc_sel_mux_F
+  vc_Mux4 #(32) pc_sel_mux_F
   (
-    .in0  (pc_plus4_F),
-    .in1  (br_target_X),
+    .in0  (br_target_X),
+    .in1  (),
     .in2  (j_target_D),
+    .in3  (pc_plus4_F),
     .sel  (pc_sel_F),
     .out  (pc_next_F)
   );
@@ -257,6 +259,8 @@ module lab2_proc_PipelinedProcBaseDpath
     .imm_target (inst_target_D),
     .j_target   (j_target_D)
   );
+
+  assign jr_target_D = rf_rdata0_D;
 
   //--------------------------------------------------------------------
   // X stage

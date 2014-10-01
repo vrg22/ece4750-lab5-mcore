@@ -99,9 +99,10 @@ module lab2_proc_PipelinedProcBaseCtrl
   // PC Mux select
 
   localparam pm_x     = 2'dx; // Don't care
-  localparam pm_p     = 2'd0; // Use pc+4
-  localparam pm_b     = 2'd1; // Use branch address
+  localparam pm_b     = 2'd0; // Use branch address
+  localparam pm_r     = 2'd1; // Use register value
   localparam pm_j     = 2'd2; // Use jump address (imm)
+  localparam pm_p     = 2'd3; // Use pc+4
 
   logic [1:0] j_pc_sel_D;
   logic       j_taken_D;
@@ -207,9 +208,11 @@ module lab2_proc_PipelinedProcBaseCtrl
 
   // Jump type
 
-  localparam j_x      = 1'bx; // Don't care
-  localparam j_n      = 1'b0; // No jump
-  localparam j_j      = 1'b1; // jump (imm)
+  localparam j_x      = 2'bx; // Don't care
+  localparam j_n      = 2'd0; // No jump
+  localparam j_j      = 2'd1; // jump (imm)
+  localparam j_r      = 2'd2; // jump (register)
+  localparam j_l      = 2'd3; // JAL
 
   // Operand 0 Mux Select
 
@@ -261,7 +264,7 @@ module lab2_proc_PipelinedProcBaseCtrl
   // Instruction Decode
 
   logic       inst_val_D;
-  logic       j_type_D;
+  logic [1:0] j_type_D;
   logic       br_type_D;
   logic       rs_en_D;
   logic       rt_en_D;
@@ -276,7 +279,7 @@ module lab2_proc_PipelinedProcBaseCtrl
   task cs
   (
     input logic       cs_val,
-    input logic       cs_j_type,
+    input logic [1:0] cs_j_type,
     input logic       cs_br_type,
     input logic [1:0] cs_op0_sel,
     input logic       cs_rs_en,
@@ -339,7 +342,8 @@ module lab2_proc_PipelinedProcBaseCtrl
       `PISA_INST_LUI     :cs( y,  j_n, br_none, am_x,     n, bm_zi,   n, alu_lui, nr, wm_a, y,  rt, n,   n   );
       `PISA_INST_BNE     :cs( y,  j_n, br_bne,  am_rdat,  y, bm_rdat, y, alu_x,   nr, wm_a, n,  rx, n,   n   );
       `PISA_INST_J       :cs( y,  j_j, br_none, am_x,     n, bm_x,    n, alu_x,   nr, wm_x, n,  rx, n,   n   );
-      `PISA_INST_JAL     :cs( y,  j_j, br_none, am_x,     n, bm_pc4,  n, alu_cp1, nr, wm_a, y,  rL, n,   n   );
+      `PISA_INST_JR      :cs( y,  j_j, br_none, am_x,     y, bm_x,    n, alu_x,   nr, wm_x, n,  rx, n,   n   );
+      `PISA_INST_JAL     :cs( y,  j_l, br_none, am_x,     n, bm_pc4,  n, alu_cp1, nr, wm_a, y,  rL, n,   n   );
       `PISA_INST_LW      :cs( y,  j_n, br_none, am_rdat,  y, bm_si,   n, alu_add, ld, wm_m, y,  rt, n,   n   );
       `PISA_INST_MFC0    :cs( y,  j_n, br_none, am_x,     n, bm_fhst, n, alu_cp1, nr, wm_a, y,  rt, n,   y   );
       `PISA_INST_MTC0    :cs( y,  j_n, br_none, am_x,     n, bm_rdat, y, alu_cp1, nr, wm_a, n,  rx, y,   n   );
@@ -360,6 +364,8 @@ module lab2_proc_PipelinedProcBaseCtrl
 
       case ( j_type_D )
         j_j:     j_pc_sel_D = pm_j;
+        j_r:     j_pc_sel_D = pm_r;
+        j_l:     j_pc_sel_D = pm_l;
         default: j_pc_sel_D = pm_p;
       endcase
 
