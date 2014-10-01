@@ -22,24 +22,27 @@ module lab2_proc_alu
   logic        lt_out;
   logic [31:0] srl_out;
   logic [31:0] sra_out;
+  logic        lt_signed_out;
 
   always @(*)
   begin
 
     case ( fn )
-      4'd0  : out = in0 + in1;              // ADD
-      4'd1  : out = in0 - in1;              // SUB
-      4'd2  : out = sll_out;                // SLL
-      4'd3  : out = in0 | in1;              // OR
-      4'd4  : out = { 31'd0, lt_out  };     // LT
-      4'd5  : out = in0 & in1;              // AND
-      4'd6  : out = in0 ^ in1;              // XOR
-      4'd7  : out = in0 ~| in1;             // NOR
-      4'd8  : out = in0 ^~ in1;             // XNOR
-      4'd9  : out = srl_out;                // SRL
-      4'd10 : out = $signed(in0) >>> in1;   // SRA
-      4'd11 : out = in0;                    // CP OP0
-      4'd12 : out = in1;                    // CP OP1
+      4'd0  : out = in0 + in1;                // ADD
+      4'd1  : out = in0 - in1;                // SUB
+      4'd2  : out = sll_out;                  // SLL
+      4'd3  : out = in0 | in1;                // OR
+      4'd4  : out = { 31'd0, lt_out  };       // LT Unsigned
+      4'd5  : out = in0 & in1;                // AND
+      4'd6  : out = in0 ^ in1;                // XOR
+      4'd7  : out = in0 ~| in1;               // NOR
+      4'd8  : out = in0 ^~ in1;               // XNOR
+      4'd9  : out = srl_out;                  // SRL
+      4'd10 : out = $signed(in0) >>> in1;     // SRA
+      4'd11 : out = in0;                      // CP OP0
+      4'd12 : out = in1;                      // CP OP1
+      4'd13 : out = { 31'd0, lt_signed_out }; // LT Signed
+      4'd14 : out = { in1[15:0] , 16'd0 };    // LUI
       default : out = 32'b0;
     endcase
 
@@ -79,6 +82,13 @@ module lab2_proc_alu
     .in0    (in0),
     .in1    (in1),
     .out    (lt_out)
+  );
+
+  vc_LtComparator #(32) lt_signed_comp
+  (
+    .in0    ($signed(in0)),
+    .in1    ($signed(in1)),
+    .out    (lt_signed_out)
   );
 
   vc_RightLogicalShifter #(32,5) right_log_shifter
