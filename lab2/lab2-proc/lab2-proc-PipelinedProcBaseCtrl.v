@@ -365,7 +365,7 @@ module lab2_proc_PipelinedProcBaseCtrl
       case ( j_type_D )
         j_j:     j_pc_sel_D = pm_j;
         j_r:     j_pc_sel_D = pm_r;
-        j_l:     j_pc_sel_D = pm_l;
+        j_l:     j_pc_sel_D = pm_j;
         default: j_pc_sel_D = pm_p;
       endcase
 

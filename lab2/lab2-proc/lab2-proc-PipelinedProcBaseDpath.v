@@ -97,7 +97,7 @@ module lab2_proc_PipelinedProcBaseDpath
   vc_Mux4 #(32) pc_sel_mux_F
   (
     .in0  (br_target_X),
-    .in1  (),
+    .in1  (jr_target_D),
     .in2  (j_target_D),
     .in3  (pc_plus4_F),
     .sel  (pc_sel_F),
