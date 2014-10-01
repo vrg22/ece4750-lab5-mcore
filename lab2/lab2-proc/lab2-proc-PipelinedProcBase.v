@@ -68,7 +68,7 @@ module lab2_proc_PipelinedProcBase
   logic [31:0]    dmemreq_msg_addr;
   logic [31:0]    dmemreq_msg_data;
   logic [31:0]    dmemresp_msg_data;
-  logic [ 2:0]    dmemreq_type,
+  logic [ 2:0]    dmemreq_type;
   logic [31:0]    imemreq_msg_addr;
 
   // imereq_enq signals coming in from the ctrl unit
