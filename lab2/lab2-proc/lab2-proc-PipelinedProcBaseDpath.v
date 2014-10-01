@@ -47,6 +47,7 @@ module lab2_proc_PipelinedProcBaseDpath
   input  logic        reg_en_X,
   input  logic        reg_en_M,
   input  logic        reg_en_W,
+  input  logic [1:0]  op0_sel_D,
   input  logic [1:0]  op1_sel_D,
   input  logic [3:0]  alu_fn_X,
   input  logic        wb_result_sel_M,
@@ -201,12 +202,19 @@ module lab2_proc_PipelinedProcBaseDpath
   logic [31:0] op0_D;
   logic [31:0] op1_D;
 
-  assign op0_D = rf_rdata0_D;
-
   vc_SignExtender #(16, 32) imm_sext_D
   (
     .in   (inst_imm_D),
     .out  (inst_imm_sext_D)
+  );
+
+  vc_Mux3 #(32) op0_sel_mux_D
+  (
+    .in0  (32'd0),
+    .in1  (rf_rdata0_D),
+    .in2  (32'd16),
+    .sel  (op0_sel_D),
+    .out  (op0_D)
   );
 
   vc_Mux3 #(32) op1_sel_mux_D

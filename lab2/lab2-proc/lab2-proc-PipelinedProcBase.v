@@ -93,6 +93,7 @@ module lab2_proc_PipelinedProcBase
   logic        reg_en_X;
   logic        reg_en_M;
   logic        reg_en_W;
+  logic [1:0]  op0_sel_D;
   logic [1:0]  op1_sel_D;
   logic [3:0]  alu_fn_X;
   logic        wb_result_sel_M;
@@ -185,6 +186,7 @@ module lab2_proc_PipelinedProcBase
     .reg_en_X               (reg_en_X),
     .reg_en_M               (reg_en_M),
     .reg_en_W               (reg_en_W),
+    .op0_sel_D              (op0_sel_D),
     .op1_sel_D              (op1_sel_D),
     .wb_result_sel_M        (wb_result_sel_M),
     .alu_fn_X               (alu_fn_X),
@@ -251,6 +253,7 @@ module lab2_proc_PipelinedProcBase
     .reg_en_X                (reg_en_X),
     .reg_en_M                (reg_en_M),
     .reg_en_W                (reg_en_W),
+    .op0_sel_D               (op0_sel_D),
     .op1_sel_D               (op1_sel_D),
     .alu_fn_X                (alu_fn_X),
     .wb_result_sel_M         (wb_result_sel_M),
