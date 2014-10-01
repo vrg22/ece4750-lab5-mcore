@@ -146,6 +146,8 @@ module lab2_proc_PipelinedProcBaseDpath
   logic   [4:0] inst_shamt_D;
   logic  [15:0] inst_imm_D;
   logic  [31:0] inst_imm_sext_D;
+  logic  [31:0] inst_imm_zext_D;
+  logic  [31:0] inst_shift_zext_D;
   logic  [25:0] inst_target_D;
 
   vc_EnResetReg #(32) pc_plus4_reg_D
@@ -208,9 +210,21 @@ module lab2_proc_PipelinedProcBaseDpath
     .out  (inst_imm_sext_D)
   );
 
+  vc_ZeroExtender #(16, 32) imm_zext_D
+  (
+    .in   (inst_imm_D),
+    .out  (inst_imm_zext_D)
+  );
+
+  vc_ZeroExtender #(5, 32) imm_zext_D
+  (
+    .in   (inst_shamt_D),
+    .out  (inst_shift_zext_D)
+  );
+
   vc_Mux3 #(32) op0_sel_mux_D
   (
-    .in0  (32'd0),
+    .in0  (inst_shift_zext_D),
     .in1  (rf_rdata0_D),
     .in2  (32'd16),
     .sel  (op0_sel_D),
@@ -222,7 +236,7 @@ module lab2_proc_PipelinedProcBaseDpath
     .in0  (rf_rdata1_D),
     .in1  (inst_imm_sext_D),
     .in2  (pc_plus4_D),
-    .in3  (32'd0),//zero extender output
+    .in3  (inst_imm_zext_D),
     .in4  (from_mngr_data),
     .sel  (op1_sel_D),
     .out  (op1_D)
