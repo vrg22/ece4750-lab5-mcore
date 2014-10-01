@@ -29,8 +29,6 @@ module lab2_proc_PipelinedProcBaseCtrl
   output logic        dmemreq_val,
   input  logic        dmemreq_rdy,
 
-  output logic [2:0]  dmemreq_msg_type,
-
   input  logic        dmemresp_val,
   output logic        dmemresp_rdy,
 
@@ -529,8 +527,7 @@ module lab2_proc_PipelinedProcBaseCtrl
   logic stall_dmem_X;
 
   assign dmemreq_val_X = val_X && ( dmemreq_type_X != nr );
-  assign dmemreq_msg_type = dmemreq_type_X == st ? `VC_MEM_REQ_MSG_TYPE_WRITE :
-                          `VC_MEM_REQ_MSG_TYPE_READ;
+
   assign dmemreq_val  = dmemreq_val_X && !stall_XM;
   assign stall_dmem_X = dmemreq_val_X && !dmemreq_rdy;
 
