@@ -49,7 +49,7 @@ module lab2_proc_PipelinedProcBaseCtrl
   output logic        reg_en_M,
   output logic        reg_en_W,
   output logic [1:0]  op0_sel_D,
-  output logic [1:0]  op1_sel_D,
+  output logic [2:0]  op1_sel_D,
   output logic [3:0]  alu_fn_X,
   output logic        wb_result_sel_M,
   output logic [4:0]  rf_waddr_W,
@@ -220,10 +220,12 @@ module lab2_proc_PipelinedProcBaseCtrl
 
   // Operand 1 Mux Select
 
-  localparam bm_x     = 2'bx; // Don't care
-  localparam bm_rdat  = 2'd0; // Use data from register file
-  localparam bm_si    = 2'd1; // Use sign-extended immediate
-  localparam bm_fhst  = 2'd2; // Use from mngr data
+  localparam bm_x     = 3'bx; // Don't care
+  localparam bm_rdat  = 3'd0; // Use data from register file
+  localparam bm_si    = 3'd1; // Use sign-extended immediate
+  localparam bm_pc4   = 3'd2; // PC+4
+  localparam bm_zi    = 3'd3; // Use zero-extended immediate
+  localparam bm_fhst  = 3'd4; // Use from mngr data
 
   // ALU Function
 
@@ -269,9 +271,9 @@ module lab2_proc_PipelinedProcBaseCtrl
     input logic       cs_val,
     input logic       cs_j_type,
     input logic       cs_br_type,
-    input logic       cs_op0_sel,
+    input logic [1:0] cs_op0_sel,
     input logic       cs_rs_en,
-    input logic [1:0] cs_op1_sel,
+    input logic [2:0] cs_op1_sel,
     input logic       cs_rt_en,
     input logic [3:0] cs_alu_fn,
     input logic [1:0] cs_dmemreq_type,

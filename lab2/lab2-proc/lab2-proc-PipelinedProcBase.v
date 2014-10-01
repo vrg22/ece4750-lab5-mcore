@@ -94,7 +94,7 @@ module lab2_proc_PipelinedProcBase
   logic        reg_en_M;
   logic        reg_en_W;
   logic [1:0]  op0_sel_D;
-  logic [1:0]  op1_sel_D;
+  logic [2:0]  op1_sel_D;
   logic [3:0]  alu_fn_X;
   logic        wb_result_sel_M;
   logic [4:0]  rf_waddr_W;
