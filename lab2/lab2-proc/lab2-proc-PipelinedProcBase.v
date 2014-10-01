@@ -170,7 +170,7 @@ module lab2_proc_PipelinedProcBase
 
     .dmemreq_val            (dmemreq_val),
     .dmemreq_rdy            (dmemreq_rdy),
-    .dmemreq_msg_type       (dmemreq_msg_type)
+    .dmemreq_msg_type       (dmemreq_msg_type),
     .dmemresp_val           (dmemresp_val),
     .dmemresp_rdy           (dmemresp_rdy),
 
