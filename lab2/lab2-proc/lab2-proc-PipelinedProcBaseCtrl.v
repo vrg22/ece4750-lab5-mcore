@@ -58,8 +58,9 @@ module lab2_proc_PipelinedProcBaseCtrl
   // status signals (dpath->ctrl)
 
   input  logic[31:0]  inst_D,
-  input  logic        br_cond_eq_X
-
+  input  logic        br_cond_eq_X,
+  input  logic        br_cond_neg_X,
+  input  logic        br_cond_zero_X
 );
 
   //----------------------------------------------------------------------
@@ -202,9 +203,14 @@ module lab2_proc_PipelinedProcBaseCtrl
 
   // Branch type
 
-  localparam br_x     = 1'bx; // Don't care
-  localparam br_none  = 1'b0; // No branch
-  localparam br_bne   = 1'b1; // bne
+  localparam br_x     = 3'bx; // Don't care
+  localparam br_none  = 3'd0; // No branch
+  localparam br_ne    = 3'd1; // bne
+  localparam br_eq    = 3'd2; // beq
+  localparam br_gtz   = 3'd3; // bgtz
+  localparam br_ltz   = 3'd4; // bltz
+  localparam br_gez   = 3'd5; // bgez
+  localparam br_lez   = 3'd6; // blez
 
   // Jump type
 
@@ -340,7 +346,7 @@ module lab2_proc_PipelinedProcBaseCtrl
       `PISA_INST_SLTI    :cs( y,  j_n, br_none, am_rdat,  y, bm_si,   y, alu_lts, nr, wm_a, y,  rt, n,   n   );
       `PISA_INST_SLTIU   :cs( y,  j_n, br_none, am_rdat,  y, bm_si,   y, alu_ltu, nr, wm_a, y,  rt, n,   n   );
       `PISA_INST_LUI     :cs( y,  j_n, br_none, am_x,     n, bm_zi,   n, alu_lui, nr, wm_a, y,  rt, n,   n   );
-      `PISA_INST_BNE     :cs( y,  j_n, br_bne,  am_rdat,  y, bm_rdat, y, alu_x,   nr, wm_a, n,  rx, n,   n   );
+      `PISA_INST_BNE     :cs( y,  j_n, br_ne,   am_rdat,  y, bm_rdat, y, alu_x,   nr, wm_a, n,  rx, n,   n   );
       `PISA_INST_J       :cs( y,  j_j, br_none, am_x,     n, bm_x,    n, alu_x,   nr, wm_x, n,  rx, n,   n   );
       `PISA_INST_JR      :cs( y,  j_r, br_none, am_rdat,  y, bm_x,    n, alu_x,   nr, wm_x, n,  rx, n,   n   );
       `PISA_INST_JAL     :cs( y,  j_l, br_none, am_x,     n, bm_pc4,  n, alu_cp1, nr, wm_a, y,  rL, n,   n   );
@@ -495,7 +501,7 @@ module lab2_proc_PipelinedProcBaseCtrl
     if ( val_X ) begin
 
       case ( br_type_X )
-        br_bne:  br_taken_X = !br_cond_eq_X;
+        br_ne:  br_taken_X = !br_cond_eq_X;
         default: br_taken_X = 1'b0;
       endcase
 

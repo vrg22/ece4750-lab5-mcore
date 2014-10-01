@@ -104,6 +104,8 @@ module lab2_proc_PipelinedProcBase
 
   logic [31:0] inst_D;
   logic        br_cond_eq_X;
+  logic        br_cond_neg_X;
+  logic        br_cond_zero_X;
 
   logic val_PF;
   assign val_PF = imemreq_val && imemreq_rdy;
@@ -196,8 +198,9 @@ module lab2_proc_PipelinedProcBase
     // status signals (dpath->ctrl)
 
     .inst_D                 (inst_D),
-    .br_cond_eq_X           (br_cond_eq_X)
-
+    .br_cond_eq_X           (br_cond_eq_X),
+    .br_cond_neg_X          (br_cond_neg_X),
+    .br_cond_zero_X         (br_cond_zero_X)
   );
 
   //----------------------------------------------------------------------
@@ -263,8 +266,9 @@ module lab2_proc_PipelinedProcBase
     // status signals (dpath->ctrl)
 
     .inst_D                  (inst_D),
-    .br_cond_eq_X            (br_cond_eq_X)
-
+    .br_cond_eq_X            (br_cond_eq_X),
+    .br_cond_neg_X           (br_cond_neg_X),
+    .br_cond_zero_X          (br_cond_zero_X)
   );
 
 
