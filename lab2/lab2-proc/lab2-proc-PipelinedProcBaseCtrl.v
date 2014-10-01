@@ -532,7 +532,7 @@ module lab2_proc_PipelinedProcBaseCtrl
 
   assign dmemreq_val  = dmemreq_val_X && !stall_XM;
   assign stall_dmem_X = dmemreq_val_X && !dmemreq_rdy;
-  assign dmemreq_type = `VC_MEM_REQ_MSG_TYPE_READ;
+  assign dmemreq_type = ( dmemreq_type_X == sw ? `VC_MEM_REQ_MSG_TYPE_WRITE : `VC_MEM_REQ_MSG_TYPE_READ;
 
   // stall in X if dmem is not rdy
   assign stall_X  = stall_dmem_X;
