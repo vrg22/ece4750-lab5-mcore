@@ -334,7 +334,7 @@ module lab2_proc_PipelinedProcBaseCtrl
       `PISA_INST_ORI     :cs( y,  j_n, br_none, am_rdat,  y, bm_zi,   n, alu_or,  nr, wm_a, y,  rt, n,   n   );
       `PISA_INST_ANDI    :cs( y,  j_n, br_none, am_rdat,  y, bm_zi,   n, alu_and, nr, wm_a, y,  rt, n,   n   );
       `PISA_INST_XORI    :cs( y,  j_n, br_none, am_rdat,  y, bm_zi,   n, alu_xor, nr, wm_a, y,  rt, n,   n   );
-      `PISA_INST_SLTI    :cs( y,  j_n, br_none, am_rdat,  y, bm_si,   y, alu_lts, nr, wm_a, y,  rd, n,   n   );
+      `PISA_INST_SLTI    :cs( y,  j_n, br_none, am_rdat,  y, bm_si,   y, alu_lts, nr, wm_a, y,  rt, n,   n   );
       `PISA_INST_SLTIU   :cs( y,  j_n, br_none, am_rdat,  y, bm_si,   y, alu_ltu, nr, wm_a, y,  rd, n,   n   );
       `PISA_INST_LUI     :cs( y,  j_n, br_none, am_x,     n, bm_zi,   n, alu_lui, nr, wm_a, y,  rt, n,   n   );
       `PISA_INST_BNE     :cs( y,  j_n, br_bne,  am_rdat,  y, bm_rdat, y, alu_x,   nr, wm_a, n,  rx, n,   n   );
