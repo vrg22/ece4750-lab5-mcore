@@ -18,44 +18,44 @@
 
 module lab2_proc_PipelinedProcBase
 (
-  input  logic                                      clk,
-  input  logic                                      reset,
-
-  // Instruction Memory Request Port
-
-  output logic [`VC_MEM_REQ_MSG_NBITS(8,32,32)-1:0] imemreq_msg,
-  output logic                                      imemreq_val,
-  input  logic                                      imemreq_rdy,
-
-  // Instruction Memory Response Port
-
-  input  logic[`VC_MEM_RESP_MSG_NBITS(8,32)-1:0]    imemresp_msg,
-  input  logic                                      imemresp_val,
-  output logic                                      imemresp_rdy,
-
-  // Data Memory Request Port
-
-  output logic [`VC_MEM_REQ_MSG_NBITS(8,32,32)-1:0] dmemreq_msg,
-  output logic                                      dmemreq_val,
-  input  logic                                      dmemreq_rdy,
-
-  // Data Memory Response Port
-
-  input  logic[`VC_MEM_RESP_MSG_NBITS(8,32)-1:0]    dmemresp_msg,
-  input  logic                                      dmemresp_val,
-  output logic                                      dmemresp_rdy,
-
-  // From mngr streaming port
-
-  input  logic[`LAB2_PROC_FROM_MNGR_MSG_NBITS-1:0]  from_mngr_msg,
-  input  logic                                      from_mngr_val,
-  output logic                                      from_mngr_rdy,
-
-  // To mngr streaming port
-
-  output logic [`LAB2_PROC_TO_MNGR_MSG_NBITS-1:0]   to_mngr_msg,
-  output logic                                      to_mngr_val,
-  input  logic                                      to_mngr_rdy
+  input  logic                                               clk,
+  input  logic                                               reset,
+         
+  // Instruction Memory Request Port         
+         
+  output logic [`VC_MEM_REQ_MSG_NBITS(8,32,32)-1:0]          imemreq_msg,
+  output logic                                               imemreq_val,
+  input  logic                                               imemreq_rdy,
+         
+  // Instruction Memory Response Port         
+         
+  input  logic[`VC_MEM_RESP_MSG_NBITS(8,32)-1:0]             imemresp_msg,
+  input  logic                                               imemresp_val,
+  output logic                                               imemresp_rdy,
+         
+  // Data Memory Request Port         
+         
+  output logic [`VC_MEM_REQ_MSG_NBITS(8,32,32)-1:0]          dmemreq_msg,  
+  output logic                                               dmemreq_val,
+  input  logic                                               dmemreq_rdy,
+         
+  // Data Memory Response Port         
+         
+  input  logic[`VC_MEM_RESP_MSG_NBITS(8,32)-1:0]             dmemresp_msg,
+  input  logic                                               dmemresp_val,
+  output logic                                               dmemresp_rdy,
+         
+  // From mngr streaming port         
+         
+  input  logic[`LAB2_PROC_FROM_MNGR_MSG_NBITS-1:0]           from_mngr_msg,
+  input  logic                                               from_mngr_val,
+  output logic                                               from_mngr_rdy,
+         
+  // To mngr streaming port         
+         
+  output logic [`LAB2_PROC_TO_MNGR_MSG_NBITS-1:0]            to_mngr_msg,
+  output logic                                               to_mngr_val,
+  input  logic                                               to_mngr_rdy
 
 );
 
@@ -65,11 +65,11 @@ module lab2_proc_PipelinedProcBase
   // data mem req/resp
   //----------------------------------------------------------------------
 
-  logic [31:0] dmemreq_msg_addr;
-  logic [31:0] dmemreq_msg_data;
-  logic [31:0] dmemresp_msg_data;
-
-  logic [31:0] imemreq_msg_addr;
+  logic [31:0]                                        dmemreq_msg_addr;
+  logic [31:0]                                        dmemreq_msg_data;
+  logic [31:0]                                        dmemresp_msg_data;
+  logic [`VC_MEM_REQ_MSG_TYPE_NBITS(8,32,32)-1:0]     dmemreq_type,
+  logic [31:0]                                        imemreq_msg_addr;
 
   // imereq_enq signals coming in from the ctrl unit
   logic [`VC_MEM_REQ_MSG_NBITS(8,32,32)-1:0] imemreq_enq_msg;
@@ -127,7 +127,7 @@ module lab2_proc_PipelinedProcBase
 
   vc_MemReqMsgPack#(8,32,32) dmemreq_msg_pack
   (
-    .type_  (`VC_MEM_REQ_MSG_TYPE_READ),
+    .type_  (dmemreq_type),
     .opaque (8'b0),
     .addr   (dmemreq_msg_addr),
     .len    (2'd0),
@@ -172,6 +172,7 @@ module lab2_proc_PipelinedProcBase
     .dmemreq_rdy            (dmemreq_rdy),
     .dmemresp_val           (dmemresp_val),
     .dmemresp_rdy           (dmemresp_rdy),
+    .dmemreq_type           (dmemreq_type),
 
     // mngr communication ports
 
