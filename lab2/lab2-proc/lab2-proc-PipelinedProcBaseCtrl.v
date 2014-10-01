@@ -315,20 +315,34 @@ module lab2_proc_PipelinedProcBaseCtrl
 
       //                          j    br        op0      rs op1      rt alu      dmm wbmux rf      thst fhst
       //                      val type type      muxsel   en muxsel   en fn       typ sel   wen wa  val  rdy
-      `PISA_INST_NOP     :cs( y,  j_n, br_none, am_rdat,   n, bm_x,    n, alu_x,   nr, wm_a, n,  rx, n,   n   );
-      `PISA_INST_ADDU    :cs( y,  j_n, br_none, am_rdat,   y, bm_rdat, y, alu_add, nr, wm_a, y,  rd, n,   n   );
-      `PISA_INST_SUBU    :cs( y,  j_n, br_none, am_rdat,   y, bm_rdat, y, alu_sub, nr, wm_a, y,  rd, n,   n   );
-      `PISA_INST_AND     :cs( y,  j_n, br_none, am_rdat,   y, bm_rdat, y, alu_and, nr, wm_a, y,  rd, n,   n   );
-      `PISA_INST_OR      :cs( y,  j_n, br_none, am_rdat,   y, bm_rdat, y, alu_or,  nr, wm_a, y,  rd, n,   n   );
-      `PISA_INST_XOR     :cs( y,  j_n, br_none, am_rdat,   y, bm_rdat, y, alu_xor, nr, wm_a, y,  rd, n,   n   );
-      `PISA_INST_NOR     :cs( y,  j_n, br_none, am_rdat,   y, bm_rdat, y, alu_nor, nr, wm_a, y,  rd, n,   n   );
-      `PISA_INST_BNE     :cs( y,  j_n, br_bne,  am_rdat,   y, bm_rdat, y, alu_x,   nr, wm_a, n,  rx, n,   n   );
-      `PISA_INST_ADDIU   :cs( y,  j_n, br_none, am_rdat,   y, bm_si,   n, alu_add, nr, wm_a, y,  rt, n,   n   );
-      `PISA_INST_J       :cs( y,  j_j, br_none, am_rdat,   n, bm_x,    n, alu_x,   nr, wm_x, n,  rx, n,   n   );
-      `PISA_INST_LW      :cs( y,  j_n, br_none, am_rdat,   y, bm_si,   n, alu_add, ld, wm_m, y,  rt, n,   n   );
-      `PISA_INST_MFC0    :cs( y,  j_n, br_none, am_rdat,   n, bm_fhst, n, alu_cp1, nr, wm_a, y,  rt, n,   y   );
-      `PISA_INST_MTC0    :cs( y,  j_n, br_none, am_rdat,   n, bm_rdat, y, alu_cp1, nr, wm_a, n,  rx, y,   n   );
-      default            :cs( n,  j_x, br_x,    am_rdat,   n, bm_x,    n, alu_x,   nr, wm_x, n,  rx, n,   n   );
+      `PISA_INST_NOP     :cs( y,  j_n, br_none, am_x,     n, bm_x,    n, alu_x,   nr, wm_a, n,  rx, n,   n   );
+      `PISA_INST_ADDU    :cs( y,  j_n, br_none, am_rdat,  y, bm_rdat, y, alu_add, nr, wm_a, y,  rd, n,   n   );
+      `PISA_INST_SUBU    :cs( y,  j_n, br_none, am_rdat,  y, bm_rdat, y, alu_sub, nr, wm_a, y,  rd, n,   n   );
+      `PISA_INST_AND     :cs( y,  j_n, br_none, am_rdat,  y, bm_rdat, y, alu_and, nr, wm_a, y,  rd, n,   n   );
+      `PISA_INST_OR      :cs( y,  j_n, br_none, am_rdat,  y, bm_rdat, y, alu_or,  nr, wm_a, y,  rd, n,   n   );
+      `PISA_INST_XOR     :cs( y,  j_n, br_none, am_rdat,  y, bm_rdat, y, alu_xor, nr, wm_a, y,  rd, n,   n   );
+      `PISA_INST_NOR     :cs( y,  j_n, br_none, am_rdat,  y, bm_rdat, y, alu_nor, nr, wm_a, y,  rd, n,   n   );
+      `PISA_INST_SRAV    :cs( y,  j_n, br_none, am_rdat,  y, bm_rdat, y, alu_sra, nr, wm_a, y,  rd, n,   n   );
+      `PISA_INST_SRLV    :cs( y,  j_n, br_none, am_rdat,  y, bm_rdat, y, alu_srl, nr, wm_a, y,  rd, n,   n   );
+      `PISA_INST_SLLV    :cs( y,  j_n, br_none, am_rdat,  y, bm_rdat, y, alu_sll, nr, wm_a, y,  rd, n,   n   );
+      `PISA_INST_SLL     :cs( y,  j_n, br_none, am_shamt, n, bm_rdat, y, alu_sll, nr, wm_a, y,  rd, n,   n   );
+      `PISA_INST_SRA     :cs( y,  j_n, br_none, am_shamt, n, bm_rdat, y, alu_sra, nr, wm_a, y,  rd, n,   n   );
+      `PISA_INST_SRL     :cs( y,  j_n, br_none, am_shamt, n, bm_rdat, y, alu_srl, nr, wm_a, y,  rd, n,   n   );
+      `PISA_INST_SLT     :cs( y,  j_n, br_none, am_rdat,  y, bm_rdat, y, alu_lts, nr, wm_a, y,  rd, n,   n   );
+      `PISA_INST_SLTU    :cs( y,  j_n, br_none, am_rdat,  y, bm_rdat, y, alu_ltu, nr, wm_a, y,  rd, n,   n   );
+      `PISA_INST_ADDIU   :cs( y,  j_n, br_none, am_rdat,  y, bm_si,   n, alu_add, nr, wm_a, y,  rt, n,   n   );
+      `PISA_INST_ORI     :cs( y,  j_n, br_none, am_rdat,  y, bm_zi,   n, alu_or,  nr, wm_a, y,  rt, n,   n   );
+      `PISA_INST_ANDI    :cs( y,  j_n, br_none, am_rdat,  y, bm_zi,   n, alu_and, nr, wm_a, y,  rt, n,   n   );
+      `PISA_INST_XORI    :cs( y,  j_n, br_none, am_rdat,  y, bm_zi,   n, alu_xor, nr, wm_a, y,  rt, n,   n   );
+      `PISA_INST_SLTI    :cs( y,  j_n, br_none, am_rdat,  y, bm_si,   y, alu_lts, nr, wm_a, y,  rd, n,   n   );
+      `PISA_INST_SLTIU   :cs( y,  j_n, br_none, am_rdat,  y, bm_si,   y, alu_ltu, nr, wm_a, y,  rd, n,   n   );
+      `PISA_INST_LUI     :cs( y,  j_n, br_none, am_x,     n, bm_zi,   n, alu_lui, nr, wm_a, y,  rt, n,   n   );
+      `PISA_INST_BNE     :cs( y,  j_n, br_bne,  am_rdat,  y, bm_rdat, y, alu_x,   nr, wm_a, n,  rx, n,   n   );
+      `PISA_INST_J       :cs( y,  j_j, br_none, am_x,     n, bm_x,    n, alu_x,   nr, wm_x, n,  rx, n,   n   );
+      `PISA_INST_LW      :cs( y,  j_n, br_none, am_rdat,  y, bm_si,   n, alu_add, ld, wm_m, y,  rt, n,   n   );
+      `PISA_INST_MFC0    :cs( y,  j_n, br_none, am_x,     n, bm_fhst, n, alu_cp1, nr, wm_a, y,  rt, n,   y   );
+      `PISA_INST_MTC0    :cs( y,  j_n, br_none, am_x,     n, bm_rdat, y, alu_cp1, nr, wm_a, n,  rx, y,   n   );
+      default            :cs( n,  j_x, br_x,    am_x,     n, bm_x,    n, alu_x,   nr, wm_x, n,  rx, n,   n   );
 
     endcase
   end
