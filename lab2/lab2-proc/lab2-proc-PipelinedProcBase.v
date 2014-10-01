@@ -267,7 +267,7 @@ module lab2_proc_PipelinedProcBase
     // status signals (dpath->ctrl)
 
     .inst_D                  (inst_D),
-    .br_cond_eq_X            (br_cond_eq_X)
+    .br_cond_eq_X            (br_cond_eq_X),
     .br_cond_neg_X           (br_cond_neg_X),
     .br_cond_zero_X          (br_cond_zero_X)
   );
