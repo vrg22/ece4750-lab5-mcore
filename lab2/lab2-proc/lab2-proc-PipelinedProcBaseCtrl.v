@@ -347,6 +347,11 @@ module lab2_proc_PipelinedProcBaseCtrl
       `PISA_INST_SLTIU   :cs( y,  j_n, br_none, am_rdat,  y, bm_si,   y, alu_ltu, nr, wm_a, y,  rt, n,   n   );
       `PISA_INST_LUI     :cs( y,  j_n, br_none, am_x,     n, bm_zi,   n, alu_lui, nr, wm_a, y,  rt, n,   n   );
       `PISA_INST_BNE     :cs( y,  j_n, br_ne,   am_rdat,  y, bm_rdat, y, alu_x,   nr, wm_a, n,  rx, n,   n   );
+      `PISA_INST_BEQ     :cs( y,  j_n, br_eq,   am_rdat,  y, bm_rdat, y, alu_x,   nr, wm_a, n,  rx, n,   n   );
+      `PISA_INST_BGTZ    :cs( y,  j_n, br_gtz,  am_rdat,  y, bm_x,    n, alu_x,   nr, wm_a, n,  rx, n,   n   );
+      `PISA_INST_BlTZ    :cs( y,  j_n, br_ltz,  am_rdat,  y, bm_x,    n, alu_x,   nr, wm_a, n,  rx, n,   n   );
+      `PISA_INST_BGEZ    :cs( y,  j_n, br_gez,  am_rdat,  y, bm_x,    n, alu_x,   nr, wm_a, n,  rx, n,   n   );
+      `PISA_INST_BLEZ    :cs( y,  j_n, br_lez,  am_rdat,  y, bm_x,    n, alu_x,   nr, wm_a, n,  rx, n,   n   );
       `PISA_INST_J       :cs( y,  j_j, br_none, am_x,     n, bm_x,    n, alu_x,   nr, wm_x, n,  rx, n,   n   );
       `PISA_INST_JR      :cs( y,  j_r, br_none, am_rdat,  y, bm_x,    n, alu_x,   nr, wm_x, n,  rx, n,   n   );
       `PISA_INST_JAL     :cs( y,  j_l, br_none, am_x,     n, bm_pc4,  n, alu_cp1, nr, wm_a, y,  rL, n,   n   );
@@ -502,9 +507,13 @@ module lab2_proc_PipelinedProcBaseCtrl
 
       case ( br_type_X )
         br_ne:  br_taken_X = !br_cond_eq_X;
+        br_eq:  br_taken_X = br_cond_eq_X;
+        br_gtz: br_taken_X = !br_cond_zero_X && !br_cond_neg_X;
+        br_ltz: br_taken_X = br_cond_neg_X;
+        br_gez: br_taken_X = br_cond_zero_X || !br_cond_neg_X;
+        br_lez: br_taken_X = br_cond_zero_X || br_cond_neg_X;
         default: br_taken_X = 1'b0;
       endcase
-
     end else
       br_taken_X = 1'b0;
   end
