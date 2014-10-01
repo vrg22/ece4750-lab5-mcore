@@ -307,8 +307,8 @@ module lab2_proc_PipelinedProcBaseDpath
     .fn       (alu_fn_X),
     .out      (alu_result_X),
     .ops_eq   (br_cond_eq_X),
-    .op0_zero (),
-    .op0_neg  ()
+    .op0_zero (br_cond_zero_X),
+    .op0_neg  (br_cond_neg_X)
   );
 
   assign ex_result_X = alu_result_X;
