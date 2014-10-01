@@ -271,7 +271,7 @@ module lab2_proc_PipelinedProcBaseCtrl
 
   logic       inst_val_D;
   logic [1:0] j_type_D;
-  logic       br_type_D;
+  logic [2:0] br_type_D;
   logic       rs_en_D;
   logic       rt_en_D;
   logic [3:0] alu_fn_D;
@@ -286,7 +286,7 @@ module lab2_proc_PipelinedProcBaseCtrl
   (
     input logic       cs_val,
     input logic [1:0] cs_j_type,
-    input logic       cs_br_type,
+    input logic [2:0] cs_br_type,
     input logic [1:0] cs_op0_sel,
     input logic       cs_rs_en,
     input logic [2:0] cs_op1_sel,
@@ -481,7 +481,7 @@ module lab2_proc_PipelinedProcBaseCtrl
   logic        rf_wen_X;
   logic [4:0]  rf_waddr_X;
   logic        to_mngr_val_X;
-  logic [0:0]  br_type_X;
+  logic [2:0]  br_type_X;
 
   always @(posedge clk) begin
     if (reset) begin
