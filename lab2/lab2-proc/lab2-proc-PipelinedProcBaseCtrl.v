@@ -232,12 +232,19 @@ module lab2_proc_PipelinedProcBaseCtrl
   localparam alu_x    = 4'bx;
   localparam alu_add  = 4'd0;
   localparam alu_sub  = 4'd1;
-  localparam alu_and  = 4'd5;
+  localparam alu_sll  = 4'd2;
   localparam alu_or   = 4'd3;
+  localparam alu_ltu  = 4'd4;
+  localparam alu_and  = 4'd5;
   localparam alu_xor  = 4'd6;
   localparam alu_nor  = 4'd7;
+  localparam alu_xnor = 4'd8;
+  localparam alu_srl  = 4'd9;
+  localparam alu_sra  = 4'd10;
   localparam alu_cp0  = 4'd11;
   localparam alu_cp1  = 4'd12;
+  localparam alu_lts  = 4'd13;
+  localparam alu_lui  = 4'd14;
 
   // Memory Request Type
 
@@ -309,7 +316,6 @@ module lab2_proc_PipelinedProcBaseCtrl
       //                          j    br        op0      rs op1      rt alu      dmm wbmux rf      thst fhst
       //                      val type type      muxsel   en muxsel   en fn       typ sel   wen wa  val  rdy
       `PISA_INST_NOP     :cs( y,  j_n, br_none, am_rdat,   n, bm_x,    n, alu_x,   nr, wm_a, n,  rx, n,   n   );
-      `PISA_INST_ADDIU   :cs( y,  j_n, br_none, am_rdat,   y, bm_si,   n, alu_add, nr, wm_a, y,  rt, n,   n   );
       `PISA_INST_ADDU    :cs( y,  j_n, br_none, am_rdat,   y, bm_rdat, y, alu_add, nr, wm_a, y,  rd, n,   n   );
       `PISA_INST_SUBU    :cs( y,  j_n, br_none, am_rdat,   y, bm_rdat, y, alu_sub, nr, wm_a, y,  rd, n,   n   );
       `PISA_INST_AND     :cs( y,  j_n, br_none, am_rdat,   y, bm_rdat, y, alu_and, nr, wm_a, y,  rd, n,   n   );
@@ -317,6 +323,7 @@ module lab2_proc_PipelinedProcBaseCtrl
       `PISA_INST_XOR     :cs( y,  j_n, br_none, am_rdat,   y, bm_rdat, y, alu_xor, nr, wm_a, y,  rd, n,   n   );
       `PISA_INST_NOR     :cs( y,  j_n, br_none, am_rdat,   y, bm_rdat, y, alu_nor, nr, wm_a, y,  rd, n,   n   );
       `PISA_INST_BNE     :cs( y,  j_n, br_bne,  am_rdat,   y, bm_rdat, y, alu_x,   nr, wm_a, n,  rx, n,   n   );
+      `PISA_INST_ADDIU   :cs( y,  j_n, br_none, am_rdat,   y, bm_si,   n, alu_add, nr, wm_a, y,  rt, n,   n   );
       `PISA_INST_J       :cs( y,  j_j, br_none, am_rdat,   n, bm_x,    n, alu_x,   nr, wm_x, n,  rx, n,   n   );
       `PISA_INST_LW      :cs( y,  j_n, br_none, am_rdat,   y, bm_si,   n, alu_add, ld, wm_m, y,  rt, n,   n   );
       `PISA_INST_MFC0    :cs( y,  j_n, br_none, am_rdat,   n, bm_fhst, n, alu_cp1, nr, wm_a, y,  rt, n,   y   );
