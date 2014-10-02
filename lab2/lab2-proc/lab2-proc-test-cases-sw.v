@@ -339,16 +339,14 @@ endtask
 task init_sw_vvadd;
 begin
   clear_mem;
-
-  // loop:
-  inst( "mfc0  r4, mngr2proc " ); init_src( 0 );
-  inst( "nop                 " );
-  inst( "mfc0  r6, mngr2proc " ); init_src( 6 );
+  address( c_reset_vector );
+  inst( "mfc0  r4, mngr2proc " ); init_src(   32'h00002000 );
+  inst( "mfc0  r6, mngr2proc " ); init_src(   32'h00000001 );
   inst( "mfc0  r7, mngr2proc " ); init_src( 7 );
   inst( "addu  r8, r6, r7    " );
   inst( "sw    r8, 0(r4)     " );
   inst( "lw    r10, 0(r4)     " );
-  inst( "mtc0  r0, proc2mngr " ); init_sink( 13 );
+  inst( "mtc0  r0, proc2mngr " ); init_sink( 8 );
   inst( "nop                 " );
   inst( "nop                 " );
 
