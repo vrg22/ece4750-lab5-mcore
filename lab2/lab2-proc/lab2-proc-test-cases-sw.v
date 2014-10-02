@@ -345,8 +345,8 @@ begin
   inst( "mfc0  r7, mngr2proc " ); init_src( 7 );
   inst( "addu  r8, r6, r7    " );
   inst( "sw    r8, 0(r4)     " );
-  inst( "lw    r10, 0(r4)     " );
-  inst( "mtc0  r0, proc2mngr " ); init_sink( 8 );
+  inst( "lw    r10, 0(r4)    " );
+  inst( "mtc0  r10, proc2mngr" ); init_sink( 8 );
   inst( "nop                 " );
   inst( "nop                 " );
 
