@@ -342,6 +342,7 @@ begin
 
   // loop:
   inst( "mfc0  r4, mngr2proc " ); init_src( 0 );
+  inst( "nop                 " );
   inst( "mfc0  r6, mngr2proc " ); init_src( 6 );
   inst( "mfc0  r7, mngr2proc " ); init_src( 7 );
   inst( "addu  r8, r6, r7    " );
