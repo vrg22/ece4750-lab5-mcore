@@ -66,8 +66,8 @@ module lab2_proc_PipelinedProcAltCtrl
   output logic [4:0]  rf_waddr_W,
   output logic        rf_wen_W,
 
-  output logic [1:0]  bypass_rs;
-  output logic [1:0]  bypass_rt;
+  output logic [1:0]  bypass_rs,
+  output logic [1:0]  bypass_rt,
 
   // status signals (dpath->ctrl)
 
