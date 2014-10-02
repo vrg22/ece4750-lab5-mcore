@@ -318,6 +318,9 @@ module lab2_proc_PipelinedProcAltCtrl
     else if ((rs_en_D) && val_M && (rf_wen_M) && (rf_waddr_M == inst_rs_D) && (rf_waddr_M != r0)) begin
       bypass_rs = bM;
     end
+    else if ((rs_en_D) && val_W && (rf_wen_W) && (rf_waddr_W == inst_rs_D) && (rf_waddr_W != r0)) begin
+      bypass_rs = bW;
+    end
     else begin
       bypass_rs = nB;
     end
@@ -332,6 +335,9 @@ module lab2_proc_PipelinedProcAltCtrl
     end
     else if ((rt_en_D) && val_M && (rf_wen_M) && (rf_waddr_M == inst_rt_D) && (rf_waddr_M != r0)) begin
       bypass_rt = bM;
+    end
+    else if ((rt_en_D) && val_W && (rf_wen_W) && (rf_waddr_W == inst_rt_D) && (rf_waddr_W != r0)) begin
+      bypass_rt = bW;
     end
     else begin
       bypass_rt = nB;
@@ -463,17 +469,13 @@ module lab2_proc_PipelinedProcAltCtrl
   // Stall if write address in M matches rs in D
 
   logic  stall_waddr_M_rs_D;
-  assign stall_waddr_M_rs_D
-    = ( rs_en_D && val_M && rf_wen_M
-        && ( inst_rs_D == rf_waddr_M ) && ( rf_waddr_M != 5'd0 ) 
-        && (bypass_rs == bM) && (stall_dmem_M));
+  assign stall_waddr_M_rs_D = ((bypass_rs == bM) && (stall_dmem_M));
 
   // Stall if write address in W matches rs in D
 
   logic  stall_waddr_W_rs_D;
   assign stall_waddr_W_rs_D
-    = ( rs_en_D && val_W && rf_wen_W
-        && ( inst_rs_D == rf_waddr_W ) && ( rf_waddr_W != 5'd0 ) );
+    = 1'b0;
 
   // Stall if write address in X matches rt in D
 
@@ -486,29 +488,13 @@ module lab2_proc_PipelinedProcAltCtrl
 
   logic  stall_waddr_M_rt_D;
   assign stall_waddr_M_rt_D
-    = ( rt_en_D && val_M && rf_wen_M
-        && ( inst_rt_D == rf_waddr_M ) && ( rf_waddr_M != 5'd0 ) 
-        && (bypass_rt == bM) && (stall_dmem_M) );
+    =  ((bypass_rt == bM) && (stall_dmem_M) );
 
   // Stall if write address in W matches rt in D
 
   logic  stall_waddr_W_rt_D;
   assign stall_waddr_W_rt_D
-    = ( rt_en_D && val_W && rf_wen_W
-        && ( inst_rt_D == rf_waddr_W ) && ( rf_waddr_W != 5'd0 ) );
-
-  logic stall_sw_waddr_X;
-  assign stall_sw_waddr_X = val_X && rf_wen_X && (inst_rt_D == rf_waddr_X);
-
-  logic stall_sw_waddr_M;
-  assign stall_sw_waddr_M = val_M && rf_wen_M && (inst_rt_D == rf_waddr_M);
-
-  logic stall_sw_waddr_W;
-  assign stall_sw_waddr_W = val_W && rf_wen_W && (inst_rt_D == rf_waddr_W);
-
-  logic stall_sw;
-  assign stall_sw = ( val_D && rt_en_D && dmemreq_type_D == st ) &&
-                    (stall_sw_waddr_X || stall_sw_waddr_W || stall_sw_waddr_M);
+    = 1'b0;
 
   // Put together final stall signal
 
@@ -521,12 +507,12 @@ module lab2_proc_PipelinedProcAltCtrl
   logic stall_mul_D;
 
   assign mulreq_val_D = val_D && ( ex_mux_sel_D == mul_out);
-  assign mulreq_val = mulreq_val_D && !stall_DX && !stall_hazard_D && !stall_from_mngr_D && !stall_sw;      //Correct
+  assign mulreq_val = mulreq_val_D && !stall_DX && !stall_hazard_D && !stall_from_mngr_D; 
 
   // Stall if multiplier not ready
   assign stall_mul_D = mulreq_val_D && !mulreq_rdy;
 
-  assign stall_D  = stall_from_mngr_D || stall_hazard_D || stall_mul_D || stall_sw;
+  assign stall_D  = stall_from_mngr_D || stall_hazard_D || stall_mul_D;
   assign squash_D = squash_j_D;
 
   //----------------------------------------------------------------------
