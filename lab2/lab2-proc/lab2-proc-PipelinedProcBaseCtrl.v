@@ -376,7 +376,7 @@ module lab2_proc_PipelinedProcBaseCtrl
       `PISA_INST_JR      :cs( y,  j_r, br_none, am_rdat,  y, bm_x,    n, alu_x,   alu_out, nr, wm_x, n,  rx, n,   n   );
       `PISA_INST_JAL     :cs( y,  j_l, br_none, am_x,     n, bm_pc4,  n, alu_cp1, alu_out, nr, wm_a, y,  rL, n,   n   );
       `PISA_INST_LW      :cs( y,  j_n, br_none, am_rdat,  y, bm_si,   n, alu_add, alu_out, ld, wm_m, y,  rt, n,   n   );
-      `PISA_INST_SW      :cs( y,  j_n, br_none, am_rdat,  y, bm_si,   n, alu_add, alu_out, st, wm_x, n,  rx, n,   n   );
+      `PISA_INST_SW      :cs( y,  j_n, br_none, am_rdat,  y, bm_si,   y, alu_add, alu_out, st, wm_x, n,  rx, n,   n   );
       `PISA_INST_MFC0    :cs( y,  j_n, br_none, am_x,     n, bm_fhst, n, alu_cp1, alu_out, nr, wm_a, y,  rt, n,   y   );
       `PISA_INST_MTC0    :cs( y,  j_n, br_none, am_x,     n, bm_rdat, y, alu_cp1, alu_out, nr, wm_a, n,  rx, y,   n   );
       default            :cs( n,  j_x, br_x,    am_x,     n, bm_x,    n, alu_x,   alu_out, nr, wm_x, n,  rx, n,   n   );
@@ -473,19 +473,19 @@ module lab2_proc_PipelinedProcBaseCtrl
 
   assign stall_hazard_D = val_D &&
     ( stall_waddr_X_rs_D || stall_waddr_M_rs_D || stall_waddr_W_rs_D ||
-      stall_waddr_X_rt_D || stall_waddr_M_rt_D || stall_waddr_W_rt_D ) || stall_sw;
+      stall_waddr_X_rt_D || stall_waddr_M_rt_D || stall_waddr_W_rt_D );
 
 
   logic mulreq_val_D;
   logic stall_mul_D;
 
   assign mulreq_val_D = val_D && ( ex_mux_sel_D == mul_out);
-  assign mulreq_val = mulreq_val_D && !stall_DX && !stall_hazard_D && !stall_from_mngr_D;       //Correct
+  assign mulreq_val = mulreq_val_D && !stall_DX && !stall_hazard_D && !stall_from_mngr_D && !stall_sw;      //Correct
 
   // Stall if multiplier not ready
   assign stall_mul_D = mulreq_val_D && !mulreq_rdy;
 
-  assign stall_D  = stall_from_mngr_D || stall_hazard_D || stall_mul_D;
+  assign stall_D  = stall_from_mngr_D || stall_hazard_D || stall_mul_D || stall_sw;
   assign squash_D = squash_j_D;
 
   //----------------------------------------------------------------------
