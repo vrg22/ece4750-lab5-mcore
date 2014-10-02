@@ -13,6 +13,7 @@
 
 subprojs = \
   vc \
+  lab1-imul \
   pisa \
   lab2-proc \
 
