@@ -285,7 +285,7 @@ module lab2_proc_PipelinedProcAltDpath
     .in2  (32'd0),
     .in3  (32'd0),
     .sel  (bypass_rt),
-    .out  (op0_D)
+    .out  (op1_D)
   );
 
   logic [31:0] br_target_D;
