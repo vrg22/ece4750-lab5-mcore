@@ -5,6 +5,16 @@
 `ifndef LAB2_PROC_PIPELINED_PROC_ALT_DPATH_V
 `define LAB2_PROC_PIPELINED_PROC_ALT_DPATH_V
 
+`include "lab2-proc-alu.v"
+`include "lab2-proc-brj-target-calc.v"
+`include "lab2-proc-regfile.v"
+`include "lab1-imul-IntMulAlt.v"
+`include "vc-arithmetic.v"
+`include "vc-mem-msgs.v"
+`include "vc-muxes.v"
+`include "vc-regs.v"
+`include "pisa-inst.v"
+
 module lab2_proc_PipelinedProcAltDpath
 #(
   parameter p_num_cores = 1,

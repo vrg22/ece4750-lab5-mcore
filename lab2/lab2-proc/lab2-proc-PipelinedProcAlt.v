@@ -8,6 +8,12 @@
 `include "vc-mem-msgs.v"
 `include "lab2-proc-PipelinedProcAltCtrl.v"
 `include "lab2-proc-PipelinedProcAltDpath.v"
+
+`include "vc-mem-msgs.v"
+`include "vc-DropUnit.v" // Do we even need this?
+`include "pisa-inst.v"
+`include "vc-queues.v"
+`include "vc-trace.v"
 `define LAB2_PROC_FROM_MNGR_MSG_NBITS 32
 `define LAB2_PROC_TO_MNGR_MSG_NBITS 32
 
