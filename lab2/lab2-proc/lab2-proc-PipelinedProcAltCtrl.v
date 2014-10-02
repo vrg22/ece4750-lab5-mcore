@@ -470,7 +470,8 @@ module lab2_proc_PipelinedProcAltCtrl
 
   logic  stall_waddr_W_rs_D;
   assign stall_waddr_W_rs_D
-    = 1'b0;
+    = ( rs_en_D && val_W && rf_wen_W
+        && ( inst_rs_D == rf_waddr_W ) && ( rf_waddr_W != 5'd0 ) );
 
   // Stall if write address in X matches rt in D
 
@@ -489,7 +490,8 @@ module lab2_proc_PipelinedProcAltCtrl
 
   logic  stall_waddr_W_rt_D;
   assign stall_waddr_W_rt_D
-    = 1'b0;
+    = ( rt_en_D && val_W && rf_wen_W
+        && ( inst_rt_D == rf_waddr_W ) && ( rf_waddr_W != 5'd0 ) );
 
   // Put together final stall signal
 
