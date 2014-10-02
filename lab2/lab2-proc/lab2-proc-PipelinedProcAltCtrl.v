@@ -315,18 +315,25 @@ module lab2_proc_PipelinedProcAltCtrl
           default       : bypass_rs = bX;
         endcase
     end
+    else if ((rs_en_D) && val_M && (rf_wen_M) && (rf_waddr_M == inst_rs_D) && (rf_waddr_M != r0)) begin
+      bypass_rs = bM;
+    end
     else begin
       bypass_rs = nB;
     end
   end
 
-  always @(*) begin //fixed syntax
+  always @(*) begin
     if ( (rt_en_D && val_X && rf_wen_X && rf_waddr_X == inst_rt_D) && (rf_waddr_X != r0) ) begin
         casez (inst_X)
           `PISA_INST_LW : bypass_rt = nB;
           default       : bypass_rt = bX;
         endcase
     end
+    else if ((rt_en_D) && val_M && (rf_wen_M) && (rf_waddr_M == inst_rt_D) && (rf_waddr_M != r0)) begin
+      bypass_rt = bM;
+    end
+    else b
     else begin
       bypass_rt = nB;
     end
@@ -459,7 +466,7 @@ module lab2_proc_PipelinedProcAltCtrl
   logic  stall_waddr_M_rs_D;
   assign stall_waddr_M_rs_D
     = ( rs_en_D && val_M && rf_wen_M
-        && ( inst_rs_D == rf_waddr_M ) && ( rf_waddr_M != 5'd0 ) );
+        && ( inst_rs_D == rf_waddr_M ) && ( rf_waddr_M != 5'd0 ) && (bypass_rs == nB));
 
   // Stall if write address in W matches rs in D
 
@@ -480,7 +487,7 @@ module lab2_proc_PipelinedProcAltCtrl
   logic  stall_waddr_M_rt_D;
   assign stall_waddr_M_rt_D
     = ( rt_en_D && val_M && rf_wen_M
-        && ( inst_rt_D == rf_waddr_M ) && ( rf_waddr_M != 5'd0 ) );
+        && ( inst_rt_D == rf_waddr_M ) && ( rf_waddr_M != 5'd0 ) (bypass_rt == nB));
 
   // Stall if write address in W matches rt in D
 
