@@ -572,7 +572,7 @@ module lab2_proc_PipelinedProcBaseCtrl
   assign mulresp_rdy = mulresp_val_X && !stall_XM;
 
   // Stall if multiplier not ready
-  assign stall_mul_X = mulresp_val_X && !mulresp_rdy;
+  assign stall_mul_X = mulresp_val_X && !mulresp_val;
   // stall in X if dmem is not rdy
   assign stall_X  = stall_dmem_X || stall_mul_X; 
   assign squash_X = squash_br_X;
