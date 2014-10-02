@@ -389,7 +389,7 @@ module lab2_proc_PipelinedProcAltDpath
     .out  (ex_result_X)
   );
 
-  assign ex_bypass_rs_rt_X = ex_result_X;
+  assign bypass_rs_rt_X = ex_result_X;
   assign dmemreq_msg_data = write_data_X;
   assign dmemreq_msg_addr = alu_result_X;
 
