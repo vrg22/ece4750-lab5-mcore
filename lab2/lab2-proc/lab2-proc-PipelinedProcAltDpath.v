@@ -322,6 +322,18 @@ module lab2_proc_PipelinedProcAltDpath
     .j_target   (j_target_D)
   );
 
+  logic [31:0] write_data_D;
+
+  vc_Mux4 #(32) dmem_write_data_mux_D
+  (
+    .in0  (rf_rdata1_D),
+    .in1  (bypass_rs_rt_X),
+    .in2  (bypass_rs_rt_M),
+    .in3  (bypass_rs_rt_W),
+    .sel  (bypass_rt),
+    .out  (write_data_D)
+  );
+
   assign jr_target_D = rf_rdata0_D;
 
   //--------------------------------------------------------------------
@@ -350,12 +362,12 @@ module lab2_proc_PipelinedProcAltDpath
     .q      (op1_X)
   );
 
-  vc_EnResetReg #(32, 0) dmem_write_data_X
+  vc_EnResetReg #(32, 0) dmem_write_data_reg_X
   (
     .clk    (clk),
     .reset  (reset),
     .en     (reg_en_X),
-    .d      (rf_rdata1_D),
+    .d      (write_data_D),
     .q      (write_data_X)
   );
 
