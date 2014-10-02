@@ -29,6 +29,7 @@ module lab2_proc_PipelinedProcBaseDpath
   // Data Memory Port
 
   output logic [31:0] dmemreq_msg_addr,
+  output logic [31:0] dmemreq_msg_data,
   input  logic [31:0] dmemresp_msg_data,
 
   // mngr communication ports
@@ -269,6 +270,7 @@ module lab2_proc_PipelinedProcBaseDpath
 
   logic [31:0] op0_X;
   logic [31:0] op1_X;
+  logic [31:0] write_data_X;
 
   vc_EnResetReg #(32, 0) op0_reg_X
   (
@@ -286,6 +288,15 @@ module lab2_proc_PipelinedProcBaseDpath
     .en     (reg_en_X),
     .d      (op1_D),
     .q      (op1_X)
+  );
+
+  vc_EnResetReg #(32, 0) dmem_write_data_X
+  (
+    .clk    (clk),
+    .reset  (reset),
+    .en     (reg_en_X),
+    .d      (rf_rdata1_D),
+    .q      (write_data_X)
   );
 
   vc_EnResetReg #(32, 0) br_target_reg_X
@@ -312,7 +323,7 @@ module lab2_proc_PipelinedProcBaseDpath
   );
 
   assign ex_result_X = alu_result_X;
-
+  assign dmemreq_msg_data = write_data_X;
   assign dmemreq_msg_addr = alu_result_X;
 
   //--------------------------------------------------------------------

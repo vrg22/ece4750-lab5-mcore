@@ -239,6 +239,7 @@ module lab2_proc_PipelinedProcBase
     // Data Memory Port
 
     .dmemreq_msg_addr        (dmemreq_msg_addr),
+    .dmemreq_msg_data        (dmemreq_msg_data),
     .dmemresp_msg_data       (dmemresp_msg_data),
 
     // mngr communication ports
