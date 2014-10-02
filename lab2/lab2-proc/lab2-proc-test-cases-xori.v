@@ -187,7 +187,7 @@ begin
 
   inst( "mfc0 r1, mngr2proc     " ); init_src(  32'h00001234 );
   inst( "xori r2, r1, 0x7fff   " );
-  inst( "mtc0 r2, proc2mngr     " ); init_sink( 32'h0x7fff0d7e );
+  inst( "mtc0 r2, proc2mngr     " ); init_sink( 32'h7fff0d7e );
 
   // Test "xori", 0x7ffffedc (reg) ^ 0xf3a2 (imm) = 0x7fff0d7e (result)
 
