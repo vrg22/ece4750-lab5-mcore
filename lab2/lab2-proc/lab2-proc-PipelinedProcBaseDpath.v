@@ -258,7 +258,8 @@ module lab2_proc_PipelinedProcBaseDpath
 
   logic [31:0] br_target_D;
 
-  logic [63:0] mul_msg = { op1_D, op2_D };
+  logic [63:0] mul_msg;
+  assign mul_msg = { op1_D, op2_D };
   logic [31:0] mul_result_X;
 
   lab1_imul_IntMulAlt mul
