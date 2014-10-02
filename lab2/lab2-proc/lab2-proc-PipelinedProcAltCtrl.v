@@ -233,10 +233,10 @@ module lab2_proc_PipelinedProcAltCtrl
 
   // Operand 0 Mux Select
 
-  localparam am_x = 3'bx;
-  localparam am_shamt = 3'd0; //use shamt field in instruction
-  localparam am_rdat = 3'd1;  //use register file
-
+  localparam am_x     = 3'bx;
+  localparam am_shamt = 3'd0;  //use shamt field in instruction
+  localparam am_rdat  = 3'd1;  //use register file
+  localparam am_xbyp  = 3'd2;  //use bypass path from X
 
   // Operand 1 Mux Select
 
@@ -246,6 +246,7 @@ module lab2_proc_PipelinedProcAltCtrl
   localparam bm_pc4   = 3'd2; // PC+4
   localparam bm_zi    = 3'd3; // Use zero-extended immediate
   localparam bm_fhst  = 3'd4; // Use from mngr data
+  localparam bm_xbyp  = 3'd5; // USe bypass from X
 
   // ALU Function
 

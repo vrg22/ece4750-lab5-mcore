@@ -168,6 +168,8 @@ module lab2_proc_PipelinedProcAltDpath
   logic  [31:0] inst_shift_zext_D;
   logic  [25:0] inst_target_D;
 
+  logic  [31:0] ex_bypass_rs_rt_X;
+
   vc_EnResetReg #(32) pc_plus4_reg_D
   (
     .clk    (clk),
@@ -244,7 +246,7 @@ module lab2_proc_PipelinedProcAltDpath
   (
     .in0  (inst_shift_zext_D),
     .in1  (rf_rdata0_D),
-    .in2  (32'd16),
+    .in2  (ex_bypass_rs_rt_X),
     .in3  (32'd0),
     .in4  (32'd0),
     .in5  (32'd0),
@@ -259,7 +261,7 @@ module lab2_proc_PipelinedProcAltDpath
     .in2  (pc_plus4_D),
     .in3  (inst_imm_zext_D),
     .in4  (from_mngr_data),
-    .in5  (32'b0),
+    .in5  (ex_bypass_rs_rt_X),
     .in6  (32'b0),
     .in7  (32'b0),
     .sel  (op1_sel_D),
@@ -366,6 +368,7 @@ module lab2_proc_PipelinedProcAltDpath
     .out  (ex_result_X)
   );
 
+  assign ex_bypass_rs_rt_X = ex_result_X;
   assign dmemreq_msg_data = write_data_X;
   assign dmemreq_msg_addr = alu_result_X;
 
