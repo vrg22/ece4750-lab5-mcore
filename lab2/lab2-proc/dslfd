@@ -1,0 +1,3 @@
+(( bypass_rs == bX ) ? am_xbyp :
+                        ( (bypass_rs == bM) ? am_mbyp : 
+                        ( (bypass_rs == bW) ? am_wbyp : cs_op0_sel)));

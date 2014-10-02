@@ -61,13 +61,16 @@ module lab2_proc_PipelinedProcAltDpath
   input  logic        reg_en_X,
   input  logic        reg_en_M,
   input  logic        reg_en_W,
-  input  logic [2:0]  op0_sel_D,
+  input  logic [1:0]  op0_sel_D,
   input  logic [2:0]  op1_sel_D,
   input  logic [3:0]  alu_fn_X,
   input  logic        ex_mux_sel_X,
   input  logic        wb_result_sel_M,
   input  logic [4:0]  rf_waddr_W,
   input  logic        rf_wen_W,
+
+  input  logic [1:0]  bypass_rs,
+  input  logic [1:0]  bypass_rt,
 
   // status signals (dpath->ctrl)
 
@@ -242,29 +245,46 @@ module lab2_proc_PipelinedProcAltDpath
     .out  (inst_shift_zext_D)
   );
 
-  vc_Mux6 #(32) op0_sel_mux_D
+  logic [31:0] no_byp_op0;
+  logic [31:0] no_byp_op1;
+
+  vc_Mux3 #(32) op0_sel_mux_D
   (
     .in0  (inst_shift_zext_D),
     .in1  (rf_rdata0_D),
-    .in2  (ex_bypass_rs_rt_X),
-    .in3  (32'd0),
-    .in4  (32'd0),
-    .in5  (32'd0),
+    .in2  (32'd16),
     .sel  (op0_sel_D),
-    .out  (op0_D)
+    .out  (no_byp_op0)
   );
 
-  vc_Mux8 #(32) op1_sel_mux_D
+  vc_Mux5 #(32) op1_sel_mux_D
   (
     .in0  (rf_rdata1_D),
     .in1  (inst_imm_sext_D),
     .in2  (pc_plus4_D),
     .in3  (inst_imm_zext_D),
     .in4  (from_mngr_data),
-    .in5  (ex_bypass_rs_rt_X),
-    .in6  (32'b0),
-    .in7  (32'b0),
     .sel  (op1_sel_D),
+    .out  (no_byp_op1)
+  );
+
+  vc_Mux4 #(32) op0_byp_mux_D
+  (
+    .in0  (no_byp_op0),
+    .in1  (ex_bypass_rs_rt_X),
+    .in2  (32'd0),
+    .in3  (32'd0),
+    .sel  (bypass_rs),
+    .out  (op0_D)
+  );
+
+  vc_Mux4 #(32) op1_byp_mux_D
+  (
+    .in0  (no_byp_op1),
+    .in1  (ex_bypass_rs_rt_X),
+    .in2  (32'd0),
+    .in3  (32'd0),
+    .sel  (bypass_rt),
     .out  (op1_D)
   );
 

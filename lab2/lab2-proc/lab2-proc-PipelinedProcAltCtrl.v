@@ -58,13 +58,16 @@ module lab2_proc_PipelinedProcAltCtrl
   output logic        reg_en_X,
   output logic        reg_en_M,
   output logic        reg_en_W,
-  output logic [2:0]  op0_sel_D,
+  output logic [1:0]  op0_sel_D,
   output logic [2:0]  op1_sel_D,
   output logic [3:0]  alu_fn_X,
   output logic        ex_mux_sel_X,
   output logic        wb_result_sel_M,
   output logic [4:0]  rf_waddr_W,
   output logic        rf_wen_W,
+
+  output logic [1:0]  bypass_rs,
+  output logic [1:0]  bypass_rt,
 
   // status signals (dpath->ctrl)
 
@@ -179,7 +182,7 @@ module lab2_proc_PipelinedProcAltCtrl
   logic   [4:0] inst_shamt_D;
   pisa_InstUnpack inst_unpack
   (
-    .inst     (inst_D),
+    .inst     ( inst_D ),
     .opcode   (),
     .rs       (inst_rs_D),
     .rt       (inst_rt_D),
@@ -233,12 +236,10 @@ module lab2_proc_PipelinedProcAltCtrl
 
   // Operand 0 Mux Select
 
-  localparam am_x     = 3'bx;
-  localparam am_shamt = 3'd0;  //use shamt field in instruction
-  localparam am_rdat  = 3'd1;  //use register file
-  localparam am_xbyp  = 3'd2;  //use bypass path from X
-  localparam am_mbyp  = 3'd3;
-  localparam am_wbyp  = 3'd4;
+  localparam am_x     = 2'bx;
+  localparam am_shamt = 2'd0;  //use shamt field in instruction
+  localparam am_rdat  = 2'd1;  //use register file
+
 
   // Operand 1 Mux Select
 
@@ -248,9 +249,7 @@ module lab2_proc_PipelinedProcAltCtrl
   localparam bm_pc4   = 3'd2; // PC+4
   localparam bm_zi    = 3'd3; // Use zero-extended immediate
   localparam bm_fhst  = 3'd4; // Use from mngr data
-  localparam bm_xbyp  = 3'd5; // USe bypass from X
-  localparam bm_mbyp  = 3'd6;
-  localparam bm_wbyp  = 3'd7;
+
 
   // ALU Function
 
@@ -304,35 +303,32 @@ module lab2_proc_PipelinedProcAltCtrl
   logic       to_mngr_val_D;
   logic       from_mngr_rdy_D;
 
-  logic [1:0] bypass_rs;
-  logic [1:0] bypass_rt;
-
   localparam nB = 2'd0;
   localparam bX = 2'd1;
   localparam bM = 2'd2;
   localparam bW = 2'd3;
 
   always @(*) begin
-    if ( (rs_en_D && val_X && rf_wen_X && rf_waddr_X == inst_rs_D) ) begin
+    if ( (rs_en_D && val_X && rf_wen_X && rf_waddr_X == inst_rs_D) && (rf_waddr_X != r0) ) begin
         casez (inst_X)
           `PISA_INST_LW : bypass_rs = nB;
           default       : bypass_rs = bX;
         endcase
     end
     else begin
-      bypass_rs = nB
+      bypass_rs = nB;
     end
   end
 
-  always @(*) begin
-    if ( (rt_en_D && val_X && rf_wen_X && rf_waddr_X == inst_rt_D) ) begin
+  always @(*) begin //fixed syntax
+    if ( (rt_en_D && val_X && rf_wen_X && rf_waddr_X == inst_rt_D) && (rf_waddr_X != r0) ) begin
         casez (inst_X)
           `PISA_INST_LW : bypass_rt = nB;
           default       : bypass_rt = bX;
         endcase
     end
     else begin
-      bypass_rt = nB
+      bypass_rt = nB;
     end
   end
 
@@ -341,7 +337,7 @@ module lab2_proc_PipelinedProcAltCtrl
     input logic       cs_val,
     input logic [1:0] cs_j_type,
     input logic [2:0] cs_br_type,
-    input logic [1:0] cs_op0_sel,
+    input logic [2:0] cs_op0_sel,
     input logic       cs_rs_en,
     input logic [2:0] cs_op1_sel,
     input logic       cs_rt_en,
@@ -358,27 +354,10 @@ module lab2_proc_PipelinedProcAltCtrl
     inst_val_D       = cs_val;
     j_type_D         = cs_j_type;
     br_type_D        = cs_br_type;
-
-    case ( bypass_rs )
-      nB : cs_op0_sel;
-      bX : am_xbyp;
-      bM : am_mbyp;
-      bW : am_wbyp;
-      default: cs_op0_sel;
-    endcase
-
+    op0_sel_D        = cs_op0_sel;
     rs_en_D          = cs_rs_en;
-
-    case ( bypass_rt )
-      nB : cs_op1_sel;
-      bX : bm_xbyp;
-      bM : bm_mbyp;
-      bW : bm_wbyp;
-      default: cs_op1_sel;
-    endcase
-
+    op1_sel_D        = cs_op1_sel;
     rt_en_D          = cs_rt_en;
-
     alu_fn_D         = cs_alu_fn;
     ex_mux_sel_D     = cs_mux_sel_D;
     dmemreq_type_D   = cs_dmemreq_type;
