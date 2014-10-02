@@ -173,6 +173,7 @@ module lab2_proc_PipelinedProcAltDpath
 
   logic  [31:0] bypass_rs_rt_X;
   logic  [31:0] bypass_rs_rt_M;
+  logic  [31:0] bypass_rs_rt_W;
 
   vc_EnResetReg #(32) pc_plus4_reg_D
   (
@@ -274,7 +275,7 @@ module lab2_proc_PipelinedProcAltDpath
     .in0  (no_byp_op0),
     .in1  (bypass_rs_rt_X),
     .in2  (bypass_rs_rt_M),
-    .in3  (32'd0),
+    .in3  (bypass_rs_rt_W),
     .sel  (bypass_rs),
     .out  (op0_D)
   );
@@ -284,7 +285,7 @@ module lab2_proc_PipelinedProcAltDpath
     .in0  (no_byp_op1),
     .in1  (bypass_rs_rt_X),
     .in2  (bypass_rs_rt_M),
-    .in3  (32'd0),
+    .in3  (bypass_rs_rt_W),
     .sel  (bypass_rt),
     .out  (op1_D)
   );
@@ -438,7 +439,7 @@ module lab2_proc_PipelinedProcAltDpath
     .d      (wb_result_M),
     .q      (wb_result_W)
   );
-
+  assign bypass_rs_rt_W = wb_result_W;
   assign to_mngr_data = wb_result_W;
 
   assign rf_wdata_W = wb_result_W;
