@@ -50,7 +50,7 @@ begin
 
   address( c_reset_vector );
 
-  // Test "xori", 0xd (reg) ^ 0xb (imm) = 0x4 (result), dest bypass in X
+  // Test "xori", 0xd (reg) ^ 0xb (imm) = 0x6 (result), dest bypass in X
 
   inst( "mfc0 r1, mngr2proc   " ); init_src(  32'hd );
   inst( "nop                  " );
@@ -59,7 +59,7 @@ begin
   inst( "nop                  " );
   inst( "nop                  " );
   inst( "xori r2, r1, 0xb    " );
-  inst( "mtc0 r2, proc2mngr   " ); init_sink( 32'h4 );
+  inst( "mtc0 r2, proc2mngr   " ); init_sink( 32'h6 );
 
   // Test "xori", 0xd (reg) ^ 0xa (imm) = 0x7 (result), dest bypass in M
 
@@ -183,6 +183,12 @@ begin
   inst( "xori r2, r1, 0x8000   " );
   inst( "mtc0 r2, proc2mngr     " ); init_sink( 32'h80000000 );
 
+  // Test "xori", 0x00001234 (reg) ^ 0x7fff (imm) = 0x7fff0d7e (result)
+
+  inst( "mfc0 r1, mngr2proc     " ); init_src(  32'h00001234 );
+  inst( "xori r2, r1, 0x7fff   " );
+  inst( "mtc0 r2, proc2mngr     " ); init_sink( 32'h0x7fff0d7e );
+
   // Test "xori", 0x7ffffedc (reg) ^ 0xf3a2 (imm) = 0x7fff0d7e (result)
 
   inst( "mfc0 r1, mngr2proc     " ); init_src(  32'h7ffffedc );
@@ -217,7 +223,7 @@ begin
 
   inst( "mfc0 r1, mngr2proc     " ); init_src(  32'h40c0d090  );
   inst( "xori r2, r1, 0xf083   " );
-  inst( "mtc0 r2, proc2mngr     " ); init_sink( 32'hd080 );
+  inst( "mtc0 r2, proc2mngr     " ); init_sink( 32'h40c02013 );
 
   // Test "xori", 0xffffffff (reg) ^ 0xffff (imm) = 0xffff0000 (result)
 
