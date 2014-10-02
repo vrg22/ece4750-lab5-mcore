@@ -308,6 +308,7 @@ module lab2_proc_PipelinedProcAltCtrl
   logic [1:0] bypass_rt;
 
   logic [2:0] op0_temp;
+  logic [2:0] op1_temp;
 
   localparam nB = 2'd0;
   localparam bX = 2'd1;
@@ -366,17 +367,18 @@ module lab2_proc_PipelinedProcAltCtrl
       bX : op0_sel_D = am_xbyp;
       bM : op0_sel_D = am_mbyp;
       bW : op0_sel_D = am_wbyp;
-      default: cs_op0_sel;
+      default: op0_temp;
     endcase
 
     rs_en_D          = cs_rs_en;
 
+    op1_temp         = cs_op1_sel;
     case ( bypass_rt )
-      nB : op1_sel_D = cs_op1_sel;
+      nB : op1_sel_D = op1_temp;
       bX : op1_sel_D = bm_xbyp;
       bM : op1_sel_D = bm_mbyp;
       bW : op1_sel_D = bm_wbyp;
-      default: cs_op1_sel;
+      default: op1_temp;
     endcase
 
     rt_en_D          = cs_rt_en;
