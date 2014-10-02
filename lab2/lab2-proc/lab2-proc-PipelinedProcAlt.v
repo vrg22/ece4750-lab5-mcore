@@ -105,7 +105,7 @@ module lab2_proc_PipelinedProcAlt
   logic        reg_en_X;
   logic        reg_en_M;
   logic        reg_en_W;
-  logic [1:0]  op0_sel_D;
+  logic [2:0]  op0_sel_D;
   logic [2:0]  op1_sel_D;
   logic [3:0]  alu_fn_X;
   logic        ex_mux_sel_X;
