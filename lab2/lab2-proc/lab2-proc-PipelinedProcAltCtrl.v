@@ -58,13 +58,16 @@ module lab2_proc_PipelinedProcAltCtrl
   output logic        reg_en_X,
   output logic        reg_en_M,
   output logic        reg_en_W,
-  output logic [2:0]  op0_sel_D,
+  output logic [1:0]  op0_sel_D,
   output logic [2:0]  op1_sel_D,
   output logic [3:0]  alu_fn_X,
   output logic        ex_mux_sel_X,
   output logic        wb_result_sel_M,
   output logic [4:0]  rf_waddr_W,
   output logic        rf_wen_W,
+
+  output logic [1:0]  bypass_rs;
+  output logic [1:0]  bypass_rt;
 
   // status signals (dpath->ctrl)
 
@@ -233,12 +236,10 @@ module lab2_proc_PipelinedProcAltCtrl
 
   // Operand 0 Mux Select
 
-  localparam am_x     = 3'bx;
-  localparam am_shamt = 3'd0;  //use shamt field in instruction
-  localparam am_rdat  = 3'd1;  //use register file
-  localparam am_xbyp  = 3'd2;  //use bypass path from X
-  localparam am_mbyp  = 3'd3;
-  localparam am_wbyp  = 3'd4;
+  localparam am_x     = 2'bx;
+  localparam am_shamt = 2'd0;  //use shamt field in instruction
+  localparam am_rdat  = 2'd1;  //use register file
+
 
   // Operand 1 Mux Select
 
@@ -248,9 +249,7 @@ module lab2_proc_PipelinedProcAltCtrl
   localparam bm_pc4   = 3'd2; // PC+4
   localparam bm_zi    = 3'd3; // Use zero-extended immediate
   localparam bm_fhst  = 3'd4; // Use from mngr data
-  localparam bm_xbyp  = 3'd5; // USe bypass from X
-  localparam bm_mbyp  = 3'd6;
-  localparam bm_wbyp  = 3'd7;
+
 
   // ALU Function
 
@@ -303,12 +302,6 @@ module lab2_proc_PipelinedProcAltCtrl
   logic [4:0] rf_waddr_D;
   logic       to_mngr_val_D;
   logic       from_mngr_rdy_D;
-
-  logic [1:0] bypass_rs;
-  logic [1:0] bypass_rt;
-
-  logic [2:0] op0_temp;
-  logic [2:0] op1_temp;
 
   localparam nB = 2'd0;
   localparam bX = 2'd1;
@@ -363,9 +356,7 @@ module lab2_proc_PipelinedProcAltCtrl
     br_type_D        = cs_br_type;
     op0_sel_D        = cs_op0_sel;
     rs_en_D          = cs_rs_en;
-    op1_sel_D        = (( bypass_rt == bX ) ? bm_xbyp :
-                        ( (bypass_rt == bM) ? bm_mbyp : 
-                        ( (bypass_rt == bW) ? bm_wbyp : cs_op1_sel)));
+    op1_sel_D        = cs_op1_sel;
     rt_en_D          = cs_rt_en;
     alu_fn_D         = cs_alu_fn;
     ex_mux_sel_D     = cs_mux_sel_D;
