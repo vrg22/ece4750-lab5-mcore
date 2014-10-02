@@ -473,7 +473,7 @@ module lab2_proc_PipelinedProcBaseCtrl
 
   assign stall_hazard_D = val_D &&
     ( stall_waddr_X_rs_D || stall_waddr_M_rs_D || stall_waddr_W_rs_D ||
-      stall_waddr_X_rt_D || stall_waddr_M_rt_D || stall_waddr_W_rt_D );
+      stall_waddr_X_rt_D || stall_waddr_M_rt_D || stall_waddr_W_rt_D ) ;
 
 
   logic mulreq_val_D;
