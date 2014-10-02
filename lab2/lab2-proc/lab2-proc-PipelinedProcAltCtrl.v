@@ -341,7 +341,7 @@ module lab2_proc_PipelinedProcAltCtrl
     input logic       cs_val,
     input logic [1:0] cs_j_type,
     input logic [2:0] cs_br_type,
-    input logic [1:0] cs_op0_sel,
+    input logic [2:0] cs_op0_sel,
     input logic       cs_rs_en,
     input logic [2:0] cs_op1_sel,
     input logic       cs_rt_en,
@@ -360,7 +360,7 @@ module lab2_proc_PipelinedProcAltCtrl
     br_type_D        = cs_br_type;
 
     case ( bypass_rs )
-      nB : op0_sel_D = op0_muxcs_op0_sel;
+      nB : op0_sel_D = cs_op0_sel;
       bX : op0_sel_D = am_xbyp;
       bM : op0_sel_D = am_mbyp;
       bW : op0_sel_D = am_wbyp;
