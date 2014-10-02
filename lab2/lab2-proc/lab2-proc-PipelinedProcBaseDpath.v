@@ -8,6 +8,7 @@
 `include "lab2-proc-alu.v"
 `include "lab2-proc-brj-target-calc.v"
 `include "lab2-proc-regfile.v"
+`include "lab1-imul-IntMulAlt.v"
 `include "vc-arithmetic.v"
 `include "vc-mem-msgs.v"
 `include "vc-muxes.v"
@@ -37,6 +38,14 @@ module lab2_proc_PipelinedProcBaseDpath
   input  logic [31:0] from_mngr_data,
   output logic [31:0] to_mngr_data,
 
+  // MUL signals
+
+  input  logic mulreq_val,
+  output logic mulreq_rdy,
+
+  output logic mulresp_val,
+  input  logic mulresp_rdy,
+
   // control signals (ctrl->dpath)
 
   output logic        imemresp_val_drop,
@@ -51,6 +60,7 @@ module lab2_proc_PipelinedProcBaseDpath
   input  logic [1:0]  op0_sel_D,
   input  logic [2:0]  op1_sel_D,
   input  logic [3:0]  alu_fn_X,
+  input  logic        ex_mux_sel_X,
   input  logic        wb_result_sel_M,
   input  logic [4:0]  rf_waddr_W,
   input  logic        rf_wen_W,
@@ -248,6 +258,22 @@ module lab2_proc_PipelinedProcBaseDpath
 
   logic [31:0] br_target_D;
 
+  logic [63:0] mul_msg;
+  assign mul_msg = { op0_D, op1_D };
+  logic [31:0] mul_result_X;
+
+  lab1_imul_IntMulAlt mul
+  (
+    .clk      (clk),
+    .reset    (reset), //not sure if we ever want to reset the mult
+    .req_val  (mulreq_val),
+    .req_rdy  (mulreq_rdy),
+    .req_msg  (mul_msg),
+    .resp_val (mulresp_val),
+    .resp_rdy (mulresp_rdy),
+    .resp_msg (mul_result_X)
+  );
+
   lab2_proc_BrTarget br_target_calc_D
   (
     .pc_plus4  (pc_plus4_D),
@@ -322,7 +348,14 @@ module lab2_proc_PipelinedProcBaseDpath
     .op0_neg  (br_cond_neg_X)
   );
 
-  assign ex_result_X = alu_result_X;
+  vc_Mux2 #(32) ex_result_mux_X
+  (
+    .in0  (alu_result_X),
+    .in1  (mul_result_X),
+    .sel  (ex_mux_sel_X),
+    .out  (ex_result_X)
+  );
+
   assign dmemreq_msg_data = write_data_X;
   assign dmemreq_msg_addr = alu_result_X;
 
