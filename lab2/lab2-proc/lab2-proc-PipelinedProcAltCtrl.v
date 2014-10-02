@@ -360,20 +360,20 @@ module lab2_proc_PipelinedProcAltCtrl
     br_type_D        = cs_br_type;
 
     case ( bypass_rs )
-      nB : cs_op0_sel;
-      bX : am_xbyp;
-      bM : am_mbyp;
-      bW : am_wbyp;
+      nB : op0_sel_D = op0_muxcs_op0_sel;
+      bX : op0_sel_D = am_xbyp;
+      bM : op0_sel_D = am_mbyp;
+      bW : op0_sel_D = am_wbyp;
       default: cs_op0_sel;
     endcase
 
     rs_en_D          = cs_rs_en;
 
     case ( bypass_rt )
-      nB : cs_op1_sel;
-      bX : bm_xbyp;
-      bM : bm_mbyp;
-      bW : bm_wbyp;
+      nB : op1_sel_D = cs_op1_sel;
+      bX : op1_sel_D = bm_xbyp;
+      bM : op1_sel_D = bm_mbyp;
+      bW : op1_sel_D = bm_wbyp;
       default: cs_op1_sel;
     endcase
 
