@@ -467,7 +467,7 @@ module lab2_proc_PipelinedProcBaseCtrl
   logic stall_mul_D;
 
   assign mulreq_val_D = val_D && ( ex_mux_sel_D == mul_out);
-  assign mulreq_val = mulreq_val_D && !stall_DX;
+  assign mulreq_val = mulreq_val_D && !stall_DX && !stall_hazard_D && !stall_from_mngr_D;       //Correct
 
   // Stall if multiplier not ready
   assign stall_mul_D = mulreq_val_D && !mulreq_rdy;
