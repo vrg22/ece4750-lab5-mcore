@@ -69,236 +69,236 @@ begin
   // (Dest Bypass) Testing addu: src0( 0xe ), src1( 0xb ), result( 0x19 )
   // dest_nops( 1 )
 
-  inst( "mfc0 r1, mngr2proc   " ); init_src(  32'he );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "mfc0 r2, mngr2proc   " ); init_src(  32'hb );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "addu r3, r1, r2    " );
-  inst( "nop                  " );
-  inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h19 );
+  // inst( "mfc0 r1, mngr2proc   " ); init_src(  32'he );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "mfc0 r2, mngr2proc   " ); init_src(  32'hb );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "addu r3, r1, r2    " );
+  // inst( "nop                  " );
+  // inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h19 );
 
-  // (Dest Bypass) Testing addu: src0( 0xf ), src1( 0xb ), result( 0x1a )
-  // dest_nops( 2 )
+  // // (Dest Bypass) Testing addu: src0( 0xf ), src1( 0xb ), result( 0x1a )
+  // // dest_nops( 2 )
 
-  inst( "mfc0 r1, mngr2proc   " ); init_src(  32'hf );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "mfc0 r2, mngr2proc   " ); init_src(  32'hb );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "addu r3, r1, r2    " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h1a );
-
-
-  // (Bypass) Testing addu: src0( 0xd ), src1( 0xb ), result( 0x18 )
-  // src0_nops( 0 ), src1_nops( 0 )
-  // - src0 loaded before src1
-
-  inst( "mfc0 r1, mngr2proc   " ); init_src(  32'hd );
-  inst( "mfc0 r2, mngr2proc   " ); init_src(  32'hb );
-  inst( "addu r3, r1, r2    " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h18 );
-
-  // (Bypass) Testing addu: src0( 0xe ), src1( 0xb ), result( 0x19 )
-  // src0_nops( 0 ), src1_nops( 1 )
-  // - src0 loaded before src1
-
-  inst( "mfc0 r1, mngr2proc   " ); init_src(  32'he );
-  inst( "mfc0 r2, mngr2proc   " ); init_src(  32'hb );
-  inst( "nop                  " );
-  inst( "addu r3, r1, r2    " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h19 );
-
-  // (Bypass) Testing addu: src0( 0xf ), src1( 0xb ), result( 0x1a )
-  // src0_nops( 0 ), src1_nops( 2 )
-  // - src0 loaded before src1
-
-  inst( "mfc0 r1, mngr2proc   " ); init_src(  32'hf );
-  inst( "mfc0 r2, mngr2proc   " ); init_src(  32'hb );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "addu r3, r1, r2    " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h1a );
-
-  // (Bypass) Testing addu: src0( 0xd ), src1( 0xb ), result( 0x18 )
-  // src0_nops( 1 ), src1_nops( 0 )
-  // - src0 loaded before src1
-
-  inst( "mfc0 r1, mngr2proc   " ); init_src(  32'hd );
-  inst( "nop                  " );
-  inst( "mfc0 r2, mngr2proc   " ); init_src(  32'hb );
-  inst( "addu r3, r1, r2    " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h18 );
-
-  // (Bypass) Testing addu: src0( 0xe ), src1( 0xb ), result( 0x19 )
-  // src0_nops( 1 ), src1_nops( 1 )
-  // - src0 loaded before src1
-
-  inst( "mfc0 r1, mngr2proc   " ); init_src(  32'he );
-  inst( "nop                  " );
-  inst( "mfc0 r2, mngr2proc   " ); init_src(  32'hb );
-  inst( "nop                  " );
-  inst( "addu r3, r1, r2    " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h19 );
-
-  // (Bypass) Testing addu: src0( 0xf ), src1( 0xb ), result( 0x1a )
-  // src0_nops( 2 ), src1_nops( 0 )
-  // - src0 loaded before src1
-
-  inst( "mfc0 r1, mngr2proc   " ); init_src(  32'hf );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "mfc0 r2, mngr2proc   " ); init_src(  32'hb );
-  inst( "addu r3, r1, r2    " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h1a );
+  // inst( "mfc0 r1, mngr2proc   " ); init_src(  32'hf );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "mfc0 r2, mngr2proc   " ); init_src(  32'hb );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "addu r3, r1, r2    " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h1a );
 
 
-  // (Bypass) Testing addu: src0( 0xd ), src1( 0xb ), result( 0x18 )
-  // src0_nops( 0 ), src1_nops( 0 )
-  // - src1 loaded before src0
+  // // (Bypass) Testing addu: src0( 0xd ), src1( 0xb ), result( 0x18 )
+  // // src0_nops( 0 ), src1_nops( 0 )
+  // // - src0 loaded before src1
 
-  inst( "mfc0 r2, mngr2proc   " ); init_src(  32'hb );
-  inst( "mfc0 r1, mngr2proc   " ); init_src(  32'hd );
-  inst( "addu r3, r2, r1    " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h18 );
+  // inst( "mfc0 r1, mngr2proc   " ); init_src(  32'hd );
+  // inst( "mfc0 r2, mngr2proc   " ); init_src(  32'hb );
+  // inst( "addu r3, r1, r2    " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h18 );
 
-  // (Bypass) Testing addu: src0( 0xe ), src1( 0xb ), result( 0x19 )
-  // src0_nops( 0 ), src1_nops( 1 )
-  // - src1 loaded before src0
+  // // (Bypass) Testing addu: src0( 0xe ), src1( 0xb ), result( 0x19 )
+  // // src0_nops( 0 ), src1_nops( 1 )
+  // // - src0 loaded before src1
 
-  inst( "mfc0 r2, mngr2proc   " ); init_src(  32'hb );
-  inst( "nop                  " );
-  inst( "mfc0 r1, mngr2proc   " ); init_src(  32'he );
-  inst( "addu r3, r2, r1    " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h19 );
+  // inst( "mfc0 r1, mngr2proc   " ); init_src(  32'he );
+  // inst( "mfc0 r2, mngr2proc   " ); init_src(  32'hb );
+  // inst( "nop                  " );
+  // inst( "addu r3, r1, r2    " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h19 );
 
-  // (Bypass) Testing addu: src0( 0xf ), src1( 0xb ), result( 0x1a )
-  // src0_nops( 0 ), src1_nops( 2 )
-  // - src1 loaded before src0
+  // // (Bypass) Testing addu: src0( 0xf ), src1( 0xb ), result( 0x1a )
+  // // src0_nops( 0 ), src1_nops( 2 )
+  // // - src0 loaded before src1
 
-  inst( "mfc0 r2, mngr2proc   " ); init_src(  32'hb );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "mfc0 r1, mngr2proc   " ); init_src(  32'hf );
-  inst( "addu r3, r2, r1    " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h1a );
+  // inst( "mfc0 r1, mngr2proc   " ); init_src(  32'hf );
+  // inst( "mfc0 r2, mngr2proc   " ); init_src(  32'hb );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "addu r3, r1, r2    " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h1a );
 
-  // (Bypass) Testing addu: src0( 0xd ), src1( 0xb ), result( 0x18 )
-  // src0_nops( 1 ), src1_nops( 0 )
-  // - src1 loaded before src0
+  // // (Bypass) Testing addu: src0( 0xd ), src1( 0xb ), result( 0x18 )
+  // // src0_nops( 1 ), src1_nops( 0 )
+  // // - src0 loaded before src1
 
-  inst( "mfc0 r2, mngr2proc   " ); init_src(  32'hb );
-  inst( "mfc0 r1, mngr2proc   " ); init_src(  32'hd );
-  inst( "nop                  " );
-  inst( "addu r3, r2, r1    " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h18 );
+  // inst( "mfc0 r1, mngr2proc   " ); init_src(  32'hd );
+  // inst( "nop                  " );
+  // inst( "mfc0 r2, mngr2proc   " ); init_src(  32'hb );
+  // inst( "addu r3, r1, r2    " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h18 );
 
-  // (Bypass) Testing addu: src0( 0xe ), src1( 0xb ), result( 0x19 )
-  // src0_nops( 1 ), src1_nops( 1 )
-  // - src1 loaded before src0
+  // // (Bypass) Testing addu: src0( 0xe ), src1( 0xb ), result( 0x19 )
+  // // src0_nops( 1 ), src1_nops( 1 )
+  // // - src0 loaded before src1
 
-  inst( "mfc0 r2, mngr2proc   " ); init_src(  32'hb );
-  inst( "nop                  " );
-  inst( "mfc0 r1, mngr2proc   " ); init_src(  32'he );
-  inst( "nop                  " );
-  inst( "addu r3, r2, r1    " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h19 );
+  // inst( "mfc0 r1, mngr2proc   " ); init_src(  32'he );
+  // inst( "nop                  " );
+  // inst( "mfc0 r2, mngr2proc   " ); init_src(  32'hb );
+  // inst( "nop                  " );
+  // inst( "addu r3, r1, r2    " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h19 );
 
-  // (Bypass) Testing addu: src0( 0xf ), src1( 0xb ), result( 0x1a )
-  // src0_nops( 2 ), src1_nops( 0 )
-  // - src1 loaded before src0
+  // // (Bypass) Testing addu: src0( 0xf ), src1( 0xb ), result( 0x1a )
+  // // src0_nops( 2 ), src1_nops( 0 )
+  // // - src0 loaded before src1
 
-  inst( "mfc0 r2, mngr2proc   " ); init_src(  32'hb );
-  inst( "mfc0 r1, mngr2proc   " ); init_src(  32'hf );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "addu r3, r2, r1    " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h1a );
+  // inst( "mfc0 r1, mngr2proc   " ); init_src(  32'hf );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "mfc0 r2, mngr2proc   " ); init_src(  32'hb );
+  // inst( "addu r3, r1, r2    " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h1a );
 
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
+
+  // // (Bypass) Testing addu: src0( 0xd ), src1( 0xb ), result( 0x18 )
+  // // src0_nops( 0 ), src1_nops( 0 )
+  // // - src1 loaded before src0
+
+  // inst( "mfc0 r2, mngr2proc   " ); init_src(  32'hb );
+  // inst( "mfc0 r1, mngr2proc   " ); init_src(  32'hd );
+  // inst( "addu r3, r2, r1    " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h18 );
+
+  // // (Bypass) Testing addu: src0( 0xe ), src1( 0xb ), result( 0x19 )
+  // // src0_nops( 0 ), src1_nops( 1 )
+  // // - src1 loaded before src0
+
+  // inst( "mfc0 r2, mngr2proc   " ); init_src(  32'hb );
+  // inst( "nop                  " );
+  // inst( "mfc0 r1, mngr2proc   " ); init_src(  32'he );
+  // inst( "addu r3, r2, r1    " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h19 );
+
+  // // (Bypass) Testing addu: src0( 0xf ), src1( 0xb ), result( 0x1a )
+  // // src0_nops( 0 ), src1_nops( 2 )
+  // // - src1 loaded before src0
+
+  // inst( "mfc0 r2, mngr2proc   " ); init_src(  32'hb );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "mfc0 r1, mngr2proc   " ); init_src(  32'hf );
+  // inst( "addu r3, r2, r1    " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h1a );
+
+  // // (Bypass) Testing addu: src0( 0xd ), src1( 0xb ), result( 0x18 )
+  // // src0_nops( 1 ), src1_nops( 0 )
+  // // - src1 loaded before src0
+
+  // inst( "mfc0 r2, mngr2proc   " ); init_src(  32'hb );
+  // inst( "mfc0 r1, mngr2proc   " ); init_src(  32'hd );
+  // inst( "nop                  " );
+  // inst( "addu r3, r2, r1    " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h18 );
+
+  // // (Bypass) Testing addu: src0( 0xe ), src1( 0xb ), result( 0x19 )
+  // // src0_nops( 1 ), src1_nops( 1 )
+  // // - src1 loaded before src0
+
+  // inst( "mfc0 r2, mngr2proc   " ); init_src(  32'hb );
+  // inst( "nop                  " );
+  // inst( "mfc0 r1, mngr2proc   " ); init_src(  32'he );
+  // inst( "nop                  " );
+  // inst( "addu r3, r2, r1    " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h19 );
+
+  // // (Bypass) Testing addu: src0( 0xf ), src1( 0xb ), result( 0x1a )
+  // // src0_nops( 2 ), src1_nops( 0 )
+  // // - src1 loaded before src0
+
+  // inst( "mfc0 r2, mngr2proc   " ); init_src(  32'hb );
+  // inst( "mfc0 r1, mngr2proc   " ); init_src(  32'hf );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "addu r3, r2, r1    " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h1a );
+
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
 
 end
 endtask
