@@ -365,7 +365,9 @@ module lab2_proc_PipelinedProcAltCtrl
                         ( (bypass_rs == bM) ? am_mbyp : 
                         ( (bypass_rs == bW) ? am_wbyp : cs_op0_sel)));
     rs_en_D          = cs_rs_en;
-    op1_sel_D         = cs_op1_sel;
+    op1_sel_D        = (( bypass_rt == bX ) ? bm_xbyp :
+                        ( (bypass_rt == bM) ? bm_mbyp : 
+                        ( (bypass_rt == bW) ? bm_wbyp : cs_op1_sel)));
     rt_en_D          = cs_rt_en;
     alu_fn_D         = cs_alu_fn;
     ex_mux_sel_D     = cs_mux_sel_D;
