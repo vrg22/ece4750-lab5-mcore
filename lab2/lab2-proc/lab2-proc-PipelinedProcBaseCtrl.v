@@ -326,7 +326,7 @@ module lab2_proc_PipelinedProcBaseCtrl
     op1_sel_D        = cs_op1_sel;
     rt_en_D          = cs_rt_en;
     alu_fn_D         = cs_alu_fn;
-    ex_mux_sel_D     = cs_mux_sel_D,
+    ex_mux_sel_D     = cs_mux_sel_D;
     dmemreq_type_D   = cs_dmemreq_type;
     wb_result_sel_D  = cs_wb_result_sel;
     rf_wen_D         = cs_rf_wen;
