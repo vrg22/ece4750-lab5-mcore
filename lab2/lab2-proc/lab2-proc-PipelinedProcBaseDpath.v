@@ -38,6 +38,14 @@ module lab2_proc_PipelinedProcBaseDpath
   input  logic [31:0] from_mngr_data,
   output logic [31:0] to_mngr_data,
 
+  // MUL signals
+
+  input  logic mulreq_val,
+  output logic mulreq_rdy,
+
+  output logic mulresp_val,
+  input  logic mulresp_rdy,
+
   // control signals (ctrl->dpath)
 
   output logic        imemresp_val_drop,
@@ -52,6 +60,7 @@ module lab2_proc_PipelinedProcBaseDpath
   input  logic [1:0]  op0_sel_D,
   input  logic [2:0]  op1_sel_D,
   input  logic [3:0]  alu_fn_X,
+  input  logic        ex_mux_sel_X,
   input  logic        wb_result_sel_M,
   input  logic [4:0]  rf_waddr_W,
   input  logic        rf_wen_W,
@@ -249,6 +258,21 @@ module lab2_proc_PipelinedProcBaseDpath
 
   logic [31:0] br_target_D;
 
+  logic [63:0] mul_msg = { op1_D, op2_D };
+  logic [31:0] mul_result_X;
+
+  lab1_imul_IntMulAlt mul
+  (
+    .clk      (clk),
+    .reset    (reset), //not sure if we ever want to reset the mult
+    .req_val  (mulreq_val),
+    .req_rdy  (mulreq_rdy),
+    .req_msg  (mul_msg),
+    .resp_val (mulresp_val),
+    .resp_rdy (mulresp_rdy),
+    .resp_msg (mul_result_X)
+  );
+
   lab2_proc_BrTarget br_target_calc_D
   (
     .pc_plus4  (pc_plus4_D),
@@ -272,9 +296,6 @@ module lab2_proc_PipelinedProcBaseDpath
   logic [31:0] op0_X;
   logic [31:0] op1_X;
   logic [31:0] write_data_X;
-  logic [31:0] mul_result_X;
-  logic        mul_req_rdy;
-  logic        mul_resp_val;
 
   vc_EnResetReg #(32, 0) op0_reg_X
   (
@@ -326,23 +347,11 @@ module lab2_proc_PipelinedProcBaseDpath
     .op0_neg  (br_cond_neg_X)
   );
 
-  lab1_imul_IntMulAlt mul
-  (
-    .clk      (clk),
-    .reset    (reset), //not sure if we ever want to reset the mult
-    .req_val  (1'b0),
-    .req_rdy  (mul_req_rdy),
-    .req_msg  (1'b0),
-    .resp_val (mul_resp_val),
-    .resp_rdy (1'b0),
-    .resp_msg (mul_result_X)
-  );
-
   vc_Mux2 #(32) ex_result_mux_X
   (
     .in0  (alu_result_X),
     .in1  (mul_result_X),
-    .sel  (1'd0),
+    .sel  (ex_mux_sel_X),
     .out  (ex_result_X)
   );
 

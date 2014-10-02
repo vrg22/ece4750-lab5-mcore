@@ -85,6 +85,13 @@ module lab2_proc_PipelinedProcBase
 
   logic                                    imemresp_drop;
 
+  // mul val/rdy signals
+
+  logic mulreq_val;
+  logic mulreq_rdy;
+  logic mulresp_val;
+  logic mulresp_rdy;
+
   // control signals (ctrl->dpath)
 
   logic [1:0]  pc_sel_F;
@@ -181,6 +188,13 @@ module lab2_proc_PipelinedProcBase
     .to_mngr_val            (to_mngr_val),
     .to_mngr_rdy            (to_mngr_rdy),
 
+    // mul signals
+
+    .mulreq_val             (mulreq_val),
+    .mulreq_rdy             (mulreq_rdy),
+    .mulresp_val            (mulresp_val),
+    .mulresp_rdy            (mulresp_rdy),
+
     // control signals (ctrl->dpath)
 
     .pc_sel_F               (pc_sel_F),
@@ -246,6 +260,13 @@ module lab2_proc_PipelinedProcBase
 
     .from_mngr_data          (from_mngr_msg),
     .to_mngr_data            (to_mngr_msg),
+
+    // mul signals
+
+    .mulreq_val             (mulreq_val),
+    .mulreq_rdy             (mulreq_rdy),
+    .mulresp_val            (mulresp_val),
+    .mulresp_rdy            (mulresp_rdy),
 
     // control signals (ctrl->dpath)
 
