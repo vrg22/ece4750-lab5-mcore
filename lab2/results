@@ -1,34 +1,64 @@
 BASELINE:
 
-
-vv_add_unopt:
+vv-add-unopt:
 
 num_cycles              = 2009
 num_insts               = 907
 avg_num_cycles_per_inst = 2.214994
 
-vv_add_opt:
+vv-add-opt:
 
 num_cycles              = 584
 num_insts               = 532
 avg_num_cycles_per_inst = 1.097744
 
-cmplx_mult:
+cmplx-mult:
 
 num_cycles              = 5621
 num_insts               = 1707
 avg_num_cycles_per_inst = 3.292912
 
-bin_search:
+bin-search:
 
 num_cycles              = 4532
 num_insts               = 1527
 avg_num_cycles_per_inst = 2.967911
 
-masked_filter:
+masked-filter:
 
 num_cycles              = 5985
 num_insts               = 1350
 avg_num_cycles_per_inst = 4.433333
 
+BYPASS_X:
 
+vvadd-unopt:
+
+num_cycles              = 1709
+num_insts               = 907
+avg_num_cycles_per_inst = 1.884234
+
+vvadd-opt:
+
+num_cycles              = 584
+num_insts               = 532
+avg_num_cycles_per_inst = 1.097744
+
+bin-search:
+
+num_cycles              = 2475
+num_insts               = 1527
+avg_num_cycles_per_inst = 1.620825
+
+cmplx-mult:
+
+num_cycles              = 5621
+num_insts               = 1707
+avg_num_cycles_per_inst = 3.292912
+    
+masked-filter:
+     
+num_cycles              = 4182
+num_insts               = 1350
+avg_num_cycles_per_inst = 3.097778
+           
