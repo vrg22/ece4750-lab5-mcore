@@ -182,7 +182,7 @@ module lab2_proc_PipelinedProcAltCtrl
   logic   [4:0] inst_shamt_D;
   pisa_InstUnpack inst_unpack
   (
-    .inst     (inst_D),
+    .inst     ( inst_D ),
     .opcode   (),
     .rs       (inst_rs_D),
     .rt       (inst_rt_D),
