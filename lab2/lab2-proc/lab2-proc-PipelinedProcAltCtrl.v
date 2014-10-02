@@ -237,6 +237,8 @@ module lab2_proc_PipelinedProcAltCtrl
   localparam am_shamt = 3'd0;  //use shamt field in instruction
   localparam am_rdat  = 3'd1;  //use register file
   localparam am_xbyp  = 3'd2;  //use bypass path from X
+  localparam am_mbyp  = 3'd3;
+  localparam am_wbyp  = 3'd4;
 
   // Operand 1 Mux Select
 
@@ -247,6 +249,8 @@ module lab2_proc_PipelinedProcAltCtrl
   localparam bm_zi    = 3'd3; // Use zero-extended immediate
   localparam bm_fhst  = 3'd4; // Use from mngr data
   localparam bm_xbyp  = 3'd5; // USe bypass from X
+  localparam bm_mbyp  = 3'd6;
+  localparam bm_wbyp  = 3'd7;
 
   // ALU Function
 
@@ -300,6 +304,36 @@ module lab2_proc_PipelinedProcAltCtrl
   logic       to_mngr_val_D;
   logic       from_mngr_rdy_D;
 
+  logic [1:0] bypass_rs;
+  logic [1:0] bypass_rt;
+
+  localparam nB = 2'd0;
+  localparam bX = 2'd1;
+  localparam bM = 2'd2;
+  localparam bW = 2'd3;
+
+  always @(*) begin
+    if ( (rs_en_D && val_X && rf_wen_X && rf_waddr_X == inst_rs_D) ) begin
+        casez (inst_X)
+          `PISA_INST_LW : bypass_rs = nB;
+          default       : bypass_rs = bX;
+        endcase
+    end
+    else 
+      bypass_rs = nB
+  end
+
+  always @(*) begin
+    if ( (rt_en_D && val_X && rf_wen_X && rf_waddr_X == inst_rt_D) ) begin
+        casez (inst_X)
+          `PISA_INST_LW : bypass_rt = nB;
+          default       : bypass_rt = bX;
+        endcase
+    end
+    else 
+      bypass_rt = nB
+  end
+
   task cs
   (
     input logic       cs_val,
@@ -322,10 +356,27 @@ module lab2_proc_PipelinedProcAltCtrl
     inst_val_D       = cs_val;
     j_type_D         = cs_j_type;
     br_type_D        = cs_br_type;
-    op0_sel_D        = cs_op0_sel;
+
+    case ( bypass_rs )
+      nB : cs_op0_sel;
+      bX : am_xbyp;
+      bM : am_mbyp;
+      bW : am_wbyp;
+      default: cs_op0_sel;
+    endcase
+
     rs_en_D          = cs_rs_en;
-    op1_sel_D        = cs_op1_sel;
+
+    case ( bypass_rt )
+      nB : cs_op1_sel;
+      bX : bm_xbyp;
+      bM : bm_mbyp;
+      bW : bm_wbyp;
+      default: cs_op1_sel;
+    endcase
+
     rt_en_D          = cs_rt_en;
+
     alu_fn_D         = cs_alu_fn;
     ex_mux_sel_D     = cs_mux_sel_D;
     dmemreq_type_D   = cs_dmemreq_type;
@@ -420,7 +471,7 @@ module lab2_proc_PipelinedProcAltCtrl
   logic  stall_waddr_X_rs_D;
   assign stall_waddr_X_rs_D
     = ( rs_en_D && val_X && rf_wen_X
-        && ( inst_rs_D == rf_waddr_X ) && ( rf_waddr_X != 5'd0 ) );
+        && ( inst_rs_D == rf_waddr_X ) && ( rf_waddr_X != 5'd0 ) && (bypass_rs == nB) );
 
   // Stall if write address in M matches rs in D
 
@@ -441,7 +492,7 @@ module lab2_proc_PipelinedProcAltCtrl
   logic  stall_waddr_X_rt_D;
   assign stall_waddr_X_rt_D
     = ( rt_en_D && val_X && rf_wen_X
-        && ( inst_rt_D == rf_waddr_X ) && ( rf_waddr_X != 5'd0 ) );
+        && ( inst_rt_D == rf_waddr_X ) && ( rf_waddr_X != 5'd0 ) && (bypass_rt == nB));
 
   // Stall if write address in M matches rt in D
 
