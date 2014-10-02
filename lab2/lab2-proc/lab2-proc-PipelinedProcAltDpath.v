@@ -272,7 +272,7 @@ module lab2_proc_PipelinedProcAltDpath
   (
     .in0  (no_byp_op0),
     .in1  (ex_bypass_rs_rt_X),
-    .in2  (32'd0),
+    .in2  (wb_result_M),
     .in3  (32'd0),
     .sel  (bypass_rs),
     .out  (op0_D)
@@ -282,7 +282,7 @@ module lab2_proc_PipelinedProcAltDpath
   (
     .in0  (no_byp_op1),
     .in1  (ex_bypass_rs_rt_X),
-    .in2  (32'd0),
+    .in2  (wb_result_M),
     .in3  (32'd0),
     .sel  (bypass_rt),
     .out  (op1_D)
