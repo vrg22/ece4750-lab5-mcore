@@ -333,7 +333,6 @@ module lab2_proc_PipelinedProcAltCtrl
     else if ((rt_en_D) && val_M && (rf_wen_M) && (rf_waddr_M == inst_rt_D) && (rf_waddr_M != r0)) begin
       bypass_rt = bM;
     end
-    else b
     else begin
       bypass_rt = nB;
     end
