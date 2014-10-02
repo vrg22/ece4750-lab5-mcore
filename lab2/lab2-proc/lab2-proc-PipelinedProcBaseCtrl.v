@@ -376,7 +376,7 @@ module lab2_proc_PipelinedProcBaseCtrl
       `PISA_INST_JR      :cs( y,  j_r, br_none, am_rdat,  y, bm_x,    n, alu_x,   alu_out, nr, wm_x, n,  rx, n,   n   );
       `PISA_INST_JAL     :cs( y,  j_l, br_none, am_x,     n, bm_pc4,  n, alu_cp1, alu_out, nr, wm_a, y,  rL, n,   n   );
       `PISA_INST_LW      :cs( y,  j_n, br_none, am_rdat,  y, bm_si,   n, alu_add, alu_out, ld, wm_m, y,  rt, n,   n   );
-      `PISA_INST_SW      :cs( y,  j_n, br_none, am_rdat,  y, bm_si,   n, alu_add, alu_out, st, wm_x, n,  rx, n,   n   );
+      `PISA_INST_SW      :cs( y,  j_n, br_none, am_rdat,  y, bm_si,   y, alu_add, alu_out, st, wm_x, n,  rx, n,   n   );
       `PISA_INST_MFC0    :cs( y,  j_n, br_none, am_x,     n, bm_fhst, n, alu_cp1, alu_out, nr, wm_a, y,  rt, n,   y   );
       `PISA_INST_MTC0    :cs( y,  j_n, br_none, am_x,     n, bm_rdat, y, alu_cp1, alu_out, nr, wm_a, n,  rx, y,   n   );
       default            :cs( n,  j_x, br_x,    am_x,     n, bm_x,    n, alu_x,   alu_out, nr, wm_x, n,  rx, n,   n   );
