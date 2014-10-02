@@ -183,11 +183,11 @@ begin
   inst( "xori r2, r1, 0x8000   " );
   inst( "mtc0 r2, proc2mngr     " ); init_sink( 32'h80000000 );
 
-  // Test "xori", 0x00001234 (reg) ^ 0x7fff (imm) = 0x7fff0d7e (result)
+  // Test "xori", 0x00001234 (reg) ^ 0x7fff (imm) = 0x6dcb (result)
 
   inst( "mfc0 r1, mngr2proc     " ); init_src(  32'h00001234 );
   inst( "xori r2, r1, 0x7fff   " );
-  inst( "mtc0 r2, proc2mngr     " ); init_sink( 32'h7fff0d7e );
+  inst( "mtc0 r2, proc2mngr     " ); init_sink( 32'h6dcb );
 
   // Test "xori", 0x7ffffedc (reg) ^ 0xf3a2 (imm) = 0x7fff0d7e (result)
 
