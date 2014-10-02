@@ -361,28 +361,12 @@ module lab2_proc_PipelinedProcAltCtrl
     inst_val_D       = cs_val;
     j_type_D         = cs_j_type;
     br_type_D        = cs_br_type;
-    op0_temp         = cs_op0_sel;
-    case ( bypass_rs )
-      nB : op0_sel_D = op0_temp;
-      bX : op0_sel_D = am_xbyp;
-      bM : op0_sel_D = am_mbyp;
-      bW : op0_sel_D = am_wbyp;
-      default: op0_temp;
-    endcase
-
+    op0_sel_D        = (( bypass_rs == bX ) ? am_xbyp :
+                        ( (bypass_rs == bM) ? am_mbyp : 
+                        ( (bypass_rs == bW) ? am_wbyp : cs_op0_sel)));
     rs_en_D          = cs_rs_en;
-
-    op1_temp         = cs_op1_sel;
-    case ( bypass_rt )
-      nB : op1_sel_D = op1_temp;
-      bX : op1_sel_D = bm_xbyp;
-      bM : op1_sel_D = bm_mbyp;
-      bW : op1_sel_D = bm_wbyp;
-      default: op1_temp;
-    endcase
-
+    op1_sel_D         = cs_op1_sel;
     rt_en_D          = cs_rt_en;
-
     alu_fn_D         = cs_alu_fn;
     ex_mux_sel_D     = cs_mux_sel_D;
     dmemreq_type_D   = cs_dmemreq_type;
