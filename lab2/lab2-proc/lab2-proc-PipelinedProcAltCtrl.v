@@ -324,7 +324,7 @@ module lab2_proc_PipelinedProcAltCtrl
     end
   end
 
-  always @(*) begin
+  always @(*) begin //fixed syntax
     if ( (rt_en_D && val_X && rf_wen_X && rf_waddr_X == inst_rt_D) ) begin
         casez (inst_X)
           `PISA_INST_LW : bypass_rt = nB;
