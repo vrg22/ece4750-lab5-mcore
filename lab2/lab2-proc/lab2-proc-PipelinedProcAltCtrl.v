@@ -58,7 +58,7 @@ module lab2_proc_PipelinedProcAltCtrl
   output logic        reg_en_X,
   output logic        reg_en_M,
   output logic        reg_en_W,
-  output logic [1:0]  op0_sel_D,
+  output logic [2:0]  op0_sel_D,
   output logic [2:0]  op1_sel_D,
   output logic [3:0]  alu_fn_X,
   output logic        ex_mux_sel_X,
@@ -233,9 +233,9 @@ module lab2_proc_PipelinedProcAltCtrl
 
   // Operand 0 Mux Select
 
-  localparam am_x = 2'bx;
-  localparam am_shamt = 2'd0; //use shamt field in instruction
-  localparam am_rdat = 2'd1;  //use register file
+  localparam am_x = 3'bx;
+  localparam am_shamt = 3'd0; //use shamt field in instruction
+  localparam am_rdat = 3'd1;  //use register file
 
 
   // Operand 1 Mux Select
