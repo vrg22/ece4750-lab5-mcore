@@ -16,5 +16,4 @@ subprojs = \
   lab1-imul \
   pisa \
   lab2-proc \
-  lab2-proc-alt \
 
