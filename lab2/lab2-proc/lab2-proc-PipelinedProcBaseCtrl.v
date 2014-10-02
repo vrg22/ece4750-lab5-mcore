@@ -473,19 +473,19 @@ module lab2_proc_PipelinedProcBaseCtrl
 
   assign stall_hazard_D = val_D &&
     ( stall_waddr_X_rs_D || stall_waddr_M_rs_D || stall_waddr_W_rs_D ||
-      stall_waddr_X_rt_D || stall_waddr_M_rt_D || stall_waddr_W_rt_D ) || stall_sw;
+      stall_waddr_X_rt_D || stall_waddr_M_rt_D || stall_waddr_W_rt_D );
 
 
   logic mulreq_val_D;
   logic stall_mul_D;
 
   assign mulreq_val_D = val_D && ( ex_mux_sel_D == mul_out);
-  assign mulreq_val = mulreq_val_D && !stall_DX && !stall_hazard_D && !stall_from_mngr_D;       //Correct
+  assign mulreq_val = mulreq_val_D && !stall_DX && !stall_hazard_D && !stall_from_mngr_D && !stall_sw;      //Correct
 
   // Stall if multiplier not ready
   assign stall_mul_D = mulreq_val_D && !mulreq_rdy;
 
-  assign stall_D  = stall_from_mngr_D || stall_hazard_D || stall_mul_D;
+  assign stall_D  = stall_from_mngr_D || stall_hazard_D || stall_mul_D || stall_sw;
   assign squash_D = squash_j_D;
 
   //----------------------------------------------------------------------
