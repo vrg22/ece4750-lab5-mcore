@@ -458,7 +458,7 @@ module lab2_proc_PipelinedProcAltCtrl
   logic  stall_waddr_X_rs_D;
   assign stall_waddr_X_rs_D
     = ( rs_en_D && val_X && rf_wen_X
-        && ( inst_rs_D == rf_waddr_X ) && ( rf_waddr_X != 5'd0 )  );
+        && ( inst_rs_D == rf_waddr_X ) && ( rf_waddr_X != 5'd0 ) && (bypass_rs == nB) );
 
   // Stall if write address in M matches rs in D
 
@@ -479,7 +479,7 @@ module lab2_proc_PipelinedProcAltCtrl
   logic  stall_waddr_X_rt_D;
   assign stall_waddr_X_rt_D
     = ( rt_en_D && val_X && rf_wen_X
-        && ( inst_rt_D == rf_waddr_X ) && ( rf_waddr_X != 5'd0 ) );
+        && ( inst_rt_D == rf_waddr_X ) && ( rf_waddr_X != 5'd0 ) && (bypass_rs == nB) ); 
 
   // Stall if write address in M matches rt in D
 
