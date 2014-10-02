@@ -331,7 +331,7 @@ module lab2_proc_PipelinedProcAltCtrl
           default       : bypass_rt = bX;
         endcase
     end
-    else if rt_en_D && val_M && rf_wen_M
+    else if (rt_en_D && val_M && rf_wen_M
         && ( inst_rt_D == rf_waddr_M ) && ( rf_waddr_M != 5'd0 )) begin
         bypass_rt = bM; 
     end
