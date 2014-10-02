@@ -456,11 +456,24 @@ module lab2_proc_PipelinedProcBaseCtrl
     = ( rt_en_D && val_W && rf_wen_W
         && ( inst_rt_D == rf_waddr_W ) && ( rf_waddr_W != 5'd0 ) );
 
+  logic stall_sw_waddr_X;
+  assign stall_sw_waddr_X = val_X && rf_wen_X && (inst_rt_D == rf_waddr_X);
+
+  logic stall_sw_waddr_M;
+  assign stall_sw_waddr_M = val_M && rf_wen_M && (inst_rt_D == rf_waddr_M);
+
+  logic stall_sw_waddr_W;
+  assign stall_sw_waddr_W = val_W && rf_wen_W && (inst_rt_D == rf_waddr_W);
+
+  logic stall_sw;
+  assign stall_sw = ( val_D && rt_en_D && dmemreq_type_D == st ) &&
+                    (stall_sw_waddr_X || stall_sw_waddr_W || stall_sw_waddr_M);
+
   // Put together final stall signal
 
   assign stall_hazard_D = val_D &&
     ( stall_waddr_X_rs_D || stall_waddr_M_rs_D || stall_waddr_W_rs_D ||
-      stall_waddr_X_rt_D || stall_waddr_M_rt_D || stall_waddr_W_rt_D );
+      stall_waddr_X_rt_D || stall_waddr_M_rt_D || stall_waddr_W_rt_D ) ;
 
 
   logic mulreq_val_D;
