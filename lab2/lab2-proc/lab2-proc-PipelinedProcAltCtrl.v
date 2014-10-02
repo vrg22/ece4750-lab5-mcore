@@ -320,7 +320,7 @@ module lab2_proc_PipelinedProcAltCtrl
         endcase
     end
     else begin
-      bypass_rs = nB
+      bypass_rs = nB;
     end
   end
 
@@ -332,7 +332,7 @@ module lab2_proc_PipelinedProcAltCtrl
         endcase
     end
     else begin
-      bypass_rt = nB
+      bypass_rt = nB;
     end
   end
 
