@@ -361,7 +361,7 @@ module lab2_proc_PipelinedProcAltCtrl
     inst_val_D       = cs_val;
     j_type_D         = cs_j_type;
     br_type_D        = cs_br_type;
-    op0_sel_D        = (( bypass_rs == bX ) ? am_xbyp : cs_op0_sel);
+    op0_sel_D        = cs_op0_sel;
     rs_en_D          = cs_rs_en;
     op1_sel_D        = (( bypass_rt == bX ) ? bm_xbyp :
                         ( (bypass_rt == bM) ? bm_mbyp : 
