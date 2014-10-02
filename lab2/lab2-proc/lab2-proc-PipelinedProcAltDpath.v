@@ -171,7 +171,8 @@ module lab2_proc_PipelinedProcAltDpath
   logic  [31:0] inst_shift_zext_D;
   logic  [25:0] inst_target_D;
 
-  logic  [31:0] ex_bypass_rs_rt_X;
+  logic  [31:0] bypass_rs_rt_X;
+  logic  [31:0] bypass_rs_rt_M;
 
   vc_EnResetReg #(32) pc_plus4_reg_D
   (
@@ -271,8 +272,8 @@ module lab2_proc_PipelinedProcAltDpath
   vc_Mux4 #(32) op0_byp_mux_D
   (
     .in0  (no_byp_op0),
-    .in1  (ex_bypass_rs_rt_X),
-    .in2  (wb_result_M),
+    .in1  (bypass_rs_rt_X),
+    .in2  (bypass_rs_rt_M),
     .in3  (32'd0),
     .sel  (bypass_rs),
     .out  (op0_D)
@@ -281,8 +282,8 @@ module lab2_proc_PipelinedProcAltDpath
   vc_Mux4 #(32) op1_byp_mux_D
   (
     .in0  (no_byp_op1),
-    .in1  (ex_bypass_rs_rt_X),
-    .in2  (wb_result_M),
+    .in1  (bypass_rs_rt_X),
+    .in2  (bypass_rs_rt_M),
     .in3  (32'd0),
     .sel  (bypass_rt),
     .out  (op1_D)
@@ -419,6 +420,8 @@ module lab2_proc_PipelinedProcAltDpath
     .sel    (wb_result_sel_M),
     .out    (wb_result_M)
   );
+
+  assign bypass_rs_rt_M = wb_result_M;
 
 
   //--------------------------------------------------------------------
