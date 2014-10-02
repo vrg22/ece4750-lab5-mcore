@@ -41,7 +41,7 @@ module lab2_proc_alu
       4'd10 : out = $signed(in1) >>> in0[4:0];       // SRA
       4'd11 : out = in0;                             // CP OP0
       4'd12 : out = in1;                             // CP OP1
-      4'd13 : out = { 31'd0, lt_signed_out };        // LT Signed
+      4'd13 : out = { 31'd0, ($signed(in0 < $signed(in1))) };        // LT Signed
       4'd14 : out = { in1[15:0] , 16'd0 };           // LUI
       default : out = 32'b0;
     endcase

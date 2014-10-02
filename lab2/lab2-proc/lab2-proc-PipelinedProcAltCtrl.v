@@ -309,7 +309,7 @@ module lab2_proc_PipelinedProcAltCtrl
   localparam bW = 2'd3;
 
   always @(*) begin
-    if ( (rs_en_D && val_X && rf_wen_X && rf_waddr_X == inst_rs_D) ) begin
+    if ( (rs_en_D && val_X && rf_wen_X && rf_waddr_X == inst_rs_D) && (rf_waddr_X != r0) ) begin
         casez (inst_X)
           `PISA_INST_LW : bypass_rs = nB;
           default       : bypass_rs = bX;
@@ -321,7 +321,7 @@ module lab2_proc_PipelinedProcAltCtrl
   end
 
   always @(*) begin //fixed syntax
-    if ( (rt_en_D && val_X && rf_wen_X && rf_waddr_X == inst_rt_D) ) begin
+    if ( (rt_en_D && val_X && rf_wen_X && rf_waddr_X == inst_rt_D) && (rf_waddr_X != r0) ) begin
         casez (inst_X)
           `PISA_INST_LW : bypass_rt = nB;
           default       : bypass_rt = bX;
