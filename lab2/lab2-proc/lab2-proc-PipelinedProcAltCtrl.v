@@ -487,6 +487,10 @@ module lab2_proc_PipelinedProcAltCtrl
 
   // Stall if write address in W matches rt in D
 
+  logic  stall_waddr_W_rt_D;
+  assign stall_waddr_W_rt_D
+    = 1'b0;
+
   // Put together final stall signal
 
   assign stall_hazard_D = val_D &&
