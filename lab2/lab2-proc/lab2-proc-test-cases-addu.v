@@ -119,6 +119,11 @@ begin
   inst( "nop                  " );
   inst( "nop                  " );
   inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h18 );
+  inst( "nop                  " );
+  inst( "nop                  " );
+  inst( "nop                  " );
+  inst( "nop                  " );
+  inst( "nop                  " );
 
   // // (Bypass) Testing addu: src0( 0xe ), src1( 0xb ), result( 0x19 )
   // // src0_nops( 0 ), src1_nops( 1 )
