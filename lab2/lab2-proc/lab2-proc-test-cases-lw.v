@@ -280,7 +280,7 @@ begin
 
   address( c_reset_vector );
 
-  for ( idx = 0; idx < 1; idx = idx + 1 ) begin
+  for ( idx = 0; idx < 100; idx = idx + 1 ) begin
   // (Value) Testing lw: offset( 0x0 ), base( 0x2000 ), result( 0xff )
 
   inst( "mfc0 r1, mngr2proc   " ); init_src(  32'h2000 );
@@ -289,9 +289,9 @@ begin
 
   // (Value) Testing lw: offset( 0x4 ), base( 0x2000 ), result( 0x7f00 )
 
-  // inst( "mfc0 r1, mngr2proc   " ); init_src(  32'h2000 );
-  // inst( "lw r2, 0x4(r1)  " );
-  // inst( "mtc0 r2, proc2mngr   " ); init_sink( 32'h7f00 );
+  inst( "mfc0 r1, mngr2proc   " ); init_src(  32'h2000 );
+  inst( "lw r2, 0x4(r1)  " );
+  inst( "mtc0 r2, proc2mngr   " ); init_sink( 32'h7f00 );
 
   end
 
