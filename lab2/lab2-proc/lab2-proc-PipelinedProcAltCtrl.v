@@ -319,8 +319,9 @@ module lab2_proc_PipelinedProcAltCtrl
           default       : bypass_rs = bX;
         endcase
     end
-    else 
+    else begin
       bypass_rs = nB
+    end
   end
 
   always @(*) begin
@@ -330,8 +331,9 @@ module lab2_proc_PipelinedProcAltCtrl
           default       : bypass_rt = bX;
         endcase
     end
-    else 
+    else begin
       bypass_rt = nB
+    end
   end
 
   task cs
