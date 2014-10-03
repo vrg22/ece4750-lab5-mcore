@@ -68,7 +68,7 @@ module lab2_proc_PipelinedProcAltCtrl
 
   output logic [1:0]  bypass_rs,
   output logic [1:0]  bypass_rt,
-  output logic [1:0]  write_data_sel_D,
+  output logic        choose_byp1_D,
 
   // status signals (dpath->ctrl)
 
@@ -326,16 +326,10 @@ module lab2_proc_PipelinedProcAltCtrl
 
   always @(*) begin
     if ( (rt_en_D && val_X && rf_wen_X && rf_waddr_X == inst_rt_D) && (rf_waddr_X != r0) ) begin
-        casez (inst_X)
-          `PISA_INST_LW : bypass_rt = nB;
-          default       : bypass_rt = bX;
-        endcase
+      bypass_rt = bX;
     end
     else if ((rt_en_D) && val_M && (rf_wen_M) && (rf_waddr_M == inst_rt_D) && (rf_waddr_M != r0)) begin
-        casez ( inst_D )
-          `PISA_INST_SW : bypass_rt = nB;
-          default       : bypass_rt = bM;
-        endcase
+      bypass_rt = bM;
     end
     else begin
       bypass_rt = nB;
@@ -343,21 +337,10 @@ module lab2_proc_PipelinedProcAltCtrl
   end
 
   always @(*) begin
-    if ( (rt_en_D && val_X && rf_wen_X && rf_waddr_X == inst_rt_D) && (rf_waddr_X != r0) ) begin
-        casez (inst_X)
-          `PISA_INST_LW : write_data_sel_D = nB;
-          default       : write_data_sel_D = bX;
-        endcase
-    end
-    else if ((rt_en_D) && val_M && (rf_wen_M) && (rf_waddr_M == inst_rt_D) && (rf_waddr_M != r0)) begin
-        casez ( inst_D )
-          `PISA_INST_SW : write_data_sel_D = bM;
-          default       : write_data_sel_D = bM;
-        endcase
-    end
-    else begin
-      bypass_rt = nB;
-    end
+    casez (inst_D)
+        `PISA_INST_SW : choose_byp1_D = n;
+        default       : choose_byp1_D = bypass_rt != 2'd0;
+    endcase
   end
 
   task cs
