@@ -71,6 +71,7 @@ module lab2_proc_PipelinedProcAltDpath
 
   input  logic [1:0]  bypass_rs,
   input  logic [1:0]  bypass_rt,
+  input  logic        choose_byp1_D,
 
   // status signals (dpath->ctrl)
 
@@ -249,6 +250,8 @@ module lab2_proc_PipelinedProcAltDpath
 
   logic [31:0] no_byp_op0;
   logic [31:0] no_byp_op1;
+  logic [31:0] op1_mux0;
+  logic [31:0] op1_mux1;
 
   vc_Mux3 #(32) op0_sel_mux_D
   (
@@ -270,6 +273,8 @@ module lab2_proc_PipelinedProcAltDpath
     .out  (no_byp_op1)
   );
 
+  assign op1_mux0 = no_byp_op1;
+
   vc_Mux4 #(32) op0_byp_mux_D
   (
     .in0  (no_byp_op0),
@@ -287,6 +292,14 @@ module lab2_proc_PipelinedProcAltDpath
     .in2  (bypass_rs_rt_M),
     .in3  (bypass_rs_rt_W),
     .sel  (bypass_rt),
+    .out  (op1_mux1)
+  );
+
+  vc_Mux2 #(32) op1_byp_sel_mux_D
+  (
+    .in0  (op1_mux0),
+    .in1  (op1_mux1),
+    .sel  (choose_byp1_D),
     .out  (op1_D)
   );
 
@@ -322,6 +335,18 @@ module lab2_proc_PipelinedProcAltDpath
     .j_target   (j_target_D)
   );
 
+  logic [31:0] write_data_D;
+
+  vc_Mux4 #(32) dmem_write_data_mux_D
+  (
+    .in0  (rf_rdata1_D),
+    .in1  (bypass_rs_rt_X),
+    .in2  (bypass_rs_rt_M),
+    .in3  (bypass_rs_rt_W),
+    .sel  (bypass_rt),
+    .out  (write_data_D)
+  );
+
   assign jr_target_D = rf_rdata0_D;
 
   //--------------------------------------------------------------------
@@ -350,12 +375,12 @@ module lab2_proc_PipelinedProcAltDpath
     .q      (op1_X)
   );
 
-  vc_EnResetReg #(32, 0) dmem_write_data_X
+  vc_EnResetReg #(32, 0) dmem_write_data_reg_X
   (
     .clk    (clk),
     .reset  (reset),
     .en     (reg_en_X),
-    .d      (rf_rdata1_D),
+    .d      (write_data_D),
     .q      (write_data_X)
   );
 

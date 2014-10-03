@@ -115,6 +115,7 @@ module lab2_proc_PipelinedProcAlt
 
   logic [1:0]  bypass_rs;
   logic [1:0]  bypass_rt;
+  logic        choose_byp1_D;
 
   // status signals (dpath->ctrl)
 
@@ -222,6 +223,7 @@ module lab2_proc_PipelinedProcAlt
 
     .bypass_rs              (bypass_rs),
     .bypass_rt              (bypass_rt),
+    .choose_byp1_D          (choose_byp1_D),
 
     // status signals (dpath->ctrl)
 
@@ -302,6 +304,7 @@ module lab2_proc_PipelinedProcAlt
 
     .bypass_rs               (bypass_rs),
     .bypass_rt               (bypass_rt),
+    .choose_byp1_D           (choose_byp1_D),
 
     // status signals (dpath->ctrl)
 

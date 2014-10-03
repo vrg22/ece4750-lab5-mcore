@@ -61,4 +61,30 @@ masked-filter:
 num_cycles              = 4182
 num_insts               = 1350
 avg_num_cycles_per_inst = 3.097778
-           
+
+BYPASS_M:
+
+vv-add:
+
+num_cycles              = 1209
+num_insts               = 907
+avg_num_cycles_per_inst = 1.332966
+
+bin-search:
+
+num_cycles              = 2376
+num_insts               = 1527
+avg_num_cycles_per_inst = 1.555992
+
+cmplx-mult:
+
+num_cycles              = 5421
+num_insts               = 1707
+avg_num_cycles_per_inst = 3.175747
+
+masked-filter:
+
+num_cycles              = 4073
+num_insts               = 1350
+avg_num_cycles_per_inst = 3.017037
+          

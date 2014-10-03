@@ -68,6 +68,7 @@ module lab2_proc_PipelinedProcAltCtrl
 
   output logic [1:0]  bypass_rs,
   output logic [1:0]  bypass_rt,
+  output logic        choose_byp1_D,
 
   // status signals (dpath->ctrl)
 
@@ -328,10 +329,7 @@ module lab2_proc_PipelinedProcAltCtrl
 
   always @(*) begin
     if ( (rt_en_D && val_X && rf_wen_X && rf_waddr_X == inst_rt_D) && (rf_waddr_X != r0) ) begin
-        casez (inst_X)
-          `PISA_INST_LW : bypass_rt = nB;
-          default       : bypass_rt = bX;
-        endcase
+      bypass_rt = bX;
     end
     else if ((rt_en_D) && val_M && (rf_wen_M) && (rf_waddr_M == inst_rt_D) && (rf_waddr_M != r0)) begin
       bypass_rt = bM;
@@ -342,6 +340,13 @@ module lab2_proc_PipelinedProcAltCtrl
     else begin
       bypass_rt = nB;
     end
+  end
+
+  always @(*) begin
+    casez (inst_D)
+        `PISA_INST_SW : choose_byp1_D = n;
+        default       : choose_byp1_D = bypass_rt != 2'd0;
+    endcase
   end
 
   task cs
@@ -469,7 +474,9 @@ module lab2_proc_PipelinedProcAltCtrl
   // Stall if write address in M matches rs in D
 
   logic  stall_waddr_M_rs_D;
-  assign stall_waddr_M_rs_D = ((bypass_rs == bM) && (stall_dmem_M));
+
+  assign stall_waddr_M_rs_D
+    = ((bypass_rs == bM) && (stall_dmem_M));
 
   // Stall if write address in W matches rs in D
 
@@ -488,13 +495,14 @@ module lab2_proc_PipelinedProcAltCtrl
 
   logic  stall_waddr_M_rt_D;
   assign stall_waddr_M_rt_D
-    =  ((bypass_rt == bM) && (stall_dmem_M) );
+    = ((bypass_rt == bM) && (stall_dmem_M));
 
   // Stall if write address in W matches rt in D
 
   logic  stall_waddr_W_rt_D;
   assign stall_waddr_W_rt_D
-    = 1'b0;
+    = ( rt_en_D && val_W && rf_wen_W
+        && ( inst_rt_D == rf_waddr_W ) && ( rf_waddr_W != 5'd0 ) );
 
   // Put together final stall signal
 
@@ -507,7 +515,7 @@ module lab2_proc_PipelinedProcAltCtrl
   logic stall_mul_D;
 
   assign mulreq_val_D = val_D && ( ex_mux_sel_D == mul_out);
-  assign mulreq_val = mulreq_val_D && !stall_DX && !stall_hazard_D && !stall_from_mngr_D; 
+  assign mulreq_val = mulreq_val_D && !stall_DX && !stall_hazard_D && !stall_from_mngr_D;  
 
   // Stall if multiplier not ready
   assign stall_mul_D = mulreq_val_D && !mulreq_rdy;
