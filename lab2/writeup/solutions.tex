@@ -58,7 +58,7 @@ Two modifications we needed to add over the PARCv1 implementation discussed in l
 
 \section{Alternative Design}
 
-The alternative design for this lab is a 5-stage pipelined processor with 3 bypass paths from the X, M, and W stages back to D. The only changes we made to the baseline datapath for this design were adding the bypass paths and corresponding muxes. The stall and squash signals in the control logic were also updated to account for the bypass paths. Bypass paths usually reduce the number of stall/squash signals required as data is transfered combinationally between the X/M/W stages and the D stage to resolve redundancies. The diagram of the alternative design is shown in Figure~\ref{fig:alt}. \\
+The alternative design for this lab is a 5-stage pipelined processor with 3 bypass paths from the X, M, and W stages back to D. The only changes we made to the baseline datapath for this design were adding the bypass paths and corresponding muxes. The stall and squash signals in the control logic were also updated to account for the bypass paths. Bypass paths usually reduce the number of stall/squash signals required as data is transfered combinationally between the X/M/W stages and the D stage to resolve redundancies. The diagram of the alternative design is shown in Figure~\ref{fig:alternative}. \\
 
 We had to add an additional modification to the control module in addition to the standard changes needed to support bypassing. The control signal identifies data dependencies by checking instruction valid and register enable signals from the buffer registers at the X, M, and W stages. However, the \texttt{lw} instruction is the only instruction that is ready not at the end of the X stage but rather at the end of the M stage (after memory is read back). Hence since we also don't check the instruction when checking for data dependencies, there was no way to identify \texttt{lw} data dependencies unless we also checked for the instruction at the D stage, which is what we ended up doing. \\
 
@@ -80,7 +80,10 @@ Ultimately both the base and alternative designs worked correctly with all test 
 
 As soon as the base and alternative designs were completed, the next step was to test the performance of the models. In order to achieve this, the simulator harness was built and run (using the given datasets) to generate the total number of cycles and the average number of cycles per transaction for the base and alternative designs. The results of the simulator for each dataset and design are summarized in Table~\ref{tab:cycles}. \\
 
-Analysis of evaluation results. \\
+Since we are comparing different pipelined processors on the \textit{same program}, the only factors affecting our performance are the cycle time and cycles per instruction.
+To a first approximation, we can assume that the clock cycle time is the same across the processors. \\
+
+If we make that approximation, we can see our fully 
 
 
 \pagebreak[4]
@@ -89,8 +92,8 @@ Analysis of evaluation results. \\
 
 % Table: test types
 
-\begin{center}
 \begin{table}[h]
+\begin{center}
 \begin{tabular}{| c | c |}
 \hline
 \multicolumn{2}{|c|}{Types of Directed Test Cases}   \\
@@ -105,8 +108,9 @@ Stalls/Bypass 						  & 							\\
 \end{tabular}
 \caption{Types of Directed Test Cases} 
 \label{table:tests}
-\end{table}
 \end{center}
+\end{table}
+
 
 % Table: execution cycles for evaluation
 
@@ -117,10 +121,21 @@ Stalls/Bypass 						  & 							\\
 \hline
 \textbf{Design}    & \textbf{vvadd-unopt} & \textbf{vvadd-opt} & \textbf{cmplx-mult} & \textbf{bin-search} & \textbf{masked-filt} \\
 \hline
-Baseline:    Total Cycles                 &        &       &      & 	&						\\
-Baseline:    Avg. Cycles / Transaction    &        &       &      & 	&						\\
-Alternative: Total Cycles                 &        &       &      & 	&						\\
-Alternative: Avg. Cycles / Transaction    &        &       &      & 	&					    \\
+Baseline:    Num. Cycles                 &    2009    &   584    &   5621   &  4532	&	5985					\\
+Baseline: 	 Num. Instructions           &      907      &   532    &   1707   & 1527 &	1350					\\
+Baseline:    Avg. Cycles / Transaction    &    2.21    &  1.10     &  3.29    & 2.97	&	4.43					\\
+
+Bypass-X: Num. Cycles                 &    1709    &   584    &  2475    & 5621	&		4182				\\
+Bypass-X: Num. Instructions           &      907      &    532   &   1527   & 1707 &		1350				\\
+Bypass-X: Avg. Cycles / Transaction    &     1.88   &    1.10   &   1.62   & 3.29	&	3.10				    \\
+
+Bypass-M: Num. Cycles                 &    1209    &   584    &  2376    & 5421	&		4073				\\
+Bypass-M: Num. Instructions           &      907      &    532   &   1527   & 1707 &		1350				\\
+Bypass-M: Avg. Cycles / Transaction    &     1.33   &    1.10   &   1.56   & 3.18	&	3.01				    \\
+
+Bypass-W: Num. Cycles                 &    1209    &   584    &  2342    & 5321	&		3903				\\
+Bypass-W: Num. Instructions           &      907      &    532   &   1527   & 1707 &		1350				\\
+Bypass-W: Avg. Cycles / Transaction    &     1.88   &    1.10   &   1.53   & 3.12	&	2.89				    \\
 \hline                    
 \end{tabular}
 \caption{Baseline v. Alternative Design Performance}
@@ -163,9 +178,9 @@ Alternative: Avg. Cycles / Transaction    &        &       &      & 	&					    \
 
 \begin{figure}[b]
 \centering
-\includegraphics[scale=0.5]{alt}
+\includegraphics[scale=0.5]{alternative}
 \caption{Diagram showing datapath and control of alternative (fully bypassed) 5-stage pipelined processor.}
-\label{fig:alternative}
+\label{fig:alt}
 \end{figure}
 
 
