@@ -80,11 +80,26 @@ Ultimately both the base and alternative designs worked correctly with all test 
 
 As soon as the base and alternative designs were completed, the next step was to test the performance of the models. In order to achieve this, the simulator harness was built and run (using the given datasets) to generate the total number of cycles and the average number of cycles per transaction for the base and alternative designs. The results of the simulator for each dataset and design are summarized in Table~\ref{tab:cycles}. \\
 
-Since we are comparing different pipelined processors on the \textit{same program}, the only factors affecting our performance are the cycle time and cycles per instruction.
+Since we are comparing different pipelined processors on the \textit{same program}, the only factors affecting our performance are the cycle time (CT) and cycles per instruction (CPI).
 To a first approximation, we can assume that the clock cycle time is the same across the processors. \\
 
-If we make that approximation, we can see our fully 
+If we make that approximation, the only factor left is cycles per instruction. 
+If we look at Table~\ref{tab:cycles}, our fully bypassed processor has the higest CPI.
+However, it is interesting to look at the performace as various bypass paths are implemented.
+Looking at vvadd-unopt, we see that after the first bypass path is implemented, its performance stagnates.
+This is because CPI is incredibly reliant on the program that is running. 
+We need to remember this when we run our benchmarks. 
+They may not be representative of programs in the wild. 
+However, assuming that our benchmarks do mirror programs running on our processor, the fully bypassed processor performs equally or better than other processors in all cases. Better is defined as having a lower CPI. \\
 
+Our first approximation may not be correct though!
+We may have added a critical path to our datapath when we added a bypass.
+Looking at our datapath diagram, we postulate that our critical path goes through the multiplier.
+This is reinforced by the results of the complex multiply benchmark.
+We waste about three cycles obtaining a result from the multiplier.
+However, since we use a val/rdy microprotocol, if the multiplier is not being used we can reduce our clock cycle time.
+We postulate then that our critical path for non val/rdy microprotocol affected components includes the ALU, the bypass into op1, and the mux selecting between the two.
+This may affect performance. We need to do a better study of the tradeoffs to correctly predict.
 
 \pagebreak[4]
 
@@ -129,13 +144,13 @@ Bypass-X: Num. Cycles                 &    1709    &   584    &  2475    & 5621	
 Bypass-X: Num. Instructions           &      907      &    532   &   1527   & 1707 &		1350				\\
 Bypass-X: Avg. Cycles / Transaction    &     1.88   &    1.10   &   1.62   & 3.29	&	3.10				    \\
 
-Bypass-M: Num. Cycles                 &    1209    &   584    &  2376    & 5421	&		4073				\\
-Bypass-M: Num. Instructions           &      907      &    532   &   1527   & 1707 &		1350				\\
-Bypass-M: Avg. Cycles / Transaction    &     1.33   &    1.10   &   1.56   & 3.18	&	3.01				    \\
+Bypass-XM: Num. Cycles                 &    1209    &   584    &  2376    & 5421	&		4073				\\
+Bypass-XM: Num. Instructions           &      907      &    532   &   1527   & 1707 &		1350				\\
+Bypass-XM: Avg. Cycles / Transaction    &     1.33   &    1.10   &   1.56   & 3.18	&	3.01				    \\
 
-Bypass-W: Num. Cycles                 &    1209    &   584    &  2342    & 5321	&		3903				\\
-Bypass-W: Num. Instructions           &      907      &    532   &   1527   & 1707 &		1350				\\
-Bypass-W: Avg. Cycles / Transaction    &     1.88   &    1.10   &   1.53   & 3.12	&	2.89				    \\
+Bypass-XMW: Num. Cycles                 &    1209    &   584    &  2342    & 5321	&		3903				\\
+Bypass-XMW: Num. Instructions           &      907      &    532   &   1527   & 1707 &		1350				\\
+Bypass-XMW: Avg. Cycles / Transaction    &     1.88   &    1.10   &   1.53   & 3.12	&	2.89				    \\
 \hline                    
 \end{tabular}
 \caption{Baseline v. Alternative Design Performance}
@@ -178,7 +193,7 @@ Bypass-W: Avg. Cycles / Transaction    &     1.88   &    1.10   &   1.53   & 3.1
 
 \begin{figure}[b]
 \centering
-\includegraphics[scale=0.5]{alternative}
+\includegraphics[scale=0.5]{alt}
 \caption{Diagram showing datapath and control of alternative (fully bypassed) 5-stage pipelined processor.}
 \label{fig:alt}
 \end{figure}
