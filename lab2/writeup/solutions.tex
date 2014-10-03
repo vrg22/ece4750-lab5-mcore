@@ -58,7 +58,7 @@ Two modifications we needed to add over the PARCv1 implementation discussed in l
 
 \section{Alternative Design}
 
-The alternative design for this lab is a 5-stage pipelined processor with 3 bypass paths from the X, M, and W stages back to D. The only changes we made to the baseline datapath for this design were adding the bypass paths and corresponding muxes. The stall and squash signals in the control logic were also updated to account for the bypass paths. Bypass paths usually reduce the number of stall/squash signals required as data is transfered combinationally between the X/M/W stages and the D stage to resolve redundancies. The diagram of the alternative design is shown in Figure~\ref{fig:alternative}. \\
+The alternative design for this lab is a 5-stage pipelined processor with 3 bypass paths from the X, M, and W stages back to D. The only changes we made to the baseline datapath for this design were adding the bypass paths and corresponding muxes. The stall and squash signals in the control logic were also updated to account for the bypass paths. Bypass paths usually reduce the number of stall/squash signals required as data is transfered combinationally between the X/M/W stages and the D stage to resolve redundancies. The diagram of the alternative design is shown in Figure~\ref{fig:alt}. \\
 
 We had to add an additional modification to the control module in addition to the standard changes needed to support bypassing. The control signal identifies data dependencies by checking instruction valid and register enable signals from the buffer registers at the X, M, and W stages. However, the \texttt{lw} instruction is the only instruction that is ready not at the end of the X stage but rather at the end of the M stage (after memory is read back). Hence since we also don't check the instruction when checking for data dependencies, there was no way to identify \texttt{lw} data dependencies unless we also checked for the instruction at the D stage, which is what we ended up doing. \\
 
@@ -163,7 +163,7 @@ Alternative: Avg. Cycles / Transaction    &        &       &      & 	&					    \
 
 \begin{figure}[b]
 \centering
-\includegraphics[scale=0.5]{alternative}
+\includegraphics[scale=0.5]{alt}
 \caption{Diagram showing datapath and control of alternative (fully bypassed) 5-stage pipelined processor.}
 \label{fig:alternative}
 \end{figure}
