@@ -68,6 +68,7 @@ module lab2_proc_PipelinedProcAltCtrl
 
   output logic [1:0]  bypass_rs,
   output logic [1:0]  bypass_rt,
+  output logic [1:0]  write_data_sel_D,
 
   // status signals (dpath->ctrl)
 
@@ -331,11 +332,18 @@ module lab2_proc_PipelinedProcAltCtrl
         endcase
     end
     else if ((rt_en_D) && val_M && (rf_wen_M) && (rf_waddr_M == inst_rt_D) && (rf_waddr_M != r0)) begin
-      bypass_rt = bM;
+        casez (inst_X)
+          `PISA_INST_SW : bypass_rt = nB;
+          default       : bypass_rt = bM;
+        endcase
     end
     else begin
       bypass_rt = nB;
     end
+  end
+
+  always @(*) begin
+    write_data_sel_D = bypass_rt;
   end
 
   task cs

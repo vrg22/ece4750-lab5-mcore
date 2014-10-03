@@ -71,6 +71,7 @@ module lab2_proc_PipelinedProcAltDpath
 
   input  logic [1:0]  bypass_rs,
   input  logic [1:0]  bypass_rt,
+  input  logic [1:0]  write_data_sel_D,
 
   // status signals (dpath->ctrl)
 
@@ -330,7 +331,7 @@ module lab2_proc_PipelinedProcAltDpath
     .in1  (bypass_rs_rt_X),
     .in2  (bypass_rs_rt_M),
     .in3  (bypass_rs_rt_W),
-    .sel  (bypass_rt),
+    .sel  (write_data_sel_D),
     .out  (write_data_D)
   );
 
