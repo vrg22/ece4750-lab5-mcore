@@ -60,6 +60,10 @@ begin
   inst( "mfc0 r1, mngr2proc   " ); init_src(  32'h2000 );
   inst( "mfc0 r2, mngr2proc   " ); init_src(  32'hff );
   inst( "sw r2, 0x0(r1)  " );
+  inst( "nop                  " );
+  inst( "nop                  " );
+  inst( "nop                  " );
+  inst( "nop                  " );
   inst( "lw r3, 0x0(r1)  " );
   inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'hff );
 
