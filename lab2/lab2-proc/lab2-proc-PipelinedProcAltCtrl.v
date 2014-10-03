@@ -332,7 +332,7 @@ module lab2_proc_PipelinedProcAltCtrl
         endcase
     end
     else if ((rt_en_D) && val_M && (rf_wen_M) && (rf_waddr_M == inst_rt_D) && (rf_waddr_M != r0)) begin
-        casez (inst_X)
+        casez ( inst_D )
           `PISA_INST_SW : bypass_rt = nB;
           default       : bypass_rt = bM;
         endcase
