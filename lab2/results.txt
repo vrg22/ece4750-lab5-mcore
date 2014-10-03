@@ -64,11 +64,17 @@ avg_num_cycles_per_inst = 3.097778
 
 BYPASS_M:
 
-vv-add:
+vvadd-unopt:
 
 num_cycles              = 1209
 num_insts               = 907
 avg_num_cycles_per_inst = 1.332966
+
+vvadd-opt:
+
+num_cycles              = 584
+num_insts               = 532
+avg_num_cycles_per_inst = 1.097744
 
 bin-search:
 
@@ -90,28 +96,31 @@ avg_num_cycles_per_inst = 3.017037
 
 BYPASS_W:
 
-akd54@amdpool-01:~/ece4750/ece4750-lab2-proc/lab2/build$ ./lab2-proc-sim-alt +input=vvadd-opt +stats +verify
-  [ passed ]          vvadd
-  num_cycles              = 584
-  num_insts               = 532
-  avg_num_cycles_per_inst = 1.097744
-  akd54@amdpool-01:~/ece4750/ece4750-lab2-proc/lab2/build$ ./lab2-proc-sim-alt +input=bin-search +stats +verify
-    [ passed ]     bin-search
-    num_cycles              = 2342
-    num_insts               = 1527
-    avg_num_cycles_per_inst = 1.533726
-    akd54@amdpool-01:~/ece4750/ece4750-lab2-proc/lab2/build$ ./lab2-proc-sim-alt +input=cmplx-mult +stats +verify
-      [ passed ]     cmplx-mult
-      num_cycles              = 5321
-      num_insts               = 1707
-      avg_num_cycles_per_inst = 3.117165
-      akd54@amdpool-01:~/ece4750/ece4750-lab2-proc/lab2/build$ ./lab2-proc-sim-alt +input=masked-filter +stats +verify
-        [ passed ]  masked-filter
-        num_cycles              = 3903
-        num_insts               = 1350
-        avg_num_cycles_per_inst = 2.891111
-        akd54@amdpool-01:~/ece4750/ece4750-lab2-proc/lab2/build$ ./lab2-proc-sim-alt +input=vvadd-unopt +stats
-        num_cycles              = 1209
-        num_insts               = 907
-        avg_num_cycles_per_inst = 1.332966
+vvadd-unopt:
 
+num_cycles              = 1209
+num_insts               = 907
+avg_num_cycles_per_inst = 1.332966
+
+vvadd-opt:
+
+num_cycles              = 584
+num_insts               = 532
+avg_num_cycles_per_inst = 1.097744
+
+bin-search: 
+    
+num_cycles              = 2342
+num_insts               = 1527
+avg_num_cycles_per_inst = 1.533726
+
+cmplx-mult:
+
+num_cycles              = 5321
+num_insts               = 1707
+avg_num_cycles_per_inst = 3.117165
+
+masked-filter:
+num_cycles              = 3903
+num_insts               = 1350
+avg_num_cycles_per_inst = 2.891111
