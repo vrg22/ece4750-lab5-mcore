@@ -92,8 +92,8 @@ If we make that approximation, we can see our fully
 
 % Table: test types
 
-\begin{center}
 \begin{table}[h]
+\begin{center}
 \begin{tabular}{| c | c |}
 \hline
 \multicolumn{2}{|c|}{Types of Directed Test Cases}   \\
@@ -108,8 +108,9 @@ Stalls/Bypass 						  & 							\\
 \end{tabular}
 \caption{Types of Directed Test Cases} 
 \label{table:tests}
-\end{table}
 \end{center}
+\end{table}
+
 
 % Table: execution cycles for evaluation
 
@@ -120,10 +121,21 @@ Stalls/Bypass 						  & 							\\
 \hline
 \textbf{Design}    & \textbf{vvadd-unopt} & \textbf{vvadd-opt} & \textbf{cmplx-mult} & \textbf{bin-search} & \textbf{masked-filt} \\
 \hline
-Baseline:    Total Cycles                 &        &       &      & 	&						\\
-Baseline:    Avg. Cycles / Transaction    &        &       &      & 	&						\\
-Alternative: Total Cycles                 &        &       &      & 	&						\\
-Alternative: Avg. Cycles / Transaction    &        &       &      & 	&					    \\
+Baseline:    Num. Cycles                 &    2009    &   584    &   5621   &  4532	&	5985					\\
+Baseline: 	 Num. Instructions           &      907      &   532    &   1707   & 1527 &	1350					\\
+Baseline:    Avg. Cycles / Transaction    &    2.21    &  1.10     &  3.29    & 2.97	&	4.43					\\
+
+Bypass-X: Num. Cycles                 &    1709    &   584    &  2475    & 5621	&		4182				\\
+Bypass-X: Num. Instructions           &      907      &    532   &   1527   & 1707 &		1350				\\
+Bypass-X: Avg. Cycles / Transaction    &     1.88   &    1.10   &   1.62   & 3.29	&	3.10				    \\
+
+Bypass-M: Num. Cycles                 &    1209    &   584    &  2376    & 5421	&		4073				\\
+Bypass-M: Num. Instructions           &      907      &    532   &   1527   & 1707 &		1350				\\
+Bypass-M: Avg. Cycles / Transaction    &     1.33   &    1.10   &   1.56   & 3.18	&	3.01				    \\
+
+Bypass-W: Num. Cycles                 &    1209    &   584    &  2342    & 5321	&		3903				\\
+Bypass-W: Num. Instructions           &      907      &    532   &   1527   & 1707 &		1350				\\
+Bypass-W: Avg. Cycles / Transaction    &     1.88   &    1.10   &   1.53   & 3.12	&	2.89				    \\
 \hline                    
 \end{tabular}
 \caption{Baseline v. Alternative Design Performance}
@@ -168,7 +180,7 @@ Alternative: Avg. Cycles / Transaction    &        &       &      & 	&					    \
 \centering
 \includegraphics[scale=0.5]{alternative}
 \caption{Diagram showing datapath and control of alternative (fully bypassed) 5-stage pipelined processor.}
-\label{fig:alternative}
+\label{fig:alt}
 \end{figure}
 
 
