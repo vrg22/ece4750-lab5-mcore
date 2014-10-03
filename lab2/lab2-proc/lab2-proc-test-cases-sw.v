@@ -191,104 +191,104 @@ begin
   inst( "lw r3, 0x0(r1)  " );
   inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'hff );
 
-  // (Value) Testing sw: offset( 0x4 ), base( 0x2000 ), result( 0x7f00 )
+  // // (Value) Testing sw: offset( 0x4 ), base( 0x2000 ), result( 0x7f00 )
 
-  inst( "mfc0 r1, mngr2proc   " ); init_src(  32'h2000 );
-  inst( "mfc0 r2, mngr2proc   " ); init_src(  32'h7f00 );
-  inst( "sw r2, 0x4(r1)  " ); 
-  inst( "lw r3, 0x4(r1)  " );
-  inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h7f00 );
+  // inst( "mfc0 r1, mngr2proc   " ); init_src(  32'h2000 );
+  // inst( "mfc0 r2, mngr2proc   " ); init_src(  32'h7f00 );
+  // inst( "sw r2, 0x4(r1)  " ); 
+  // inst( "lw r3, 0x4(r1)  " );
+  // inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h7f00 );
 
-  // (Value) Testing sw: offset( 0x8 ), base( 0x2000 ), result( 0xabcd0ff0 )
+  // // (Value) Testing sw: offset( 0x8 ), base( 0x2000 ), result( 0xabcd0ff0 )
 
-  inst( "mfc0 r1, mngr2proc   " ); init_src(  32'h2000 );
-  inst( "mfc0 r2, mngr2proc   " ); init_src(  32'habcd0ff0 );
-  inst( "sw r2, 0x8(r1)  " ); 
-  inst( "lw r3, 0x8(r1)  " );
-  inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'habcd0ff0 );
+  // inst( "mfc0 r1, mngr2proc   " ); init_src(  32'h2000 );
+  // inst( "mfc0 r2, mngr2proc   " ); init_src(  32'habcd0ff0 );
+  // inst( "sw r2, 0x8(r1)  " ); 
+  // inst( "lw r3, 0x8(r1)  " );
+  // inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'habcd0ff0 );
 
-  // (Value) Testing sw: offset( 0xc ), base( 0x2000 ), result( 0x700f )
+  // // (Value) Testing sw: offset( 0xc ), base( 0x2000 ), result( 0x700f )
 
-  inst( "mfc0 r1, mngr2proc   " ); init_src(  32'h2000 );
-  inst( "mfc0 r2, mngr2proc   " ); init_src(  32'h700f );
-  inst( "sw r2, 0xc(r1)  " ); 
-  inst( "lw r3, 0xc(r1)  " );
-  inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h700f );
+  // inst( "mfc0 r1, mngr2proc   " ); init_src(  32'h2000 );
+  // inst( "mfc0 r2, mngr2proc   " ); init_src(  32'h700f );
+  // inst( "sw r2, 0xc(r1)  " ); 
+  // inst( "lw r3, 0xc(r1)  " );
+  // inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h700f );
 
-  // (Value) Testing sw: offset( -0xc ), base( 0x200c ), result( 0xff )
+  // // (Value) Testing sw: offset( -0xc ), base( 0x200c ), result( 0xff )
 
-  inst( "mfc0 r1, mngr2proc   " ); init_src(  32'h200c );
-  inst( "mfc0 r2, mngr2proc   " ); init_src(  32'hff );
-  inst( "sw r2, -12(r1)  " );
-  inst( "lw r3, -12(r1)  " );
-  inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'hff );
+  // inst( "mfc0 r1, mngr2proc   " ); init_src(  32'h200c );
+  // inst( "mfc0 r2, mngr2proc   " ); init_src(  32'hff );
+  // inst( "sw r2, -12(r1)  " );
+  // inst( "lw r3, -12(r1)  " );
+  // inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'hff );
 
-  // (Value) Testing sw: offset( -0x8 ), base( 0x200c ), result( 0x7f00 )
+  // // (Value) Testing sw: offset( -0x8 ), base( 0x200c ), result( 0x7f00 )
 
-  inst( "mfc0 r1, mngr2proc   " ); init_src(  32'h200c );
-  inst( "mfc0 r2, mngr2proc   " ); init_src(  32'h7f00 );
-  inst( "sw r2, -8(r1)  " );
-  inst( "lw r3, -8(r1)  " );
-  inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h7f00 );
+  // inst( "mfc0 r1, mngr2proc   " ); init_src(  32'h200c );
+  // inst( "mfc0 r2, mngr2proc   " ); init_src(  32'h7f00 );
+  // inst( "sw r2, -8(r1)  " );
+  // inst( "lw r3, -8(r1)  " );
+  // inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h7f00 );
 
-  // (Value) Testing sw: offset( -0x4 ), base( 0x200c ), result( 0xabcd0ff0 )
+  // // (Value) Testing sw: offset( -0x4 ), base( 0x200c ), result( 0xabcd0ff0 )
 
-  inst( "mfc0 r1, mngr2proc   " ); init_src(  32'h200c );
-  inst( "mfc0 r2, mngr2proc   " ); init_src(  32'habcd0ff0 );
-  inst( "sw r2, -4(r1)  " );
-  inst( "lw r3, -4(r1)  " );
-  inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'habcd0ff0 );
+  // inst( "mfc0 r1, mngr2proc   " ); init_src(  32'h200c );
+  // inst( "mfc0 r2, mngr2proc   " ); init_src(  32'habcd0ff0 );
+  // inst( "sw r2, -4(r1)  " );
+  // inst( "lw r3, -4(r1)  " );
+  // inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'habcd0ff0 );
 
-  // (Value) Testing sw: offset( 0x0 ), base( 0x200c ), result( 0x700f )
+  // // (Value) Testing sw: offset( 0x0 ), base( 0x200c ), result( 0x700f )
 
-  inst( "mfc0 r1, mngr2proc   " ); init_src(  32'h200c );
-  inst( "mfc0 r2, mngr2proc   " ); init_src(  32'h700f );
-  inst( "sw r2, 0x0(r1)  " );
-  inst( "lw r3, 0x0(r1)  " );
-  inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h700f );
-
-
-  // Test with a negative base
-
-  // (Value) Testing sw: offset( 0x3000 ), base( -0x1000 ), result( 0xff )
-
-  inst( "mfc0 r1, mngr2proc   " ); init_src(  -32'h00001000 );
-  inst( "mfc0 r2, mngr2proc   " ); init_src(  32'hff );
-  inst( "sw r2, 0x3000(r1)  " );
-  inst( "lw r3, 0x3000(r1)  " );
-  inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'hff );
+  // inst( "mfc0 r1, mngr2proc   " ); init_src(  32'h200c );
+  // inst( "mfc0 r2, mngr2proc   " ); init_src(  32'h700f );
+  // inst( "sw r2, 0x0(r1)  " );
+  // inst( "lw r3, 0x0(r1)  " );
+  // inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h700f );
 
 
-  // Test with unaligned base
+  // // Test with a negative base
 
-  // (Value) Testing sw: offset( 0x7 ), base( 0x1ffd ), result( 0x7f00 )
+  // // (Value) Testing sw: offset( 0x3000 ), base( -0x1000 ), result( 0xff )
 
-  inst( "mfc0 r1, mngr2proc   " ); init_src(  32'h1ffd );
-  inst( "mfc0 r2, mngr2proc   " ); init_src(  32'h7f00 );
-  inst( "sw r2, 0x7(r1)  " );
-  inst( "lw r3, 0x7(r1)  " );
-  inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h7f00 );
+  // inst( "mfc0 r1, mngr2proc   " ); init_src(  -32'h00001000 );
+  // inst( "mfc0 r2, mngr2proc   " ); init_src(  32'hff );
+  // inst( "sw r2, 0x3000(r1)  " );
+  // inst( "lw r3, 0x3000(r1)  " );
+  // inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'hff );
 
 
-  //----------------------------------------------------------------------
-  // Test WAW Hazard
-  //----------------------------------------------------------------------
+  // // Test with unaligned base
 
-  inst( "mfc0 r1, mngr2proc" ); init_src(  32'h00002000 );
-  inst( "mfc0 r2, mngr2proc" ); init_src(  32'h00000002 );
-  inst( "sw   r2, 0(r1)    " );
-  inst( "lw   r3, 0(r1)    " );
-  inst( "addu r3, r1, r2   " );
-  inst( "mtc0 r3, proc2mngr" ); init_sink( 32'h00002002 );
+  // // (Value) Testing sw: offset( 0x7 ), base( 0x1ffd ), result( 0x7f00 )
 
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
-  inst( "nop                  " );
+  // inst( "mfc0 r1, mngr2proc   " ); init_src(  32'h1ffd );
+  // inst( "mfc0 r2, mngr2proc   " ); init_src(  32'h7f00 );
+  // inst( "sw r2, 0x7(r1)  " );
+  // inst( "lw r3, 0x7(r1)  " );
+  // inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h7f00 );
+
+
+  // //----------------------------------------------------------------------
+  // // Test WAW Hazard
+  // //----------------------------------------------------------------------
+
+  // inst( "mfc0 r1, mngr2proc" ); init_src(  32'h00002000 );
+  // inst( "mfc0 r2, mngr2proc" ); init_src(  32'h00000002 );
+  // inst( "sw   r2, 0(r1)    " );
+  // inst( "lw   r3, 0(r1)    " );
+  // inst( "addu r3, r1, r2   " );
+  // inst( "mtc0 r3, proc2mngr" ); init_sink( 32'h00002002 );
+
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
+  // inst( "nop                  " );
 
 end
 endtask
