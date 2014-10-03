@@ -326,8 +326,8 @@ module lab2_proc_PipelinedProcAltCtrl
 
   always @(*) begin
     if ( (rt_en_D && val_X && rf_wen_X && rf_waddr_X == inst_rt_D) && (rf_waddr_X != r0) ) begin
-        casez (inst_D)
-          `PISA_INST_SW : bypass_rt = nB;
+        casez (inst_X)
+          `PISA_INST_LW : bypass_rt = nB;
           default       : bypass_rt = bX;
         endcase
     end
@@ -344,8 +344,8 @@ module lab2_proc_PipelinedProcAltCtrl
 
   always @(*) begin
     if ( (rt_en_D && val_X && rf_wen_X && rf_waddr_X == inst_rt_D) && (rf_waddr_X != r0) ) begin
-        casez (inst_D)
-          `PISA_INST_SW : write_data_sel_D = nB;
+        casez (inst_X)
+          `PISA_INST_LW : write_data_sel_D = nB;
           default       : write_data_sel_D = bX;
         endcase
     end
@@ -356,7 +356,7 @@ module lab2_proc_PipelinedProcAltCtrl
         endcase
     end
     else begin
-      write_data_sel_D = nB;
+      bypass_rt = nB;
     end
   end
 
