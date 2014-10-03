@@ -14,7 +14,7 @@
 localparam c_vvadd_src0_ptr = 32'h2000;
 localparam c_vvadd_src1_ptr = 32'h3000;
 localparam c_vvadd_dest_ptr = 32'h4000;
-localparam c_vvadd_size     = 100;
+localparam c_vvadd_size     = 1;
 
 //------------------------------------------------------------------------
 // initialize unoptimized (not unrolled) vector vector add kernel
