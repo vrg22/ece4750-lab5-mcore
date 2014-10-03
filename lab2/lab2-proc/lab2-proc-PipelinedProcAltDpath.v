@@ -347,7 +347,7 @@ module lab2_proc_PipelinedProcAltDpath
     .out  (write_data_D)
   );
 
-  assign jr_target_D = rf_rdata0_D;
+  assign jr_target_D = op0_D;
 
   //--------------------------------------------------------------------
   // X stage
