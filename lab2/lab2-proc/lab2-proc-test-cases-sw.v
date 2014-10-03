@@ -67,107 +67,107 @@ begin
   inst( "lw r3, 0x0(r1)  " );
   inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'hff );
 
-  // // (Dest Bypass) Testing sw: offset( 0x4 ), base( 0x2000 ), result( 0x7f00 )  // dest_nops( 1 )
+  // (Dest Bypass) Testing sw: offset( 0x4 ), base( 0x2000 ), result( 0x7f00 )  // dest_nops( 1 )
 
-  // inst( "mfc0 r1, mngr2proc   " ); init_src(  32'h2000 );
-  // inst( "mfc0 r2, mngr2proc   " ); init_src(  32'h7f00 );  
-  // inst( "sw r2, 0x4(r1)  " );
-  // inst( "lw r3, 0x4(r1)  " );
-  // inst( "nop                  " );
-  // inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h7f00 );
+  inst( "mfc0 r1, mngr2proc   " ); init_src(  32'h2000 );
+  inst( "mfc0 r2, mngr2proc   " ); init_src(  32'h7f00 );  
+  inst( "sw r2, 0x4(r1)  " );
+  inst( "lw r3, 0x4(r1)  " );
+  inst( "nop                  " );
+  inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h7f00 );
 
-  // // (Dest Bypass) Testing sw: offset( 0x0 ), base( 0x2004 ), result( 0x7f01 )  // dest_nops( 2 )
+  // (Dest Bypass) Testing sw: offset( 0x0 ), base( 0x2004 ), result( 0x7f01 )  // dest_nops( 2 )
 
-  // inst( "mfc0 r1, mngr2proc   " ); init_src(  32'h2004 );
-  // inst( "mfc0 r2, mngr2proc   " ); init_src(  32'h7f01 );
-  // inst( "sw r2, 0x0(r1)  " );  
-  // inst( "lw r3, 0x0(r1)  " );
-  // inst( "nop                  " );
-  // inst( "nop                  " );
-  // inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h7f01 );
+  inst( "mfc0 r1, mngr2proc   " ); init_src(  32'h2004 );
+  inst( "mfc0 r2, mngr2proc   " ); init_src(  32'h7f01 );
+  inst( "sw r2, 0x0(r1)  " );  
+  inst( "lw r3, 0x0(r1)  " );
+  inst( "nop                  " );
+  inst( "nop                  " );
+  inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h7f01 );
 
-  // // (Dest Bypass) Testing sw: offset( 0x4 ), base( 0x2004 ), result( 0xabcd0ff0 )  // dest_nops( 3 )
+  // (Dest Bypass) Testing sw: offset( 0x4 ), base( 0x2004 ), result( 0xabcd0ff0 )  // dest_nops( 3 )
 
-  // inst( "mfc0 r1, mngr2proc   " ); init_src(  32'h2004 );
-  // inst( "mfc0 r2, mngr2proc   " ); init_src(  32'habcd0ff0 );
-  // inst( "sw r2, 0x4(r1)  " );  
-  // inst( "lw r3, 0x4(r1)  " );
-  // inst( "nop                  " );
-  // inst( "nop                  " );
-  // inst( "nop                  " );
-  // inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'habcd0ff0 );
+  inst( "mfc0 r1, mngr2proc   " ); init_src(  32'h2004 );
+  inst( "mfc0 r2, mngr2proc   " ); init_src(  32'habcd0ff0 );
+  inst( "sw r2, 0x4(r1)  " );  
+  inst( "lw r3, 0x4(r1)  " );
+  inst( "nop                  " );
+  inst( "nop                  " );
+  inst( "nop                  " );
+  inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'habcd0ff0 );
 
-  // // (Dest Bypass) Testing sw: offset( 0x0 ), base( 0x200c ), result( 0x700f )  // dest_nops( 4 )
+  // (Dest Bypass) Testing sw: offset( 0x0 ), base( 0x200c ), result( 0x700f )  // dest_nops( 4 )
 
-  // inst( "mfc0 r1, mngr2proc   " ); init_src(  32'h200c );
-  // inst( "mfc0 r2, mngr2proc   " ); init_src(  32'h700f );
-  // inst( "sw r2, 0x0(r1)  " );  
-  // inst( "lw r3, 0x0(r1)  " );
-  // inst( "nop                  " );
-  // inst( "nop                  " );
-  // inst( "nop                  " );
-  // inst( "nop                  " );
-  // inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h700f );
+  inst( "mfc0 r1, mngr2proc   " ); init_src(  32'h200c );
+  inst( "mfc0 r2, mngr2proc   " ); init_src(  32'h700f );
+  inst( "sw r2, 0x0(r1)  " );  
+  inst( "lw r3, 0x0(r1)  " );
+  inst( "nop                  " );
+  inst( "nop                  " );
+  inst( "nop                  " );
+  inst( "nop                  " );
+  inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h700f );
 
 
-  // // (Src0 Bypass) Testing sw: offset( 0x0 ), base( 0x2000 ), result( 0xff )  // src0_nops( 0 )
+  // (Src0 Bypass) Testing sw: offset( 0x0 ), base( 0x2000 ), result( 0xff )  // src0_nops( 0 )
 
-  // inst( "mfc0 r1, mngr2proc   " ); init_src(  32'h2000 );
-  // inst( "mfc0 r2, mngr2proc   " ); init_src(  32'hff );
-  // inst( "sw r2, 0x0(r1)  " );  
-  // inst( "lw r3, 0x0(r1)  " );
-  // inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'hff );
+  inst( "mfc0 r1, mngr2proc   " ); init_src(  32'h2000 );
+  inst( "mfc0 r2, mngr2proc   " ); init_src(  32'hff );
+  inst( "sw r2, 0x0(r1)  " );  
+  inst( "lw r3, 0x0(r1)  " );
+  inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'hff );
 
-  // // (Src0 Bypass) Testing sw: offset( 0x4 ), base( 0x2000 ), result( 0x7f00 )  // src0_nops( 1 )
+  // (Src0 Bypass) Testing sw: offset( 0x4 ), base( 0x2000 ), result( 0x7f00 )  // src0_nops( 1 )
 
-  // inst( "mfc0 r1, mngr2proc   " ); init_src(  32'h2000 );
-  // inst( "mfc0 r2, mngr2proc   " ); init_src(  32'h7f00 );
-  // inst( "nop                  " );
-  // inst( "sw r2, 0x4(r1)  " );  
-  // inst( "lw r3, 0x4(r1)  " );
-  // inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h7f00 );
+  inst( "mfc0 r1, mngr2proc   " ); init_src(  32'h2000 );
+  inst( "mfc0 r2, mngr2proc   " ); init_src(  32'h7f00 );
+  inst( "nop                  " );
+  inst( "sw r2, 0x4(r1)  " );  
+  inst( "lw r3, 0x4(r1)  " );
+  inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h7f00 );
 
-  // // (Src0 Bypass) Testing sw: offset( 0x0 ), base( 0x2004 ), result( 0x7f00 )  // src0_nops( 2 )
+  // (Src0 Bypass) Testing sw: offset( 0x0 ), base( 0x2004 ), result( 0x7f00 )  // src0_nops( 2 )
 
-  // inst( "mfc0 r1, mngr2proc   " ); init_src(  32'h2004 );
-  // inst( "mfc0 r2, mngr2proc   " ); init_src(  32'h7f00 );
-  // inst( "nop                  " );
-  // inst( "nop                  " );
-  // inst( "sw r2, 0x0(r1)  " );  
-  // inst( "lw r3, 0x0(r1)  " );
-  // inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h7f00 );
+  inst( "mfc0 r1, mngr2proc   " ); init_src(  32'h2004 );
+  inst( "mfc0 r2, mngr2proc   " ); init_src(  32'h7f00 );
+  inst( "nop                  " );
+  inst( "nop                  " );
+  inst( "sw r2, 0x0(r1)  " );  
+  inst( "lw r3, 0x0(r1)  " );
+  inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h7f00 );
 
-  // // (Src0 Bypass) Testing sw: offset( 0x4 ), base( 0x2004 ), result( 0xabcd0ff0 )  // src0_nops( 3 )
+  // (Src0 Bypass) Testing sw: offset( 0x4 ), base( 0x2004 ), result( 0xabcd0ff0 )  // src0_nops( 3 )
 
-  // inst( "mfc0 r1, mngr2proc   " ); init_src(  32'h2004 );
-  // inst( "mfc0 r2, mngr2proc   " ); init_src(  32'habcd0ff0 );
-  // inst( "nop                  " );
-  // inst( "nop                  " );
-  // inst( "nop                  " );
-  // inst( "sw r2, 0x4(r1)  " );  
-  // inst( "lw r3, 0x4(r1)  " );
-  // inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'habcd0ff0 );
+  inst( "mfc0 r1, mngr2proc   " ); init_src(  32'h2004 );
+  inst( "mfc0 r2, mngr2proc   " ); init_src(  32'habcd0ff0 );
+  inst( "nop                  " );
+  inst( "nop                  " );
+  inst( "nop                  " );
+  inst( "sw r2, 0x4(r1)  " );  
+  inst( "lw r3, 0x4(r1)  " );
+  inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'habcd0ff0 );
 
-  // // (Src0 Bypass) Testing lw: offset( 0x0 ), base( 0x200c ), result( 0x700f )  // src0_nops( 4 )
+  // (Src0 Bypass) Testing lw: offset( 0x0 ), base( 0x200c ), result( 0x700f )  // src0_nops( 4 )
   
-  // inst( "mfc0 r1, mngr2proc   " ); init_src(  32'h200c );
-  // inst( "mfc0 r2, mngr2proc   " ); init_src(  32'h700f );
-  // inst( "nop                  " );
-  // inst( "nop                  " );
-  // inst( "nop                  " );
-  // inst( "nop                  " );
-  // inst( "sw r2, 0x0(r1)  " );  
-  // inst( "lw r3, 0x0(r1)  " );
-  // inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h700f );
+  inst( "mfc0 r1, mngr2proc   " ); init_src(  32'h200c );
+  inst( "mfc0 r2, mngr2proc   " ); init_src(  32'h700f );
+  inst( "nop                  " );
+  inst( "nop                  " );
+  inst( "nop                  " );
+  inst( "nop                  " );
+  inst( "sw r2, 0x0(r1)  " );  
+  inst( "lw r3, 0x0(r1)  " );
+  inst( "mtc0 r3, proc2mngr   " ); init_sink( 32'h700f );
 
-  // inst( "nop                  " );
-  // inst( "nop                  " );
-  // inst( "nop                  " );
-  // inst( "nop                  " );
-  // inst( "nop                  " );
-  // inst( "nop                  " );
-  // inst( "nop                  " );
-  // inst( "nop                  " );
+  inst( "nop                  " );
+  inst( "nop                  " );
+  inst( "nop                  " );
+  inst( "nop                  " );
+  inst( "nop                  " );
+  inst( "nop                  " );
+  inst( "nop                  " );
+  inst( "nop                  " );
 
 end
 endtask
