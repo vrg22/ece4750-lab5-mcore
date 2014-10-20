@@ -457,16 +457,6 @@ module top;
   localparam c_resp_in = `VC_MEM_RESP_MSG_TYPE_WRITE_INIT;
 
   //----------------------------------------------------------------------
-  // Include Python-generated input datasets
-  //----------------------------------------------------------------------
-
-  `include "lab3-mem-gen-input_loop-1d.py.v"
-
-  `include "lab3-mem-gen-input_loop-2d.py.v"
-
-  `include "lab3-mem-gen-input_loop-3d.py.v"
-
-  //----------------------------------------------------------------------
   // Drive the simulation
   //----------------------------------------------------------------------
 
@@ -490,11 +480,11 @@ module top;
     init_delays( 0, 0, 19, 0 );
 
     if          ( input_dataset == "loop-1d"   ) begin
-      init_loop_1d;
+      `include "lab3-mem-gen-input_loop-1d.py.v"
     end else if ( input_dataset == "loop-2d"   ) begin
-      init_loop_2d;
+      `include "lab3-mem-gen-input_loop-2d.py.v"
     end else if ( input_dataset == "loop-3d"   ) begin
-      init_loop_3d;
+      `include "lab3-mem-gen-input_loop-3d.py.v"
     end
 
     else begin

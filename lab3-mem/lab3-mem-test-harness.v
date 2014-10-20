@@ -365,49 +365,10 @@ module top;
   endtask
 
   //----------------------------------------------------------------------
-  // Include Python-generated input datasets
-  //----------------------------------------------------------------------
-
-  `include "lab3-mem-gen-input_loop-1d.py.v"
-
-  `include "lab3-mem-gen-input_loop-2d.py.v"
-
-  `include "lab3-mem-gen-input_loop-3d.py.v"
-
-  //----------------------------------------------------------------------
-  // Ad-hoc test: init loads one word
-  //----------------------------------------------------------------------
-
-  // This test has been commented out and can be uncommented as
-  // a first ad-hoc test case for the init transaction. Note that
-  // ad-hoc tests may not work on the functional model.
-
-  // Remove this test case once your init transaction works.
-
-  `VC_TEST_CASE_BEGIN( 1, "init - loading one word in the 0th cacheline" )
-  begin
-    init_test_case( 0, 0, 0 );
-
-    //// Initialize Port
-
-    ////         ------------- memory request ----------------  --------- memory response ----------
-    ////         type      opaque addr          len   data          type       opaque len   data
-
-    //init_port( c_req_in, 8'h00, 32'h00000000, 2'd0, 32'he110341d, c_resp_in, 8'h00, 2'd0, 32'h???????? );
-
-    //run_test;
-
-    //if ( th.done )
-    //  `VC_ASSERT( th.cache.dpath.data_array.mem[0][31:0] == 32'he110341d );
-
-  end
-  `VC_TEST_CASE_END
-
-  //----------------------------------------------------------------------
   // Basic Test Case #1: Read Hit Path (clean)
   //----------------------------------------------------------------------
 
-  `VC_TEST_CASE_BEGIN( 2, "basic test case 1: read hit path (clean)" )
+  `VC_TEST_CASE_BEGIN( 1, "basic test case 1: read hit path (clean)" )
   begin
     init_test_case( 0, 0, 0 );
 
@@ -424,40 +385,13 @@ module top;
   `VC_TEST_CASE_END
 
   //----------------------------------------------------------------------
-  // Basic Test Case #2
-  //----------------------------------------------------------------------
-
-  //----------------------------------------------------------------------
-  // Basic Test Case #3
-  //----------------------------------------------------------------------
-
-  //----------------------------------------------------------------------
-  // Directed Test Case #1
-  //----------------------------------------------------------------------
-
-  //----------------------------------------------------------------------
-  // Directed Test Case #2
-  //----------------------------------------------------------------------
-
-  //----------------------------------------------------------------------
-  // Directed Test Case #3
+  // Directed Test Cases
   //----------------------------------------------------------------------
 
   //----------------------------------------------------------------------
   // Random Tests
   //----------------------------------------------------------------------
 
-  //----------------------------------------------------------------------
-  // Pattern Tests
-  //----------------------------------------------------------------------
-
-  // insert pattern test cases here! You can use these tasks, but you
-  // should write more patterns as described in the lab handout:
-  //
-  // - init_loop_1d;
-  // - init_loop_2d;
-  // - init_loop_3d;
-
-
   `VC_TEST_SUITE_END
 endmodule
+
