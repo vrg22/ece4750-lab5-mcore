@@ -1,5 +1,5 @@
 //=========================================================================
-// Base Blocking Cache Unit Tests
+// Baseline Blocking Cache Unit Tests
 //=========================================================================
 
 `define LAB3_CACHE_IMPL     lab3_mem_BlockingCacheBase

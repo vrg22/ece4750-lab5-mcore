@@ -1,5 +1,5 @@
 //=========================================================================
-// Alt Blocking Cache Unit Tests
+// Alternative Blocking Cache Unit Tests
 //=========================================================================
 
 `define LAB3_CACHE_IMPL     lab3_mem_BlockingCacheAlt

@@ -339,14 +339,14 @@ module top;
 
   localparam c_req_rd  = `VC_MEM_REQ_MSG_TYPE_READ;
   localparam c_req_wr  = `VC_MEM_REQ_MSG_TYPE_WRITE;
-  localparam c_req_wn  = `VC_MEM_REQ_MSG_TYPE_WRITE_INIT;
+  localparam c_req_in  = `VC_MEM_REQ_MSG_TYPE_WRITE_INIT;
   localparam c_req_ad  = `VC_MEM_REQ_MSG_TYPE_AMO_ADD;
   localparam c_req_an  = `VC_MEM_REQ_MSG_TYPE_AMO_AND;
   localparam c_req_ao  = `VC_MEM_REQ_MSG_TYPE_AMO_OR;
 
   localparam c_resp_rd = `VC_MEM_RESP_MSG_TYPE_READ;
   localparam c_resp_wr = `VC_MEM_RESP_MSG_TYPE_WRITE;
-  localparam c_resp_wn = `VC_MEM_RESP_MSG_TYPE_WRITE_INIT;
+  localparam c_resp_in = `VC_MEM_RESP_MSG_TYPE_WRITE_INIT;
   localparam c_resp_ad = `VC_MEM_RESP_MSG_TYPE_AMO_ADD;
   localparam c_resp_an = `VC_MEM_RESP_MSG_TYPE_AMO_AND;
   localparam c_resp_ao = `VC_MEM_RESP_MSG_TYPE_AMO_OR;
@@ -368,19 +368,7 @@ module top;
   // Include Python-generated input datasets
   //----------------------------------------------------------------------
 
-  `include "lab3-mem-gen-input_random-writeread.py.v"
-
-  `include "lab3-mem-gen-input_random.py.v"
-
-  `include "lab3-mem-gen-input_ustride.py.v"
-
-  `include "lab3-mem-gen-input_stride2.py.v"
-
-  `include "lab3-mem-gen-input_stride4.py.v"
-
-  `include "lab3-mem-gen-input_shared.py.v"
-
-  `include "lab3-mem-gen-input_ustride-shared.py.v"
+  `include "lab3-mem-gen-input_loop-1d.py.v"
 
   `include "lab3-mem-gen-input_loop-2d.py.v"
 
@@ -394,6 +382,8 @@ module top;
   // a first ad-hoc test case for the init transaction. Note that
   // ad-hoc tests may not work on the functional model.
 
+  // Remove this test case once your init transaction works.
+
   `VC_TEST_CASE_BEGIN( 1, "init - loading one word in the 0th cacheline" )
   begin
     init_test_case( 0, 0, 0 );
@@ -403,7 +393,7 @@ module top;
     ////         ------------- memory request ----------------  --------- memory response ----------
     ////         type      opaque addr          len   data          type       opaque len   data
 
-    //init_port( c_req_wn, 8'h00, 32'h00000000, 2'd0, 32'he110341d, c_resp_wn, 8'h00, 2'd0, 32'h???????? );
+    //init_port( c_req_in, 8'h00, 32'h00000000, 2'd0, 32'he110341d, c_resp_in, 8'h00, 2'd0, 32'h???????? );
 
     //run_test;
 
@@ -414,35 +404,57 @@ module top;
   `VC_TEST_CASE_END
 
   //----------------------------------------------------------------------
-  // Basic Tests
+  // Basic Test Case #1: Read Hit Path (clean)
   //----------------------------------------------------------------------
 
-  // insert basic test cases here!
+  `VC_TEST_CASE_BEGIN( 2, "basic test case 1: read hit path (clean)" )
+  begin
+    init_test_case( 0, 0, 0 );
+
+    // Initialize Port
+
+    //         ------------- memory request --------------------  --------- memory response ----------
+    //         type      opaque addr          len   data          type       opaque len   data
+
+    init_port( c_req_in, 8'h00, 32'h00000000, 2'd0, 32'h0a0b0c0d, c_resp_in, 8'h00, 2'd0, 32'h???????? ); // write word  0x00000000
+    init_port( c_req_rd, 8'h01, 32'h00000000, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h0a0b0c0d ); // read  word  0x00000000
+
+    run_test;
+  end
+  `VC_TEST_CASE_END
 
   //----------------------------------------------------------------------
-  // Directed Tests
+  // Basic Test Case #2
   //----------------------------------------------------------------------
 
-  // insert directed test cases here!
+  //----------------------------------------------------------------------
+  // Basic Test Case #3
+  //----------------------------------------------------------------------
+
+  //----------------------------------------------------------------------
+  // Directed Test Case #1
+  //----------------------------------------------------------------------
+
+  //----------------------------------------------------------------------
+  // Directed Test Case #2
+  //----------------------------------------------------------------------
+
+  //----------------------------------------------------------------------
+  // Directed Test Case #3
+  //----------------------------------------------------------------------
 
   //----------------------------------------------------------------------
   // Random Tests
   //----------------------------------------------------------------------
 
-  // insert random test cases from scripts here!
-
   //----------------------------------------------------------------------
   // Pattern Tests
   //----------------------------------------------------------------------
 
-  // insert pattern test cases here! You can use these tasks:
-  // - init_random_writeread;
-  // - init_random;
-  // - init_ustride;
-  // - init_stride2;
-  // - init_stride4;
-  // - init_shared;
-  // - init_ustride_shared;
+  // insert pattern test cases here! You can use these tasks, but you
+  // should write more patterns as described in the lab handout:
+  //
+  // - init_loop_1d;
   // - init_loop_2d;
   // - init_loop_3d;
 

@@ -316,9 +316,7 @@ module top;
       $display( " lab3-mem-sim [options]" );
       $display( "" );
       $display( "   +help                 : this message" );
-      $display( "   +input=<dataset>      : {random,ustride,stride2,stride4," );
-      $display( "                            shared,ustride-shared,loop-2d," );
-      $display( "                            loop-3d}" );
+      $display( "   +input=<dataset>      : {loop-1d,loop-2d,loop-3d}" );
       $display( "   +max-cycles=<int>     : max cycles to wait until done" );
       $display( "   +trace=<int>          : 1 turns on line tracing" );
       $display( "   +dump-vcd=<file-name> : dump VCD to given file name" );
@@ -452,27 +450,17 @@ module top;
 
   localparam c_req_rd  = `VC_MEM_REQ_MSG_TYPE_READ;
   localparam c_req_wr  = `VC_MEM_REQ_MSG_TYPE_WRITE;
-  localparam c_req_wn  = `VC_MEM_REQ_MSG_TYPE_WRITE_INIT;
+  localparam c_req_in  = `VC_MEM_REQ_MSG_TYPE_WRITE_INIT;
 
   localparam c_resp_rd = `VC_MEM_RESP_MSG_TYPE_READ;
   localparam c_resp_wr = `VC_MEM_RESP_MSG_TYPE_WRITE;
-  localparam c_resp_wn = `VC_MEM_RESP_MSG_TYPE_WRITE_INIT;
+  localparam c_resp_in = `VC_MEM_RESP_MSG_TYPE_WRITE_INIT;
 
   //----------------------------------------------------------------------
   // Include Python-generated input datasets
   //----------------------------------------------------------------------
 
-  `include "lab3-mem-gen-input_random.py.v"
-
-  `include "lab3-mem-gen-input_ustride.py.v"
-
-  `include "lab3-mem-gen-input_stride2.py.v"
-
-  `include "lab3-mem-gen-input_stride4.py.v"
-
-  `include "lab3-mem-gen-input_shared.py.v"
-
-  `include "lab3-mem-gen-input_ustride-shared.py.v"
+  `include "lab3-mem-gen-input_loop-1d.py.v"
 
   `include "lab3-mem-gen-input_loop-2d.py.v"
 
@@ -498,21 +486,11 @@ module top;
 
     #1;
 
-    // we use a fixed delay of 10 cycles in the memory
-    init_delays( 0, 0, 9, 0 );
+    // we use a fixed delay of 20 cycles in the memory
+    init_delays( 0, 0, 19, 0 );
 
-    if          ( input_dataset == "random"   ) begin
-      init_random;
-    end else if ( input_dataset == "ustride"   ) begin
-      init_ustride;
-    end else if ( input_dataset == "stride2"   ) begin
-      init_stride2;
-    end else if ( input_dataset == "stride4"   ) begin
-      init_stride4;
-    end else if ( input_dataset == "shared"   ) begin
-      init_shared;
-    end else if ( input_dataset == "ustride-shared"   ) begin
-      init_ustride_shared;
+    if          ( input_dataset == "loop-1d"   ) begin
+      init_loop_1d;
     end else if ( input_dataset == "loop-2d"   ) begin
       init_loop_2d;
     end else if ( input_dataset == "loop-3d"   ) begin
