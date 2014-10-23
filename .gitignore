@@ -24,3 +24,7 @@ build
 *.hex
 
 *.swp
+*~
+.project
+.keepme
+
