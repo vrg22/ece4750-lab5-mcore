@@ -57,7 +57,7 @@ module lab3_mem_BlockingCacheBaseDpath
   input logic         tag_array_ren,
   input logic         data_array_wen,
   input logic         data_array_ren,
-  input logic [3:0]   data_array_wben,                    // SHOULD THIS BE 16 BITS OR 4 BITS ?
+  input logic [15:0]  data_array_wben,                  
   input logic         read_data_reg_en,
   input logic         read_tag_reg_en,
   input logic         memreq_tag_mux_sel,
@@ -72,14 +72,6 @@ module lab3_mem_BlockingCacheBaseDpath
   output logic            tag_match
 
 );
-
-  // Set cache response message to zeros
-
-  assign cacheresp_msg = {`VC_MEM_RESP_MSG_NBITS(o,dbw){1'b0}};
-
-  // Set memory request message to zeros
-
-  assign memreq_msg    = {`VC_MEM_REQ_MSG_NBITS(o,abw,clw){1'b0}};
 
 
   //--------------------------------------------------------------------
@@ -101,8 +93,6 @@ module lab3_mem_BlockingCacheBaseDpath
 
   vc_MemReqMsgUnpack#(o,abw,dbw) memreq_msg_unpack
   (
-    .clk    (clk),
-    .reset  (reset),
     .msg    (cachereq_msg),
     .type_  (cachereq_type_temp),
     .opaque (cachereq_opaque),
@@ -115,8 +105,6 @@ module lab3_mem_BlockingCacheBaseDpath
 
   vc_MemRespMsgUnpack#(o,clw) memresp_msg_unpack
   (
-    .clk     (clk),
-    .reset   (reset),
     .msg     (memresp_msg),
     .type_   (),
     .opaque  (),
@@ -201,7 +189,7 @@ module lab3_mem_BlockingCacheBaseDpath
   // SRAMs
 
   logic [abw-1-idw-4:0]   read_tag;
-  logic [dbw-1:0]         read_data;
+  logic [clw-1:0]         read_data;
 
   vc_CombinationalSRAM_1rw #(abw-idw-4,nblocks) tag_array
   (
@@ -230,7 +218,7 @@ module lab3_mem_BlockingCacheBaseDpath
   );
 
 
-  vc_EqComparator #(dbw) tag_comparator
+  vc_EqComparator #(abw-idw-4) tag_comparator
   (
     .in0            (tag),
     .in1            (read_tag),
@@ -251,7 +239,7 @@ module lab3_mem_BlockingCacheBaseDpath
   logic [dbw-1:0]       read_data_out;    
 
 
-  vc_EnResetReg #(dbw) read_data_reg
+  vc_EnResetReg #(clw) read_data_reg
   (
     .clk    (clk),
     .reset  (reset),
@@ -260,7 +248,7 @@ module lab3_mem_BlockingCacheBaseDpath
     .q      (read_data_temp)
   );
 
-  vc_EnResetReg #(dbw) read_tag_reg
+  vc_EnResetReg #(abw-idw-4) read_tag_reg
   (
     .clk    (clk),
     .reset  (reset),
@@ -304,12 +292,13 @@ module lab3_mem_BlockingCacheBaseDpath
 
   // Pack Memory Request Message
 
-  vc_MemRespMsgPack #(o,abw,clw) memreq_msg_pack
+  vc_MemReqMsgPack #(o,abw,clw) memreq_msg_pack
   (
     .type_    (memreq_type),
     .opaque   (8'b0),
+    .addr     (addr_out),
     .len      (4'b0),
-    .data     (addr_out),
+    .data     (read_data_temp),
     .msg      (memreq_msg)
   );
 
