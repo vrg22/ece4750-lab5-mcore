@@ -6,6 +6,8 @@
 `define LAB3_MEM_BLOCKING_CACHE_BASE_DPATH_V
 
 `include "vc-mem-msgs.v"
+`include "vc-srams.v"
+`include "vc-arithmetic.v"
 
 
 module lab3_mem_BlockingCacheBaseDpath
@@ -43,25 +45,25 @@ module lab3_mem_BlockingCacheBaseDpath
 
   // Memory Response
 
-  input  logic [`VC_MEM_RESP_MSG_NBITS(o,clw)-1:0]         memresp_msg
+  input  logic [`VC_MEM_RESP_MSG_NBITS(o,clw)-1:0]         memresp_msg,
 
 
   // control signals (ctrl->dpath)
 
-  input logic         cachereq_en;
-  input logic         memresp_en;
-  input logic         refill_mux_sel;
-  input logic         tag_array_wen;
-  input logic         tag_array_ren;
-  input logic         data_array_wen;
-  input logic         data_array_ren;
-  input logic [15:0]  data_array_wben;
-  input logic         read_data_reg_en;
-  input logic         read_tag_reg_en;
-  input logic         memreq_tag_mux_sel;
-  input logic [1:0]   read_byte_mux_sel;
-  input logic [2:0]   cacheresp_type;
-  input logic [2:0]   memreq_type;
+  input logic         cachereq_en,
+  input logic         memresp_en,
+  input logic         refill_mux_sel,
+  input logic         tag_array_wen,
+  input logic         tag_array_ren,
+  input logic         data_array_wen,
+  input logic         data_array_ren,
+  input logic [3:0]   data_array_wben,                    // SHOULD THIS BE 16 BITS OR 4 BITS ?
+  input logic         read_data_reg_en,
+  input logic         read_tag_reg_en,
+  input logic         memreq_tag_mux_sel,
+  input logic [1:0]   read_byte_mux_sel,
+  input logic [2:0]   cacheresp_type,
+  input logic [2:0]   memreq_type,
 
   // status signals (dpath->ctrl)
 
@@ -88,7 +90,7 @@ module lab3_mem_BlockingCacheBaseDpath
   logic [2:0]     cachereq_type_temp;
   logic [o-1:0]   cachereq_opaque;
   logic [abw-1:0] cachereq_addr_temp;
-  logic [abw-1:0] cachereq_addr;
+  logic [abw-1:0] cachereq_addr_out;
   logic [dbw-1:0] cachereq_data_temp;
   logic [dbw-1:0] cachereq_data;
   logic [clw-1:0] memresp_data_temp;
@@ -99,18 +101,22 @@ module lab3_mem_BlockingCacheBaseDpath
 
   vc_MemReqMsgUnpack#(o,abw,dbw) memreq_msg_unpack
   (
+    .clk    (clk),
+    .reset  (reset),
     .msg    (cachereq_msg),
     .type_  (cachereq_type_temp),
     .opaque (cachereq_opaque),
     .addr   (cachereq_addr_temp),
     .len    (),
-    .data   (imemresp_msg_data)
+    .data   (cachereq_data_temp)
   );
 
   // Unpack Memory Response Message
 
-  vc_MemRespMsgUnpack#(o,dbw) memresp_msg_unpack
+  vc_MemRespMsgUnpack#(o,clw) memresp_msg_unpack
   (
+    .clk     (clk),
+    .reset   (reset),
     .msg     (memresp_msg),
     .type_   (),
     .opaque  (),
@@ -133,9 +139,11 @@ module lab3_mem_BlockingCacheBaseDpath
     .clk    (clk),
     .reset  (reset),
     .en     (cachereq_en),
-    .d      (cachereq_type_addr),
-    .q      (cachereq_addr)
+    .d      (cachereq_addr_temp),
+    .q      (cachereq_addr_out)
   );
+
+  assign cachereq_addr= cachereq_addr_out;
 
   vc_EnResetReg #(o) cachereq_opaque_reg
   (
@@ -155,7 +163,7 @@ module lab3_mem_BlockingCacheBaseDpath
     .q      (cachereq_data)
   );
 
-  vc_EnResetReg # (clw) memresp_data_reg
+  vc_EnResetReg #(clw) memresp_data_reg
   (
     .clk    (clk),
     .reset  (reset),
@@ -186,8 +194,8 @@ module lab3_mem_BlockingCacheBaseDpath
   logic [idw-1:0]       idx;
   logic [abw-1-idw-4:0] tag;
 
-  assign idx= cachereq_addr[idw+4-1:4];
-  assign tag= cachereq_addr[abw-1:idw+4]; 
+  assign idx= cachereq_addr_out[idw+4-1:4];
+  assign tag= cachereq_addr_out[abw-1:idw+4]; 
 
 
   // SRAMs
@@ -195,8 +203,10 @@ module lab3_mem_BlockingCacheBaseDpath
   logic [abw-1-idw-4:0]   read_tag;
   logic [dbw-1:0]         read_data;
 
-  vc_CombinationalSRAM_1rw(abw,nblocks) tag_array
+  vc_CombinationalSRAM_1rw #(abw-idw-4,nblocks) tag_array
   (
+    .clk            (clk),
+    .reset          (reset),
     .read_en        (tag_array_ren),
     .read_addr      (idx),
     .read_data      (read_tag),
@@ -206,8 +216,10 @@ module lab3_mem_BlockingCacheBaseDpath
     .write_data     (tag)
   );
 
-  vc_CombinationalSRAM_1rw(abw,nblocks) data_array
+  vc_CombinationalSRAM_1rw #(clw,nblocks) data_array
   (
+    .clk            (clk),
+    .reset          (reset),
     .read_en        (data_array_ren),
     .read_addr      (idx),
     .read_data      (read_data),
@@ -218,10 +230,10 @@ module lab3_mem_BlockingCacheBaseDpath
   );
 
 
-  vc_EqComparator(dbw)
+  vc_EqComparator #(dbw) tag_comparator
   (
     .in0            (tag),
-    .in1            (read_data),
+    .in1            (read_tag),
     .out            (tag_match)
   );
 
@@ -281,7 +293,7 @@ module lab3_mem_BlockingCacheBaseDpath
 
   // Pack Cache Response Message
 
-  vc_MemRespMsgPack(o,dbw) cacheresp_msg_pack
+  vc_MemRespMsgPack #(o,dbw) cacheresp_msg_pack
   (
     .type_    (cacheresp_type),
     .opaque   (8'b0),
@@ -292,7 +304,7 @@ module lab3_mem_BlockingCacheBaseDpath
 
   // Pack Memory Request Message
 
-  vc_MemRespMsgPack(o,abw,clw) memreq_msg_pack
+  vc_MemRespMsgPack #(o,abw,clw) memreq_msg_pack
   (
     .type_    (memreq_type),
     .opaque   (8'b0),
