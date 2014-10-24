@@ -47,6 +47,9 @@ module lab3_mem_BlockingCacheBaseCtrl
 
   input  logic                                             memresp_val,
   output logic                                             memresp_rdy
+
+
+
  );
 
   // Drop incoming requests
@@ -61,6 +64,17 @@ module lab3_mem_BlockingCacheBaseCtrl
 
   assign memreq_val  = 1'b0;
   assign memresp_rdy = 1'b0;
+
+
+
+
+
+
+
+
+
+
+
 
 endmodule
 
