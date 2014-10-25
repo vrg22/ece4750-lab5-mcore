@@ -52,7 +52,7 @@ module lab3_mem_BlockingCacheBaseCtrl
 
   input logic [2:0]      cachereq_type,
   input logic [abw-1:0]  cachereq_addr,
-  input logic            tag_match
+  input logic            tag_match,
 
   // Control Signals
 
@@ -68,8 +68,8 @@ module lab3_mem_BlockingCacheBaseCtrl
   output logic         read_tag_reg_en,
   output logic         memreq_tag_mux_sel,
   output logic [1:0]   read_byte_mux_sel,
-  output logic [2:0]   cacheresp_type,
-  output logic [2:0]   memreq_type,
+  output logic [2:0]   cacheresp_type,                    // cacheresp_type: Init - 000, Read - 010, Write - 100
+  output logic [2:0]   memreq_type
 
  );
 
@@ -82,22 +82,25 @@ module lab3_mem_BlockingCacheBaseCtrl
 
   typedef struct packed {
 
-    logic         cachereq_en,          // Enable for cache request message registers
-    logic         memresp_en,           // Enable for memory response enable register
-    logic         refill_mux_sel,       // Sel for cache line refill mux behind data array
-    logic         tag_array_wen,        // Write enable for tag array
-    logic         tag_array_ren,        // Read enable for tag array
-    logic         data_array_wen,       // Write enable for data array
-    logic         data_array_ren,       // Read enable for data array
-    logic [15:0]  data_array_wben,      // Write byte enable for data array             
-    logic         read_data_reg_en,     // Enable for data array output register
-    logic         read_tag_reg_en,      // Enable for tag array output register
-    logic         memreq_tag_mux_sel,   // Sel for memory request tag mux in front of tag array output register
-    logic [1:0]   read_byte_mux_sel,    // Sel for read byte select mux in front of data array output register
-    logic [2:0]   cacheresp_type,       // read/write/init for cache response message
-    logic [2:0]   memreq_type,          // read/write/init for memory request message
+    logic         cachereq_en;          // Enable for cache request message registers
+    logic         memresp_en;           // Enable for memory response enable register
+    logic         refill_mux_sel;       // Sel for cache line refill mux behind data array
+    logic         tag_array_wen;        // Write enable for tag array
+    logic         tag_array_ren;        // Read enable for tag array
+    logic         data_array_wen;       // Write enable for data array
+    logic         data_array_ren;       // Read enable for data array
+    logic [15:0]  data_array_wben;      // Write byte enable for data array             
+    logic         read_data_reg_en;     // Enable for data array output register
+    logic         read_tag_reg_en;      // Enable for tag array output register
+    logic         memreq_tag_mux_sel;   // Sel for memory request tag mux in front of tag array output register
+    logic [1:0]   read_byte_mux_sel;    // Sel for read byte select mux in front of data array output register
+    logic [2:0]   cacheresp_type;       // read/write/init for cache response message
+    logic [2:0]   memreq_type;          // read/write/init for memory request message
 
   } lab3_mem_cs_t;
+
+  // create new control signal struct
+  lab3_mem_cs_t cs;
 
 
   //----------------------------------------------------------------------
@@ -148,6 +151,7 @@ module lab3_mem_BlockingCacheBaseCtrl
                                 state_next = STATE_INIT_DATA_ACCESS;
                               end
       STATE_INIT_DATA_ACCESS: if ( 1 ) begin
+                                assign cs_cacheresp_type = 3'b000; 
                                 state_next = STATE_WAIT;
                               end
 
@@ -208,7 +212,7 @@ module lab3_mem_BlockingCacheBaseCtrl
     cs.memreq_tag_mux_sel = cs_memreq_tag_mux_sel;
     cs.read_byte_mux_sel  = cs_read_byte_mux_sel;
     cs.cacheresp_type     = cs_cacheresp_type;
-    cs.cs_memreq_type     = cs_memreq_type;
+    cs.memreq_type        = cs_memreq_type;
   end
   endtask
 
@@ -227,7 +231,7 @@ module lab3_mem_BlockingCacheBaseCtrl
       STATE_IDLE:               set_cs( 1,  0,  0,  0,  0, 0, x, 0, 0, 0, 0, 16'bx, 0, 0, x, 2'bxx, 3'bxxx, 3'bxxx ); 
       STATE_TAG_CHECK: 
                                 set_cs( 0,  0,  0,  0,  1, 0, x, 0, 1, 0, 0, 16'bx, 0, 0, x, 2'bxx, 3'bxxx, 3'bxxx ); 
-      STATE_INIT_DATA_ACCESS    set_cs( 0,  0,  0,  0,  1, 0, 0, 1, 0, 1, 0, 16'bx, 0, 0, x, 2'bxx, 3'bxxx, 3'bxxx );            
+      STATE_INIT_DATA_ACCESS:   set_cs( 0,  0,  0,  0,  1, 0, 0, 1, 0, 1, 0, 16'bx, 0, 0, x, 2'bxx, 3'bxxx, 3'bxxx );            
       STATE_WAIT:               set_cs( 0,  0,  0,  0,  0, 0, x, 0, 0, 0, 0, 16'bx, 0, 0, x, 2'bxx, 3'bxxx, 3'bxxx ); 
 
     endcase
@@ -250,7 +254,7 @@ module lab3_mem_BlockingCacheBaseCtrl
    assign memreq_tag_mux_sel = cs.memreq_tag_mux_sel;
    assign read_byte_mux_sel  = cs.read_byte_mux_sel;
    assign cacheresp_type     = cs.cacheresp_type;
-   assign cs_memreq_type     = cs.memreq_type;
+   assign memreq_type        = cs.memreq_type;
 
 
 endmodule
