@@ -58,32 +58,6 @@ module lab3_mem_BlockingCacheBase
 
   localparam c_idx_shamt = $clog2( p_num_banks );
 
-
-  // Status Signals
-
-  logic [2:0]      cachereq_type;
-  logic [abw-1:0]  cachereq_addr;
-  logic            tag_match;
-
-  // Control Signals
-
-  logic         cachereq_en;
-  logic         memresp_en;
-  logic         refill_mux_sel;
-  logic         tag_array_wen;
-  logic         tag_array_ren;
-  logic         data_array_wen;
-  logic         data_array_ren;
-  logic [15:0]  data_array_wben;                  
-  logic         read_data_reg_en;
-  logic         read_tag_reg_en;
-  logic         memreq_tag_mux_sel;
-  logic [1:0]   read_byte_mux_sel;
-  logic [2:0]   cacheresp_type;                   
-  logic [2:0]   memreq_type;
-
-
-
   //----------------------------------------------------------------------
   // Control
   //----------------------------------------------------------------------
@@ -117,33 +91,8 @@ module lab3_mem_BlockingCacheBase
    // Memory Response
 
    .memresp_val       (memresp_val),
-   .memresp_rdy       (memresp_rdy),
-
-   // Status Signals
-
-   .cachereq_type     (cachereq_type),
-   .cachereq_addr     (cachereq_addr),
-   .tag_match         (tag_match),
-
-   // Control Signals
-
-   .cachereq_en       (cachereq_en),
-   .memresp_en        (memresp_en),
-   .refill_mux_sel    (refill_mux_sel),
-   .tag_array_wen     (tag_array_wen),
-   .tag_array_ren     (tag_array_ren),
-   .data_array_wen    (data_array_wen),
-   .data_array_ren    (data_array_ren),
-   .data_array_wben   (data_array_wben),                  
-   .read_data_reg_en  (read_data_reg_en),
-   .read_tag_reg_en   (read_tag_reg_en),
-   .memreq_tag_mux_sel(memreq_tag_mux_sel),
-   .read_byte_mux_sel (read_byte_mux_sel),
-   .cacheresp_type    (cacheresp_type),                   
-   .memreq_type       (memreq_type)
-
+   .memresp_rdy       (memresp_rdy)
   );
-
 
   //----------------------------------------------------------------------
   // Datapath
@@ -174,32 +123,7 @@ module lab3_mem_BlockingCacheBase
 
    // Memory Response
 
-   .memresp_msg       (memresp_msg),
-
-
-  // control signals (ctrl->dpath)
-
-  .cachereq_en        (cachereq_en),
-  .memresp_en         (memresp_en),
-  .refill_mux_sel     (refill_mux_sel),
-  .tag_array_wen      (tag_array_wen),
-  .tag_array_ren      (tag_array_ren),
-  .data_array_wen     (data_array_wen),
-  .data_array_ren     (data_array_ren),
-  .data_array_wben    (data_array_wben),                  
-  .read_data_reg_en   (read_data_reg_en),
-  .read_tag_reg_en    (read_tag_reg_en),
-  .memreq_tag_mux_sel (memreq_tag_mux_sel),
-  .read_byte_mux_sel  (read_byte_mux_sel),
-  .cacheresp_type     (cacheresp_type),
-  .memreq_type        (memreq_type),
-
-  // status signals (dpath->ctrl)
-
-  .cachereq_type      (cachereq_type),
-  .cachereq_addr      (cachereq_addr),
-  .tag_match
-
+   .memresp_msg       (memresp_msg)
   );
 
 
