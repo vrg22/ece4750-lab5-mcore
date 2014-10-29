@@ -136,6 +136,9 @@ module lab3_mem_BlockingCacheBaseCtrl
         else if ( cachereq_type == `VC_MEM_RESP_MSG_TYPE_WRITE && tag_match && v_read_data ) begin
           state_next = STATE_WRITE_DATA_ACCESS;
         end
+        else if ( cachereq_type == `VC_MEM_REQ_MSG_TYPE_READ && !d_read_data && !tag_match) begin
+          state_next = STATE_REFILL_REQUEST;
+        end
         else begin
           state_next = STATE_IDLE;
         end
@@ -167,28 +170,26 @@ module lab3_mem_BlockingCacheBaseCtrl
           state_next = STATE_WAIT;
           state_prev = STATE_WRITE_DATA_ACCESS;
         end
+      STATE_REFILL_REQUEST:
+        if ( memreq_rdy ) begin
+          state_next = STATE_REFILL_WAIT;
+        end
+        else begin
+          state_next = STATE_REFILL_REQUEST;
+        end
+      STATE_REFILL_WAIT:
+        if( !memresp_val ) begin
+          state_next = STATE_REFILL_WAIT;
+        end
+        else begin
+          state_next = STATE_REFILL_UPDATE;
+        end
+      STATE_REFILL_UPDATE:
+        state_next = STATE_READ_DATA_ACCESS;
       default:
         state_next = STATE_IDLE;
     endcase
   end
-
-  // HELPER FOR wben BITS
-
-  logic [15:0] wb;
-  logic [1:0]  wsel;
-
-  assign wsel = cachereq_addr[3:2];     
-
-  always @(*) begin
-    case ( cachereq_addr[3:2] )
-      00: wb = 16'b0000000000001111;
-      01: wb = 16'b0000000011110000;
-      10: wb = 16'b0000111100000000;
-      11: wb = 16'b1111000000000000;
-    endcase
-  end
-
-  // END HELPER
 
   // REGISTER FILES
   logic [$clog2(nblocks)-1:0] v_read_addr;
@@ -258,7 +259,7 @@ module lab3_mem_BlockingCacheBaseCtrl
       v_write_data = 1'b1;
 
       d_write_en = y;
-      d_write_data = 1'b1;
+      d_write_data = 1'b0;
     end
     else if ( state_reg == STATE_WRITE_DATA_ACCESS ) begin
       d_write_en = y;
@@ -351,10 +352,26 @@ module lab3_mem_BlockingCacheBaseCtrl
     end
   end
 
+  logic [15:0] wb;
+  logic [1:0]  wsel;
 
+  assign wsel = cachereq_addr[3:2];     
+
+  always @(*) begin
+    case ( cachereq_addr[3:2] )
+      00: wb = 16'b0000000000001111;
+      01: wb = 16'b0000000011110000;
+      10: wb = 16'b0000111100000000;
+      11: wb = 16'b1111000000000000;
+    endcase
+  end
+  localparam all = 16'hf;
 
   localparam r = 1'b0;
   localparam m = 1'b1;
+
+  localparam e = 1'b0;
+  localparam a = 1'b1;
 
   always @(*) begin
 
@@ -368,6 +385,9 @@ module lab3_mem_BlockingCacheBaseCtrl
       STATE_WAIT              :set_cs( n,  y,  n,  n,   n,  n,   n,   x, n,  x, wtr, n,  n,  n,  nwb, n,  wtm, tx  );
       STATE_READ_DATA_ACCESS  :set_cs( n,  n,  n,  n,   n,  y,   n,   x, n,  x, rd,  n,  y,  n,  nwb, y,  rwm, tx  );
       STATE_WRITE_DATA_ACCESS :set_cs( n,  n,  n,  n,   n,  n,   n,   r, n,  x, wr,  n,  n,  y,   wb, n,   wx, tx  );
+      STATE_REFILL_REQUEST    :set_cs( n,  n,  y,  n,   n,  n,   n,   x, n,  a, tx,  n,  n,  n,  nwb, n,   wx, rd  );
+      STATE_REFILL_WAIT       :set_cs( n,  n,  n,  y,   n,  n,   n,   x, n,  x, tx,  y,  n,  n,  nwb, n,   wx, tx  );
+      STATE_REFILL_UPDATE     :set_cs( n,  n,  n,  n,   n,  n,   y,   m, n,  x, tx,  n,  n,  y,  all, n,   wx, tx  );
       default                 :set_cs( n,  n,  n,  n,   n,  n,   n,   x, n,  x, tx,  n,  n,  n,  nwb, n,   wx, tx  );
     endcase
 

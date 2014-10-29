@@ -204,6 +204,9 @@ module lab3_mem_BlockingCacheBase
       ctrl.STATE_WAIT:                   vc_trace.append_str( trace_str, "(W )" );
       ctrl.STATE_READ_DATA_ACCESS:       vc_trace.append_str( trace_str, "(RD)" );
       ctrl.STATE_WRITE_DATA_ACCESS:      vc_trace.append_str( trace_str, "(WR)" );
+      ctrl.STATE_REFILL_REQUEST:         vc_trace.append_str( trace_str, "(RR)" );
+      ctrl.STATE_REFILL_WAIT:            vc_trace.append_str( trace_str, "(RW)" );
+      ctrl.STATE_REFILL_UPDATE:          vc_trace.append_str( trace_str, "(RU)" );
       default:                           vc_trace.append_str( trace_str, "(? )" );
 
     endcase
