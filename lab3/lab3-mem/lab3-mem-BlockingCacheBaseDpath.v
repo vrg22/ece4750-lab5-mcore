@@ -57,7 +57,7 @@ module lab3_mem_BlockingCacheBaseDpath
   input  logic                                             data_array_wen,
   input  logic [15:0]                                      data_array_wben,
   input  logic                                             read_data_reg_en,
-  input  logic [1:0]                                       read_word_mux_sel,
+  input  logic [2:0]                                       read_word_mux_sel,
   input  logic [2:0]                                       memreq_type, 
   output logic [`VC_MEM_RESP_MSG_NBITS(o,dbw)-1:0]         cacheresp_msg,
 
@@ -227,12 +227,13 @@ module lab3_mem_BlockingCacheBaseDpath
   );
 
   logic [dbw-1:0] cacheresp_msg_data;
-  vc_Mux4 #(dbw) read_byte_mux
+  vc_Mux5 #(dbw) read_byte_mux
   (
-    .in0      (valid_cache_data[dbw-1:0]),
-    .in1      (valid_cache_data[2*dbw-1:dbw]),
-    .in2      (valid_cache_data[3*dbw-1:2*dbw]),
-    .in3      (valid_cache_data[4*dbw-1:3*dbw]),
+    .in0      (valid_cache_data[4*dbw-1:3*dbw]),
+    .in1      (valid_cache_data[3*dbw-1:2*dbw]),
+    .in2      (valid_cache_data[2*dbw-1:dbw]),
+    .in3      (valid_cache_data[dbw-1:0]),
+    .in4      (32'b0),
     .sel      (read_word_mux_sel),
     .out      (cacheresp_msg_data)
   );

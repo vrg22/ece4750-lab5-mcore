@@ -69,7 +69,7 @@ module lab3_mem_BlockingCacheBase
   logic [15:0]    data_array_wben;
   logic           read_data_reg_en;
   logic           evict_addr_reg_en;
-  logic [1:0]     read_word_mux_sel;
+  logic [2:0]     read_word_mux_sel;
   logic           memreq_addr_mux_sel;
   logic [2:0]     cacheresp_type;
   logic [2:0]     memreq_type;

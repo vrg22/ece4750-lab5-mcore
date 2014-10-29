@@ -7,6 +7,7 @@
 
 `include "vc-mem-msgs.v"
 `include "vc-assert.v"
+`include "vc-regfiles.v"
 
 module lab3_mem_BlockingCacheBaseCtrl
 #(
@@ -67,7 +68,7 @@ module lab3_mem_BlockingCacheBaseCtrl
   output  logic                                            data_array_wen,
   output  logic [15:0]                                     data_array_wben,
   output  logic                                            read_data_reg_en,
-  output  logic [1:0]                                      read_word_mux_sel,
+  output  logic [2:0]                                      read_word_mux_sel,
   output  logic [2:0]                                      memreq_type
 
  );
@@ -108,6 +109,8 @@ module lab3_mem_BlockingCacheBaseCtrl
     end
   end
 
+  // State Transition Logic
+
     always @(*) begin
 
     state_next = state_reg;
@@ -121,8 +124,26 @@ module lab3_mem_BlockingCacheBaseCtrl
         else begin
           state_next = STATE_WAIT;
         end
+      STATE_TAG_CHECK:
+        if ( cachereq_type == `VC_MEM_REQ_MSG_TYPE_WRITE_INIT) begin
+          state_next = STATE_INIT_DATA_ACCESS;
+        end
+        else begin
+          state_next = STATE_WAIT;
+        end
+      STATE_INIT_DATA_ACCESS:
+        if ( cacheresp_val && cacheresp_rdy ) begin
+          state_next = STATE_IDLE;
+        end
+        else begin
+          state_next = STATE_WAIT;
+        end
+      STATE_WAIT:
+        if ( cacheresp_val && cacheresp_rdy ) begin
+          state_next = STATE_IDLE;
+        end
       default:
-        state_next = STATE_WAIT;
+        state_next = STATE_IDLE;
     endcase
   end
 
@@ -143,6 +164,49 @@ module lab3_mem_BlockingCacheBaseCtrl
   end
 
   // END HELPER
+
+  // REGISTER FILES
+  logic [$clog2(nblocks)-1:0] v_read_addr;
+  logic [$clog2(nblocks)-1:0] v_write_addr;
+
+  logic v_write_en;
+  logic v_read_data;
+  logic v_write_data;
+
+  vc_ResetRegfile_1r1w #(1,nblocks) valid_regfile
+  (
+    .clk        (clk),
+    .reset      (reset),
+
+    .read_addr  (v_read_addr),
+    .read_data  (v_read_data),
+
+    .write_en   (v_write_en),
+    .write_addr (v_write_addr),
+    .write_data (v_write_data)
+  );
+
+  logic [$clog2(nblocks)-1:0] d_read_addr;
+  logic [$clog2(nblocks)-1:0] d_write_addr;
+
+  logic d_write_en;
+  logic d_read_data;
+  logic d_write_data;
+
+  vc_ResetRegfile_1r1w #(1,nblocks) dirty_regfile
+  (
+    .clk        (clk),
+    .reset      (reset),
+
+    .read_addr  (d_read_addr),
+    .read_data  (d_read_data),
+
+    .write_en   (d_write_en),
+    .write_addr (d_write_addr),
+    .write_data (d_write_data)
+  );
+
+  // END REGISTER FILES
 
 
   task set_cs
@@ -194,22 +258,35 @@ module lab3_mem_BlockingCacheBaseCtrl
 
   localparam nwb = 16'dx;
 
-  localparam ze = 2'b00;
-  localparam fs = 2'b01;
-  localparam sn = 2'b10;
-  localparam th = 2'b11;
+  localparam ze = 3'b000;
+  localparam fs = 3'b001;
+  localparam sn = 3'b010;
+  localparam th = 3'b011;
+  localparam dm = 3'b100;
+  localparam wx = 3'bx;
 
-  localparam ev_reg = 1'b0;
-  localparam m_addr = 1'b1;
+  localparam ev = 1'b0;
+  localparam ad = 1'b1;
+
+  localparam rd = 3'd0;
+  localparam wr = 3'd1;
+  localparam in = 3'd2;
+  localparam tx = 3'dx;
+
+  localparam r = 1'b0;
+  localparam m = 1'b1;
 
   always @(*) begin
 
     case ( state_reg )
-                              //        C   C   M   M    C   TAG  TAG  WD EA MRQ CRSP M   DTA DTA DTA  RD   RD  MREQ
-                              //        REQ RSP REQ RSP  REQ REN  WEN  MX EN ADR TYPE RSP ARR ARR ARR  DTA  WR  TYPE
-                              //        RDY VAL VAL RDY  EN                  MX       EN  REN WEN WBEN REN  MX     
-      STATE_IDLE               :set_cs( y,  n,  n,  n,   y,  x,   n,   x, n, x,  0,   n,  n,  n,  n,   nwb, ze, 0   ); 
-      default                  :set_cs( n,  n,  n,  n,   n,  n,   n,   x, n, x,  0,   n,  n,  n,  n,   nwb, ze, 0   );
+                              //       C   C   M   M    C   TAG  TAG  WD EA MRQ CRSP M   DTA DTA DTA  RD   RD  MREQ
+                              //       REQ RSP REQ RSP  REQ REN  WEN  MX EN ADR TYPE RSP ARR ARR ARR  DTA  WR  TYPE
+                              //       RDY VAL VAL RDY  EN       |    |  |  MX  |    EN  REN WEN WBEN REN  MX  |  
+      STATE_IDLE              :set_cs( y,  n,  n,  n,   y,  x,   n,   x, n,  x, tx,  n,  n,  n,  nwb, n,   wx, tx  );
+      STATE_TAG_CHECK         :set_cs( n,  n,  n,  n,   n,  y,   n,   x, n,  x, tx,  n,  n,  n,  nwb, n,   wx, tx  );
+      STATE_INIT_DATA_ACCESS  :set_cs( n,  y,  n,  n,   n,  n,   y,   r, n,  x, in,  n,  n,  y,   wb, n,   dm, tx  );
+      STATE_WAIT              :set_cs( n,  y,  n,  n,   n,  n,   n,   x, n,  x, in,  n,  n,  n,  nwb, n,   dm, tx  );
+      default                 :set_cs( n,  n,  n,  n,   n,  n,   n,   x, n,  x, tx,  n,  n,  n,  nwb, n,   wx, tx  );
     endcase
 
   end
