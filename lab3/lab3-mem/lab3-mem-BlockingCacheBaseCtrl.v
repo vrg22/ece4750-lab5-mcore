@@ -46,7 +46,7 @@ module lab3_mem_BlockingCacheBaseCtrl
   input   logic                                            memreq_rdy,
 
   // Memory Response
-  
+
   input   logic                                            memresp_val,
   output  logic                                            memresp_rdy,
 
@@ -336,7 +336,6 @@ module lab3_mem_BlockingCacheBaseCtrl
     endcase
 
   end
->>>>>>> hit-path-akshay
 
 endmodule
 

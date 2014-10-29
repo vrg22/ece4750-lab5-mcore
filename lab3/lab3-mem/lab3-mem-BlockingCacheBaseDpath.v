@@ -9,10 +9,6 @@
 `include "vc-srams.v"
 `include "vc-arithmetic.v"
 
-<<<<<<< HEAD
-
-=======
->>>>>>> hit-path-akshay
 module lab3_mem_BlockingCacheBaseDpath
 #(
   parameter size    = 256,            // Cache size in bytes
@@ -275,7 +271,6 @@ module lab3_mem_BlockingCacheBaseDpath
     .data     (valid_cache_data),
     .msg      (memreq_msg)
   );
->>>>>>> hit-path-akshay
 
 endmodule
 
