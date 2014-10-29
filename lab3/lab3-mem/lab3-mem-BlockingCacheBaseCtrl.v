@@ -100,6 +100,7 @@ module lab3_mem_BlockingCacheBaseCtrl
 
   state_t state_reg;
   state_t state_next;
+  state_t state_prev;
 
   always @( posedge clk ) begin
     if ( reset ) begin
@@ -141,6 +142,7 @@ module lab3_mem_BlockingCacheBaseCtrl
         end
         else begin
           state_next = STATE_WAIT;
+          state_prev = STATE_INIT_DATA_ACCESS;
         end
       STATE_WAIT:
         if ( cacheresp_val && cacheresp_rdy ) begin
@@ -152,6 +154,7 @@ module lab3_mem_BlockingCacheBaseCtrl
         end
         else begin
           state_next = STATE_WAIT;
+          state_prev = STATE_READ_DATA_ACCESS;
         end
       default:
         state_next = STATE_IDLE;
@@ -300,6 +303,20 @@ module lab3_mem_BlockingCacheBaseCtrl
   localparam wr = 3'd1;
   localparam in = 3'd2;
   localparam tx = 3'dx;
+  logic [2:0] wt;
+  always @(*) begin
+    if (state_prev == STATE_INIT_DATA_ACCESS) begin
+      wt = in;
+    end
+    else if (state_prev == STATE_READ_DATA_ACCESS) begin
+      wt = rd;
+    end
+    else begin
+      wt = tx;
+    end
+  end
+
+
 
   localparam r = 1'b0;
   localparam m = 1'b1;
@@ -313,7 +330,7 @@ module lab3_mem_BlockingCacheBaseCtrl
       STATE_IDLE              :set_cs( y,  n,  n,  n,   y,  n,   n,   x, n,  x, tx,  n,  n,  n,  nwb, n,   wx, tx  );
       STATE_TAG_CHECK         :set_cs( n,  n,  n,  n,   n,  y,   n,   x, n,  x, tx,  n,  n,  n,  nwb, n,   wx, tx  );
       STATE_INIT_DATA_ACCESS  :set_cs( n,  n,  n,  n,   n,  n,   y,   r, n,  x, in,  n,  n,  y,   wb, n,   dm, tx  );
-      STATE_WAIT              :set_cs( n,  y,  n,  n,   n,  n,   n,   x, n,  x, in,  n,  n,  n,  nwb, n,   dm, tx  );
+      STATE_WAIT              :set_cs( n,  y,  n,  n,   n,  n,   n,   x, n,  x, wt,  n,  n,  n,  nwb, n,   dm, tx  );
       STATE_READ_DATA_ACCESS  :set_cs( n,  n,  n,  n,   n,  y,   n,   x, n,  x, rd,  n,  y,  n,  nwb, y,  rwm, tx  );
       default                 :set_cs( n,  n,  n,  n,   n,  n,   n,   x, n,  x, tx,  n,  n,  n,  nwb, n,   wx, tx  );
     endcase

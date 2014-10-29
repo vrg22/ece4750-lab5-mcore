@@ -72,18 +72,20 @@ module lab3_mem_BlockingCacheBaseDpath
   logic [abw-1:0] cachereq_addr_in;
   logic [dbw-1:0] cachereq_data_reg_in;
    
+  logic [7:0] opq;
   vc_MemReqMsgUnpack#(o,abw,dbw) memreq_msg_unpack
   (
     .msg      (cachereq_msg),
     .type_    (cachereq_type_in),
-    .opaque   (),
+    .opaque   (opq),
     .addr     (cachereq_addr_in),
     .len      (),
     .data     (cachereq_data_reg_in)
   );
 
   logic [clw-1:0] memresp_data_in;
-   
+  
+     
   vc_MemRespMsgUnpack#(o,clw) memresp_msg_unpack
   (
     .msg      (memresp_msg),
@@ -92,6 +94,17 @@ module lab3_mem_BlockingCacheBaseDpath
     .len      (),
     .data     (memresp_data_in)
   );
+
+
+  logic [7:0] pack_opq;
+  vc_EnReg #(8) cachereq_opaque_reg
+  (
+    .clk      (clk),
+    .reset    (reset),
+    .en       (cachereq_en),
+    .d        (opq),
+    .q        (pack_opq)
+  );  
 
   vc_EnReg #(3) cachereq_type_reg
   (
@@ -243,7 +256,7 @@ module lab3_mem_BlockingCacheBaseDpath
   vc_MemRespMsgPack #(o,dbw) cacheresp_msg_pack
   (
     .type_    (cacheresp_type),
-    .opaque   (8'b0),
+    .opaque   (pack_opq),
     .len      (2'b0),
     .data     (cacheresp_msg_data),
     .msg      (cacheresp_msg)
