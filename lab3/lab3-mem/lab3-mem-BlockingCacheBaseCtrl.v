@@ -385,14 +385,14 @@ module lab3_mem_BlockingCacheBaseCtrl
 
   logic [15:0] wb;
   always @(*) begin
-    case ( off] )
+    case ( off )
       00: wb = 16'h000f;
       01: wb = 16'h00f0;
       10: wb = 16'h0f00;
       11: wb = 16'hf000;
     endcase
   end
-  
+
   localparam all = 16'hffff;
 
   localparam r = 1'b0;
