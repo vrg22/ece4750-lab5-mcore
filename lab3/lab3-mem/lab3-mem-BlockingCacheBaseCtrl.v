@@ -344,8 +344,8 @@ module lab3_mem_BlockingCacheBaseCtrl
 
   localparam nwb = 16'dx;
 
-  logic [idw:0] rwm;
-  assign rwm = {1'b0 , cachereq_addr[idw+4-1:4]};
+  logic [1:0] rwm;
+  assign rwm = cachereq_addr[3:2];
 
   localparam dm = 3'b100;
   localparam wx = 3'bx;
