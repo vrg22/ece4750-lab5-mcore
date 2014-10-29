@@ -231,9 +231,11 @@ module lab3_mem_BlockingCacheBaseCtrl
   always @(*) begin
     if ( state_reg == STATE_INIT_DATA_ACCESS ) begin
       v_write_en = y;
+      d_write_en = n;
     end
     else begin
       v_write_en = n;
+      d_write_en = n;
     end
   end
 
@@ -308,9 +310,9 @@ module lab3_mem_BlockingCacheBaseCtrl
                               //       C   C   M   M    C   TAG  TAG  WD EA MRQ CRSP M   DTA DTA DTA  RD   RD  MREQ
                               //       REQ RSP REQ RSP  REQ REN  WEN  MX EN ADR TYPE RSP ARR ARR ARR  DTA  WR  TYPE
                               //       RDY VAL VAL RDY  EN       |    |  |  MX  |    EN  REN WEN WBEN REN  MX  |  
-      STATE_IDLE              :set_cs( y,  n,  n,  n,   y,  x,   n,   x, n,  x, tx,  n,  n,  n,  nwb, n,   wx, tx  );
+      STATE_IDLE              :set_cs( y,  n,  n,  n,   y,  n,   n,   x, n,  x, tx,  n,  n,  n,  nwb, n,   wx, tx  );
       STATE_TAG_CHECK         :set_cs( n,  n,  n,  n,   n,  y,   n,   x, n,  x, tx,  n,  n,  n,  nwb, n,   wx, tx  );
-      STATE_INIT_DATA_ACCESS  :set_cs( n,  y,  n,  n,   n,  n,   y,   r, n,  x, in,  n,  n,  y,   wb, n,   dm, tx  );
+      STATE_INIT_DATA_ACCESS  :set_cs( n,  n,  n,  n,   n,  n,   y,   r, n,  x, in,  n,  n,  y,   wb, n,   dm, tx  );
       STATE_WAIT              :set_cs( n,  y,  n,  n,   n,  n,   n,   x, n,  x, in,  n,  n,  n,  nwb, n,   dm, tx  );
       STATE_READ_DATA_ACCESS  :set_cs( n,  n,  n,  n,   n,  y,   n,   x, n,  x, rd,  n,  y,  n,  nwb, y,  rwm, tx  );
       default                 :set_cs( n,  n,  n,  n,   n,  n,   n,   x, n,  x, tx,  n,  n,  n,  nwb, n,   wx, tx  );

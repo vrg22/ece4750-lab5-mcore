@@ -196,15 +196,16 @@ module lab3_mem_BlockingCacheBase
 
     // Tracing for init transaction states
 
-    //case ( ctrl.state_reg )
+    case ( ctrl.state_reg )
 
-    //  ctrl.STATE_IDLE:                   vc_trace.append_str( trace_str, "(I )" );
-    //  ctrl.STATE_TAG_CHECK:              vc_trace.append_str( trace_str, "(TC)" );
-    //  ctrl.STATE_INIT_DATA_ACCESS:       vc_trace.append_str( trace_str, "(IN)" );
-    //  ctrl.STATE_WAIT:                   vc_trace.append_str( trace_str, "(W )" );
-    //  default:                           vc_trace.append_str( trace_str, "(? )" );
+      ctrl.STATE_IDLE:                   vc_trace.append_str( trace_str, "(I )" );
+      ctrl.STATE_TAG_CHECK:              vc_trace.append_str( trace_str, "(TC)" );
+      ctrl.STATE_INIT_DATA_ACCESS:       vc_trace.append_str( trace_str, "(IN)" );
+      ctrl.STATE_WAIT:                   vc_trace.append_str( trace_str, "(W )" );
+      ctrl.STATE_READ_DATA_ACCESS:        vc_trace.append_str( trace_str, "(RD)" );
+      default:                           vc_trace.append_str( trace_str, "(? )" );
 
-    //endcase
+    endcase
 
   end
   `VC_TRACE_END
