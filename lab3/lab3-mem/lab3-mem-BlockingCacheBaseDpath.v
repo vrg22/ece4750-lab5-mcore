@@ -222,7 +222,7 @@ module lab3_mem_BlockingCacheBaseDpath
   vc_Mux2 #(abw) memreq_addr_mux
   (
     .in0      (evict_addr),
-    .in1      (mk_addr),
+    .in1      (cachereq_addr),
     .sel      (memreq_addr_mux_sel),
     .out      (memreq_addr)
   );

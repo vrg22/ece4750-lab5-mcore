@@ -136,8 +136,17 @@ module lab3_mem_BlockingCacheBaseCtrl
         else if ( cachereq_type == `VC_MEM_RESP_MSG_TYPE_WRITE && tag_match && v_read_data ) begin
           state_next = STATE_WRITE_DATA_ACCESS;
         end
-        else if ( cachereq_type == `VC_MEM_REQ_MSG_TYPE_READ && !d_read_data && !tag_match) begin
+        else if ( cachereq_type == `VC_MEM_REQ_MSG_TYPE_READ && !d_read_data && !tag_match ) begin
           state_next = STATE_REFILL_REQUEST;
+        end
+        else if ( cachereq_type == `VC_MEM_REQ_MSG_TYPE_WRITE && !d_read_data && !tag_match ) begin
+          state_next = STATE_REFILL_REQUEST;
+        end
+        else if ( cachereq_type == `VC_MEM_REQ_MSG_TYPE_READ && d_read_data && !tag_match ) begin
+          state_next = STATE_EVICT_PREPARE;
+        end
+        else if ( cachereq_type == `VC_MEM_REQ_MSG_TYPE_WRITE && d_read_data && !tag_match ) begin
+          state_next = STATE_EVICT_PREPARE;
         end
         else begin
           state_next = STATE_IDLE;
@@ -188,6 +197,22 @@ module lab3_mem_BlockingCacheBaseCtrl
         state_next = STATE_READ_DATA_ACCESS;
       default:
         state_next = STATE_IDLE;
+      STATE_EVICT_PREPARE:
+        state_next = STATE_EVICT_REQUEST;
+      STATE_EVICT_REQUEST:
+        if ( memreq_rdy ) begin
+          state_next = STATE_EVICT_WAIT;
+        end
+        else begin
+          state_next = STATE_EVICT_REQUEST;
+        end
+      STATE_EVICT_WAIT:
+        if( !memresp_val ) begin
+          state_next = STATE_EVICT_WAIT;
+        end
+        else begin
+          state_next = STATE_REFILL_REQUEST;
+        end
     endcase
   end
 
@@ -377,10 +402,10 @@ module lab3_mem_BlockingCacheBaseCtrl
 
     case ( state_reg )
                               //       C   C   M   M    C   TAG  TAG  WD EA MRQ CRSP M   DTA DTA DTA  RD   RD  MREQ
-                              //       REQ RSP REQ RSP  REQ REN  WEN  MX EN ADR TYPE RSP ARR ARR ARR  DTA  WR  TYPE
-                              //       RDY VAL VAL RDY  EN       |    |  |  MX  |    EN  REN WEN WBEN REN  MX  |  
+                              //       REQ RSP REQ RSP  REG REN  WEN  MX EN ADR TYPE RSP ARR ARR ARR  REG  WR  TYPE
+                              //       RDY VAL VAL RDY  EN       |    |  |  MX  |    EN  REN WEN WBEN EN   MX  |  
       STATE_IDLE              :set_cs( y,  n,  n,  n,   y,  n,   n,   x, n,  x, tx,  n,  n,  n,  nwb, n,   wx, tx  );
-      STATE_TAG_CHECK         :set_cs( n,  n,  n,  n,   n,  y,   n,   x, n,  x, tx,  n,  n,  n,  nwb, n,   wx, tx  );
+      STATE_TAG_CHECK         :set_cs( n,  n,  n,  n,   n,  y,   n,   x, y,  x, tx,  n,  n,  n,  nwb, n,   wx, tx  );
       STATE_INIT_DATA_ACCESS  :set_cs( n,  n,  n,  n,   n,  n,   y,   r, n,  x, in,  n,  n,  y,   wb, n,   dm, tx  );
       STATE_WAIT              :set_cs( n,  y,  n,  n,   n,  n,   n,   x, n,  x, wtr, n,  n,  n,  nwb, n,  wtm, tx  );
       STATE_READ_DATA_ACCESS  :set_cs( n,  n,  n,  n,   n,  y,   n,   x, n,  x, rd,  n,  y,  n,  nwb, y,  rwm, tx  );
@@ -388,6 +413,9 @@ module lab3_mem_BlockingCacheBaseCtrl
       STATE_REFILL_REQUEST    :set_cs( n,  n,  y,  n,   n,  n,   n,   x, n,  a, tx,  n,  n,  n,  nwb, n,   wx, rd  );
       STATE_REFILL_WAIT       :set_cs( n,  n,  n,  y,   n,  n,   n,   x, n,  x, tx,  y,  n,  n,  nwb, n,   wx, tx  );
       STATE_REFILL_UPDATE     :set_cs( n,  n,  n,  n,   n,  n,   y,   m, n,  x, tx,  n,  n,  y,  all, n,   wx, tx  );
+      STATE_EVICT_PREPARE     :set_cs( n,  n,  n,  n,   n,  n,   n,   x, y,  x, tx,  n,  y,  n,  nwb, y,   wx, tx  );
+      STATE_EVICT_REQUEST     :set_cs( n,  n,  y,  n,   n,  n,   n,   x, n,  e, tx,  n,  n,  n,  nwb, n,   wx, wr  );
+      STATE_EVICT_WAIT        :set_cs( n,  n,  n,  y,   n,  n,   n,   x, n,  x, tx,  n,  n,  n,  nwb, n,   wx, tx  );
       default                 :set_cs( n,  n,  n,  n,   n,  n,   n,   x, n,  x, tx,  n,  n,  n,  nwb, n,   wx, tx  );
     endcase
 
