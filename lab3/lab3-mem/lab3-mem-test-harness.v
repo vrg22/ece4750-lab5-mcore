@@ -380,14 +380,12 @@ module top;
     init_port( c_req_in, 8'h00, 32'h00000000, 2'd0, 32'h0a0b0c0d, c_resp_in, 8'h00, 2'd0, 32'h???????? ); // write word  0x00000000
     init_port( c_req_in, 8'h00, 32'h00000004, 2'd0, 32'h000b0c0d, c_resp_in, 8'h00, 2'd0, 32'h???????? ); // write word  0x00000004
     init_port( c_req_in, 8'h00, 32'h00000008, 2'd0, 32'h00000c0d, c_resp_in, 8'h00, 2'd0, 32'h???????? ); // write word  0x00000008
-    //init_port( c_req_in, 8'h00, 32'h0000000c, 2'd0, 32'h0000000d, c_resp_in, 8'h00, 2'd0, 32'h???????? ); // write word  0x0000000c
-    //init_port( c_req_in, 8'h00, 32'h00000010, 2'd0, 32'h0000000e, c_resp_in, 8'h00, 2'd0, 32'h???????? ); // write word  0x00000010
+
 
     init_port( c_req_rd, 8'h01, 32'h00000000, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h0a0b0c0d ); // read  word  0x00000000
     init_port( c_req_rd, 8'h01, 32'h00000004, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h000b0c0d ); // read  word  0x00000004
     init_port( c_req_rd, 8'h01, 32'h00000008, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h00000c0d ); // read  word  0x00000008
-    //init_port( c_req_rd, 8'h01, 32'h0000000c, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h0000000d ); // read  word  0x0000000c
-    //init_port( c_req_rd, 8'h01, 32'h00000010, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h0000000e ); // read  word  0x0000000c
+
 
     run_test;
   end

@@ -344,6 +344,12 @@ module lab3_mem_BlockingCacheBaseCtrl
 
   localparam nwb = 16'd0;
 
+  logic [idw-1:0] idx;
+  assign idx = cachereq_addr[idw+4-1:4];
+
+  logic [1:0] off;
+  assign off = cachereq_addr[3:2];
+
   logic [1:0] rwm;
   assign rwm = cachereq_addr[3:2];
 
@@ -378,18 +384,15 @@ module lab3_mem_BlockingCacheBaseCtrl
   end
 
   logic [15:0] wb;
-  logic [1:0]  wsel;
-
-  assign wsel = cachereq_addr[3:2];     
-
   always @(*) begin
-    case ( cachereq_addr[3:2] )
+    case ( off] )
       00: wb = 16'h000f;
       01: wb = 16'h00f0;
       10: wb = 16'h0f00;
       11: wb = 16'hf000;
     endcase
   end
+  
   localparam all = 16'hffff;
 
   localparam r = 1'b0;
