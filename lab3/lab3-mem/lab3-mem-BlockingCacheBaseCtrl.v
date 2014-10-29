@@ -130,7 +130,7 @@ module lab3_mem_BlockingCacheBaseCtrl
         if ( cachereq_type == `VC_MEM_REQ_MSG_TYPE_WRITE_INIT) begin
           state_next = STATE_INIT_DATA_ACCESS;
         end
-        else if ( cachereq_type == `VC_MEM_REQ_MSG_TYPE_READ && tag_match) begin
+        else if ( cachereq_type == `VC_MEM_REQ_MSG_TYPE_READ && tag_match && v_read_data) begin
           state_next = STATE_READ_DATA_ACCESS;
         end
         else begin
@@ -228,12 +228,24 @@ module lab3_mem_BlockingCacheBaseCtrl
   localparam n = 1'b0;
   localparam x = 1'bx;
 
+  assign v_read_addr  = cachereq_addr[7:4];
+  assign d_read_addr  = cachereq_addr[7:4];
   assign v_write_addr = cachereq_addr[7:4];
   assign d_write_addr = cachereq_addr[7:4];
 
   always @(*) begin
-    if ( state_reg == STATE_INIT_DATA_ACCESS ) begin
+    if ( state_reg == STATE_IDLE ) begin
+      v_write_en = n;
+      d_write_en = n;
+    end
+    else if ( state_reg == STATE_TAG_CHECK ) begin
+      v_write_en = n;
+      d_write_en = n;
+    end
+    else if ( state_reg == STATE_INIT_DATA_ACCESS ) begin
       v_write_en = y;
+      v_write_data = 1'b1;
+
       d_write_en = n;
     end
     else begin
