@@ -202,7 +202,8 @@ module lab3_mem_BlockingCacheBase
       ctrl.STATE_TAG_CHECK:              vc_trace.append_str( trace_str, "(TC)" );
       ctrl.STATE_INIT_DATA_ACCESS:       vc_trace.append_str( trace_str, "(IN)" );
       ctrl.STATE_WAIT:                   vc_trace.append_str( trace_str, "(W )" );
-      ctrl.STATE_READ_DATA_ACCESS:        vc_trace.append_str( trace_str, "(RD)" );
+      ctrl.STATE_READ_DATA_ACCESS:       vc_trace.append_str( trace_str, "(RD)" );
+      ctrl.STATE_WRITE_DATA_ACCESS:      vc_trace.append_str( trace_str, "(WR)" );
       default:                           vc_trace.append_str( trace_str, "(? )" );
 
     endcase

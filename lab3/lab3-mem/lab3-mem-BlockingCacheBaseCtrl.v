@@ -127,11 +127,14 @@ module lab3_mem_BlockingCacheBaseCtrl
           state_next = STATE_IDLE;
         end
       STATE_TAG_CHECK:
-        if ( cachereq_type == `VC_MEM_REQ_MSG_TYPE_WRITE_INIT) begin
+        if ( cachereq_type == `VC_MEM_REQ_MSG_TYPE_WRITE_INIT ) begin
           state_next = STATE_INIT_DATA_ACCESS;
         end
-        else if ( cachereq_type == `VC_MEM_REQ_MSG_TYPE_READ && tag_match && v_read_data) begin
+        else if ( cachereq_type == `VC_MEM_REQ_MSG_TYPE_READ && tag_match && v_read_data ) begin
           state_next = STATE_READ_DATA_ACCESS;
+        end
+        else if ( cachereq_type == `VC_MEM_RESP_MSG_TYPE_WRITE && tag_match && v_read_data ) begin
+          state_next = STATE_WRITE_DATA_ACCESS;
         end
         else begin
           state_next = STATE_IDLE;
@@ -155,6 +158,14 @@ module lab3_mem_BlockingCacheBaseCtrl
         else begin
           state_next = STATE_WAIT;
           state_prev = STATE_READ_DATA_ACCESS;
+        end
+      STATE_WRITE_DATA_ACCESS:
+        if ( cacheresp_val && cacheresp_rdy ) begin
+          state_next = STATE_IDLE;
+        end
+        else begin
+          state_next = STATE_WAIT;
+          state_prev = STATE_WRITE_DATA_ACCESS;
         end
       default:
         state_next = STATE_IDLE;
@@ -246,7 +257,12 @@ module lab3_mem_BlockingCacheBaseCtrl
       v_write_en = y;
       v_write_data = 1'b1;
 
-      d_write_en = n;
+      d_write_en = y;
+      d_write_data = 1'b1;
+    end
+    else if ( state_reg == STATE_WRITE_DATA_ACCESS ) begin
+      d_write_en = y;
+      d_write_data = 1'b1;
     end
     else begin
       v_write_en = n;
@@ -315,16 +331,23 @@ module lab3_mem_BlockingCacheBaseCtrl
   localparam wr = 3'd1;
   localparam in = 3'd2;
   localparam tx = 3'dx;
-  logic [2:0] wt;
+  logic [2:0] wtr;
+  logic [2:0] wtm;
   always @(*) begin
     if (state_prev == STATE_INIT_DATA_ACCESS) begin
-      wt = in;
+      wtr = in;
+      wtm = dm;
     end
     else if (state_prev == STATE_READ_DATA_ACCESS) begin
-      wt = rd;
+      wtr = rd;
+      wtm = dm;
+    end
+    else if (state_prev == STATE_WRITE_DATA_ACCESS) begin
+      wtr = wr;
+      wtm = rwm;
     end
     else begin
-      wt = tx;
+      wtr = tx;
     end
   end
 
@@ -342,8 +365,9 @@ module lab3_mem_BlockingCacheBaseCtrl
       STATE_IDLE              :set_cs( y,  n,  n,  n,   y,  n,   n,   x, n,  x, tx,  n,  n,  n,  nwb, n,   wx, tx  );
       STATE_TAG_CHECK         :set_cs( n,  n,  n,  n,   n,  y,   n,   x, n,  x, tx,  n,  n,  n,  nwb, n,   wx, tx  );
       STATE_INIT_DATA_ACCESS  :set_cs( n,  n,  n,  n,   n,  n,   y,   r, n,  x, in,  n,  n,  y,   wb, n,   dm, tx  );
-      STATE_WAIT              :set_cs( n,  y,  n,  n,   n,  n,   n,   x, n,  x, wt,  n,  n,  n,  nwb, n,   dm, tx  );
+      STATE_WAIT              :set_cs( n,  y,  n,  n,   n,  n,   n,   x, n,  x, wtr, n,  n,  n,  nwb, n,  wtm, tx  );
       STATE_READ_DATA_ACCESS  :set_cs( n,  n,  n,  n,   n,  y,   n,   x, n,  x, rd,  n,  y,  n,  nwb, y,  rwm, tx  );
+      STATE_WRITE_DATA_ACCESS :set_cs( n,  n,  n,  n,   n,  n,   n,   r, n,  x, wr,  n,  n,  y,   wb, n,   wx, tx  );
       default                 :set_cs( n,  n,  n,  n,   n,  n,   n,   x, n,  x, tx,  n,  n,  n,  nwb, n,   wx, tx  );
     endcase
 
