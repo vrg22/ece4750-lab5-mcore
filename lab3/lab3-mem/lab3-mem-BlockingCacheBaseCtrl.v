@@ -366,7 +366,7 @@ module lab3_mem_BlockingCacheBaseCtrl
     end
     else if (state_prev == STATE_READ_DATA_ACCESS) begin
       wtr = rd;
-      wtm = dm;
+      wtm = rwm;
     end
     else if (state_prev == STATE_WRITE_DATA_ACCESS) begin
       wtr = wr;
