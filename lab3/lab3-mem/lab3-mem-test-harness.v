@@ -457,20 +457,35 @@ module top;
   end
   `VC_TEST_CASE_END
 
+  //----------------------------------------------------------------------
+  // Basic Test Case #4: Read Hit Path (dirty)
+  //----------------------------------------------------------------------
+
   `VC_TEST_CASE_BEGIN( 4, "basic test case 4: read hit path (dirty miss)" )
   begin
     init_test_case( 0, 0, 0 );
-    load_mem( 32'h00000100, 32'heeeeeeee );
+    load_mem( 32'h00000100, 128'h00000004000000030000000200000001 );
+
 
     // Initialize Port
 
     //         ------------- memory request --------------------  --------- memory response ----------
     //         type      opaque addr          len   data          type       opaque len   data
 
-    init_port( c_req_in, 8'h00, 32'h00000000, 2'd0, 32'h0a0b0c0d, c_resp_in, 8'h00, 2'd0, 32'h???????? ); // write word  0x00000000
-    init_port( c_req_wr, 8'h01, 32'h00000004, 2'd0, 32'hdeadbeef, c_resp_wr, 8'h01, 2'd0, 32'h???????? ); // write word  0x00000004
-    init_port( c_req_rd, 8'h01, 32'h00000004, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'hdeadbeef ); // read and kick dirty cache
+    init_port( c_req_in, 8'h00, 32'h00000000, 2'd0, 32'h0a0b0c0d, c_resp_in, 8'h00, 2'd0, 32'h???????? ); 
+    init_port( c_req_in, 8'h00, 32'h00000004, 2'd0, 32'h0a000000, c_resp_in, 8'h00, 2'd0, 32'h???????? ); 
+    init_port( c_req_wr, 8'h01, 32'h00000008, 2'd0, 32'h12345678, c_resp_wr, 8'h01, 2'd0, 32'h???????? );
 
+    init_port( c_req_rd, 8'h01, 32'h00000100, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h00000001 );
+    //init_port( c_req_rd, 8'h01, 32'h00000104, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h00000002 );
+    //init_port( c_req_rd, 8'h01, 32'h00000108, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h00000003 );
+    //init_port( c_req_rd, 8'h01, 32'h0000010c, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h00000004 );
+    //init_port( c_req_wr, 8'h01, 32'h0000010c, 2'd0, 32'h00000005, c_resp_wr, 8'h01, 2'd0, 32'h???????? );
+    //init_port( c_req_rd, 8'h01, 32'h00000000, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h0a0b0c0d );
+    //init_port( c_req_rd, 8'h01, 32'h00000004, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h0a000000 );
+    //init_port( c_req_rd, 8'h01, 32'h00000008, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h12345678 );
+
+    //init_port( c_req_rd, 8'h01, 32'h0000010c, 2'd0, 32'h????????, c_resp_rd, 8'h01, 2'd0, 32'h00000005 );
 
     run_test;
   end

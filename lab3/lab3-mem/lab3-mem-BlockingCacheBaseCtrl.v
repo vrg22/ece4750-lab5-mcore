@@ -290,6 +290,24 @@ module lab3_mem_BlockingCacheBaseCtrl
       d_write_en = y;
       d_write_data = 1'b1;
     end
+    else if ( state_reg == STATE_REFILL_REQUEST ) begin
+      v_write_en = y;
+      v_write_data = 1'b0;
+    end
+    else if ( state_reg == STATE_EVICT_REQUEST ) begin
+      v_write_en = y;
+      v_write_data = 1'b0;
+
+      d_write_en = y;
+      d_write_data = 1'b0;
+    end
+    else if ( state_reg == STATE_REFILL_UPDATE ) begin
+      v_write_en = y;
+      v_write_data = 1'b1;
+
+      d_write_en = y;
+      d_write_data = 1'b0;
+    end
     else begin
       v_write_en = n;
       d_write_en = n;
@@ -416,7 +434,7 @@ module lab3_mem_BlockingCacheBaseCtrl
       STATE_REFILL_REQUEST    :set_cs( n,  n,  y,  n,   n,  n,   n,   x, n,  a, tx,  n,  n,  n,  nwb, n,   wx, rd  );
       STATE_REFILL_WAIT       :set_cs( n,  n,  n,  y,   n,  n,   n,   x, n,  x, tx,  y,  n,  n,  nwb, n,   wx, tx  );
       STATE_REFILL_UPDATE     :set_cs( n,  n,  n,  n,   n,  n,   y,   m, n,  x, tx,  n,  n,  y,  all, n,   wx, tx  );
-      STATE_EVICT_PREPARE     :set_cs( n,  n,  n,  n,   n,  n,   n,   x, y,  x, tx,  n,  y,  n,  nwb, y,   wx, tx  );
+      STATE_EVICT_PREPARE     :set_cs( n,  n,  n,  n,   n,  n,   n,   x, y,  e, tx,  n,  y,  n,  nwb, y,   wx, tx  );
       STATE_EVICT_REQUEST     :set_cs( n,  n,  y,  n,   n,  n,   n,   x, n,  e, tx,  n,  n,  n,  nwb, n,   wx, wr  );
       STATE_EVICT_WAIT        :set_cs( n,  n,  n,  y,   n,  n,   n,   x, n,  x, tx,  n,  n,  n,  nwb, n,   wx, tx  );
       default                 :set_cs( n,  n,  n,  n,   n,  n,   n,   x, n,  x, tx,  n,  n,  n,  nwb, n,   wx, tx  );
