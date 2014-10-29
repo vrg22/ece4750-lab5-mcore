@@ -177,7 +177,7 @@ module lab3_mem_BlockingCacheBaseDpath
     .write_en       (data_array_wen),
     .write_byte_en  (data_array_wben),
     .write_addr     (idx),
-    .write_data     (cache_data)
+    .write_data     (write_data)
   );
 
   vc_EqComparator #(abw-(idw+odw+2)) tag_comparator
@@ -227,12 +227,12 @@ module lab3_mem_BlockingCacheBaseDpath
   );
 
   logic [dbw-1:0] cacheresp_msg_data;
-  vc_Mux5 #(dbw) read_byte_mux
+  vc_Mux5 #(dbw) read_word_mux
   (
-    .in0      (valid_cache_data[4*dbw-1:3*dbw]),
-    .in1      (valid_cache_data[3*dbw-1:2*dbw]),
-    .in2      (valid_cache_data[2*dbw-1:dbw]),
-    .in3      (valid_cache_data[dbw-1:0]),
+    .in0      (valid_cache_data[dbw-1:0]),
+    .in1      (valid_cache_data[2*dbw-1:dbw]),
+    .in2      (valid_cache_data[3*dbw-1:2*dbw]),
+    .in3      (valid_cache_data[4*dbw-1:3*dbw]),
     .in4      (32'b0),
     .sel      (read_word_mux_sel),
     .out      (cacheresp_msg_data)
