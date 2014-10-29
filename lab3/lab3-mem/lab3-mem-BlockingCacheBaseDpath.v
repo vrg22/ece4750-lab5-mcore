@@ -9,7 +9,10 @@
 `include "vc-srams.v"
 `include "vc-arithmetic.v"
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> hit-path-akshay
 module lab3_mem_BlockingCacheBaseDpath
 #(
   parameter size    = 256,            // Cache size in bytes
@@ -21,177 +24,151 @@ module lab3_mem_BlockingCacheBaseDpath
   // local parameters not meant to be set from outside
   parameter dbw     = 32,             // Short name for data bitwidth
   parameter abw     = 32,             // Short name for addr bitwidth
-  parameter clw     = 128,            // Short name for cacheline bitwidth
+  parameter clw     = 128,            // Short name for cacheline bitwidth 
   parameter nblocks = size*8/clw,     // Number of blocks in the cache
   parameter idw     = $clog2(nblocks),// Short name for index width
 
-  parameter o = p_opaque_nbits
+  parameter o       = p_opaque_nbits,
+  parameter lww     = clw/dbw,         // Short name for words in line
+  parameter odw     = $clog2(lww)     // Short name for offset width
 )
 (
+  // Clock and reset signals
   input  logic                                             clk,
   input  logic                                             reset,
 
-  // Cache Request
+  // Top half of datapath control signals
+  input  logic [`VC_MEM_REQ_MSG_NBITS(o,abw,dbw)-1:0]      cachereq_msg, 
+  input  logic                                             cachereq_en, 
 
-  input  logic [`VC_MEM_REQ_MSG_NBITS(o,abw,dbw)-1:0]      cachereq_msg,
+  output logic [2:0]                                       cachereq_type, 
+  output logic [abw-1:0]                                   cachereq_addr,
 
-  // Cache Response
-
-  output logic [`VC_MEM_RESP_MSG_NBITS(o,dbw)-1:0]         cacheresp_msg,
-
-  // Memory Request
-
-  output logic [`VC_MEM_REQ_MSG_NBITS(o,abw,clw)-1:0]      memreq_msg,
-
-  // Memory Response
+  input  logic                                             write_data_mux_sel,
+  input  logic                                             tag_array_ren, 
+  input  logic                                             tag_array_wen, 
+  
+  output logic                                             tag_match,
+  input  logic                                             evict_addr_reg_en,
+  input  logic                                             memreq_addr_mux_sel, 
+  input  logic [2:0]                                       cacheresp_type,
+  
+  //Bottom half of datapath control signals  
 
   input  logic [`VC_MEM_RESP_MSG_NBITS(o,clw)-1:0]         memresp_msg,
+  input  logic                                             memresp_en,
+  input  logic                                             data_array_ren,
+  input  logic                                             data_array_wen,
+  input  logic [15:0]                                      data_array_wben,
+  input  logic                                             read_data_reg_en,
+  input  logic [2:0]                                       read_word_mux_sel,
+  input  logic [2:0]                                       memreq_type, 
+  output logic [`VC_MEM_RESP_MSG_NBITS(o,dbw)-1:0]         cacheresp_msg,
 
-
-  // control signals (ctrl->dpath)
-
-  input logic         cachereq_en,
-  input logic         memresp_en,
-  input logic         refill_mux_sel,
-  input logic         tag_array_wen,
-  input logic         tag_array_ren,
-  input logic         data_array_wen,
-  input logic         data_array_ren,
-  input logic [15:0]  data_array_wben,                  
-  input logic         read_data_reg_en,
-  input logic         read_tag_reg_en,
-  input logic         memreq_tag_mux_sel,
-  input logic [1:0]   read_byte_mux_sel,
-  input logic [2:0]   cacheresp_type,
-  input logic [2:0]   memreq_type,
-
-  // status signals (dpath->ctrl)
-
-  output logic [2:0]      cachereq_type,
-  output logic [abw-1:0]  cachereq_addr,
-  output logic            tag_match
-
+  output logic [`VC_MEM_REQ_MSG_NBITS(o,abw,clw)-1:0]      memreq_msg
 );
 
+//-----------------------------------------------------------------------------
+// Stage 0
+//-----------------------------------------------------------------------------
 
-  //--------------------------------------------------------------------
-  // Stage 0
-  //--------------------------------------------------------------------
-
-
-  logic [2:0]     cachereq_type_temp;
-  logic [o-1:0]   cachereq_opaque;
-  logic [abw-1:0] cachereq_addr_temp;
-  logic [abw-1:0] cachereq_addr_out;
-  logic [dbw-1:0] cachereq_data_temp;
-  logic [dbw-1:0] cachereq_data;
-  logic [clw-1:0] memresp_data_temp;
-  logic [clw-1:0] memresp_data;
-
-
-  // Unpack Cache Request Message
-
+  logic [2:0]     cachereq_type_in;
+  logic [abw-1:0] cachereq_addr_in;
+  logic [dbw-1:0] cachereq_data_reg_in;
+   
+  logic [7:0] opq;
   vc_MemReqMsgUnpack#(o,abw,dbw) memreq_msg_unpack
   (
-    .msg    (cachereq_msg),
-    .type_  (cachereq_type_temp),
-    .opaque (cachereq_opaque),
-    .addr   (cachereq_addr_temp),
-    .len    (),
-    .data   (cachereq_data_temp)
+    .msg      (cachereq_msg),
+    .type_    (cachereq_type_in),
+    .opaque   (opq),
+    .addr     (cachereq_addr_in),
+    .len      (),
+    .data     (cachereq_data_reg_in)
   );
 
-  // Unpack Memory Response Message
-
+  logic [clw-1:0] memresp_data_in;
   vc_MemRespMsgUnpack#(o,clw) memresp_msg_unpack
   (
-    .msg     (memresp_msg),
-    .type_   (),
-    .opaque  (),
-    .len     (),
-    .data    (memresp_data_temp)
+    .msg      (memresp_msg),
+    .type_    (),
+    .opaque   (),
+    .len      (),
+    .data     (memresp_data_in)
   );
 
 
- vc_EnResetReg #(3) cachereq_type_reg
+  logic [7:0] pack_opq;
+  vc_EnReg #(8) cachereq_opaque_reg
   (
-    .clk    (clk),
-    .reset  (reset),
-    .en     (cachereq_en),
-    .d      (cachereq_type_temp),
-    .q      (cachereq_type)
-  );
+    .clk      (clk),
+    .reset    (reset),
+    .en       (cachereq_en),
+    .d        (opq),
+    .q        (pack_opq)
+  );  
 
-  vc_EnResetReg #(abw) cachereq_addr_reg
+  vc_EnReg #(3) cachereq_type_reg
   (
-    .clk    (clk),
-    .reset  (reset),
-    .en     (cachereq_en),
-    .d      (cachereq_addr_temp),
-    .q      (cachereq_addr_out)
+    .clk      (clk),
+    .reset    (reset),
+    .en       (cachereq_en),
+    .d        (cachereq_type_in),
+    .q        (cachereq_type)
   );
-
-  assign cachereq_addr= cachereq_addr_out;
-
-  vc_EnResetReg #(o) cachereq_opaque_reg
+ 
+  vc_EnReg #(abw) cachereq_addr_reg
   (
-    .clk    (clk),
-    .reset  (reset),
-    .en     (cachereq_en),
-    .d      (cachereq_opaque),
-    .q      ()
+    .clk      (clk),
+    .reset    (reset),
+    .en       (cachereq_en),
+    .d        (cachereq_addr_in),
+    .q        (cachereq_addr)
   );
 
-  vc_EnResetReg #(dbw) cachereq_data_reg
+  logic [dbw-1:0] cachereq_data;
+  vc_EnReg #(dbw) cachereq_data_reg 
   (
-    .clk    (clk),
-    .reset  (reset),
-    .en     (cachereq_en),
-    .d      (cachereq_data_temp),
-    .q      (cachereq_data)
+    .clk      (clk),
+    .reset    (reset),
+    .en       (cachereq_en),
+    .d        (cachereq_data_reg_in),
+    .q        (cachereq_data)
   );
 
-  vc_EnResetReg #(clw) memresp_data_reg
+  logic [clw-1:0] memresp_data;
+  vc_EnReg #(clw) memresp_data_reg
   (
-    .clk    (clk),
-    .reset  (reset),
-    .en     (cachereq_en),
-    .d      (memresp_data_temp),
-    .q      (memresp_data)
+    .clk      (clk),
+    .reset    (reset),
+    .en       (memresp_en),
+    .d        (memresp_data_in),
+    .q        (memresp_data)
   );
-
-
-  // Write data 
 
   logic [clw-1:0] repl_cachereq;
-  logic [clw-1:0] write_data;
-
+  logic [clw-1:0] wd;
+  
   assign repl_cachereq= {cachereq_data, cachereq_data, cachereq_data, cachereq_data};
-
+  
   vc_Mux2 #(clw) refill_mux
   (
-    .in0  (repl_cachereq),
-    .in1  (memresp_data),
-    .sel  (refill_mux_sel),
-    .out  (write_data)
+    .in0      (repl_cachereq),
+    .in1      (memresp_data),
+    .sel      (write_data_mux_sel),
+    .out      (wd)
   );
-
-
-  // retrieve idx and tag fields
-
-  logic [idw-1:0]       idx;
-  logic [abw-1-idw-4:0] tag;
-
-  assign idx= cachereq_addr_out[idw+4-1:4];
-  assign tag= cachereq_addr_out[abw-1:idw+4]; 
-
-
+  
+  logic [idw-1:0]             idx;
+  logic [abw-1-(idw+odw+2):0] tag;
+      
+  assign idx = cachereq_addr[idw+4-1:4];
+  assign tag = cachereq_addr[abw-1:idw+4];  
+  
   // SRAMs
 
-  logic [abw-1-idw-4:0]   read_tag;
-  logic [clw-1:0]         read_data;
-
-  vc_CombinationalSRAM_1rw #(abw-idw-4,nblocks) tag_array
+  logic [abw-1-(idw+odw+2):0]   read_tag;
+  vc_CombinationalSRAM_1rw #(abw-(idw+odw+2),nblocks) tag_array
   (
     .clk            (clk),
     .reset          (reset),
@@ -204,89 +181,86 @@ module lab3_mem_BlockingCacheBaseDpath
     .write_data     (tag)
   );
 
+  logic [clw-1:0]             cache_data;
   vc_CombinationalSRAM_1rw #(clw,nblocks) data_array
   (
     .clk            (clk),
     .reset          (reset),
     .read_en        (data_array_ren),
     .read_addr      (idx),
-    .read_data      (read_data),
+    .read_data      (cache_data),
     .write_en       (data_array_wen),
     .write_byte_en  (data_array_wben),
     .write_addr     (idx),
-    .write_data     (write_data)
+    .write_data     (wd)
   );
 
-
-  vc_EqComparator #(abw-idw-4) tag_comparator
+  vc_EqComparator #(abw-(idw+odw+2)) tag_comparator
   (
     .in0            (tag),
     .in1            (read_tag),
     .out            (tag_match)
   );
 
+  logic [abw-1:0] mk_addr;
 
+  // 2 bits zero for offset alignment
+  // 2 bits zero for byte alignment
+  assign  mk_addr = {tag, idx, 4'b0};
 
-  //--------------------------------------------------------------------
-  // Stage 1
-  //--------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+// Stage 1
+//-----------------------------------------------------------------------------
 
- 
-  logic [clw-1:0]       read_data_temp;
-  logic [abw-1-idw-4:0] read_tag_out;  
-  logic [abw-1-idw-4:0] tag_out;       
-  logic [abw-1:0]       addr_out;  
-  logic [dbw-1:0]       read_data_out;    
-
-
-  vc_EnResetReg #(clw) read_data_reg
+  logic [abw-1:0] evict_addr;
+  vc_EnResetReg #(abw) evict_tag_reg
   (
     .clk    (clk),
     .reset  (reset),
-    .en     (read_data_reg_en),
-    .d      (read_data),
-    .q      (read_data_temp)
+    .en     (evict_addr_reg_en),
+    .d      (mk_addr),
+    .q      (evict_addr)
   );
 
-  vc_EnResetReg #(abw-idw-4) read_tag_reg
+  logic [abw-1:0] memreq_addr;
+  vc_Mux2 #(abw) memreq_addr_mux
   (
-    .clk    (clk),
-    .reset  (reset),
-    .en     (read_tag_reg_en),
-    .d      (read_tag),
-    .q      (read_tag_out)
+    .in0      (evict_addr),
+    .in1      (mk_addr),
+    .sel      (memreq_addr_mux_sel),
+    .out      (memreq_addr)
   );
 
-  vc_Mux2 #(abw-idw-4) memreq_tag_mux
+  logic [clw-1:0] valid_cache_data;
+  vc_EnReg #(clw) read_data_reg
   (
-    .in0  (read_tag_out),
-    .in1  (tag),
-    .sel  (memreq_tag_mux_sel),
-    .out  (tag_out)
+    .clk      (clk),
+    .reset    (reset),
+    .en       (read_data_reg_en),
+    .d        (cache_data),
+    .q        (valid_cache_data)
   );
 
-  assign addr_out= {tag_out,idx,4'b0};
-
-
-  vc_Mux4 #(dbw) read_byte_mux
+  logic [dbw-1:0] cacheresp_msg_data;
+  vc_Mux5 #(dbw) read_word_mux
   (
-    .in0  (read_data_temp[dbw-1:0]),
-    .in1  (read_data_temp[2*dbw-1:dbw]),
-    .in2  (read_data_temp[3*dbw-1:2*dbw]),
-    .in3  (read_data_temp[4*dbw-1:3*dbw]),
-    .sel  (read_byte_mux_sel),
-    .out  (read_data_out)
+    .in0      (valid_cache_data[dbw-1:0]),
+    .in1      (valid_cache_data[2*dbw-1:dbw]),
+    .in2      (valid_cache_data[3*dbw-1:2*dbw]),
+    .in3      (valid_cache_data[4*dbw-1:3*dbw]),
+    .in4      (32'b0),
+    .sel      (read_word_mux_sel),
+    .out      (cacheresp_msg_data)
   );
-
 
   // Pack Cache Response Message
 
   vc_MemRespMsgPack #(o,dbw) cacheresp_msg_pack
   (
     .type_    (cacheresp_type),
-    .opaque   (8'b0),
+    .opaque   (pack_opq),
     .len      (2'b0),
-    .data     (read_data_out),
+    .data     (cacheresp_msg_data),
     .msg      (cacheresp_msg)
   );
 
@@ -296,12 +270,12 @@ module lab3_mem_BlockingCacheBaseDpath
   (
     .type_    (memreq_type),
     .opaque   (8'b0),
-    .addr     (addr_out),
+    .addr     (memreq_addr),
     .len      (4'b0),
-    .data     (read_data_temp),
+    .data     (valid_cache_data),
     .msg      (memreq_msg)
   );
-
+>>>>>>> hit-path-akshay
 
 endmodule
 

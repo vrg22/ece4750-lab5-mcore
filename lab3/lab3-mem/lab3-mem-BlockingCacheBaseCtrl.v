@@ -7,6 +7,7 @@
 
 `include "vc-mem-msgs.v"
 `include "vc-assert.v"
+`include "vc-regfiles.v"
 
 module lab3_mem_BlockingCacheBaseCtrl
 #(
@@ -21,94 +22,75 @@ module lab3_mem_BlockingCacheBaseCtrl
   parameter abw     = 32,             // Short name for addr bitwidth
   parameter clw     = 128,            // Short name for cacheline bitwidth
   parameter nblocks = size*8/clw,     // Number of blocks in the cache
+  parameter idw     = $clog2(nblocks),// Short name for index width
 
   parameter o = p_opaque_nbits
 )
 (
-  input  logic                                             clk,
-  input  logic                                             reset,
+  input   logic                                            clk,
+  input   logic                                            reset,
 
   // Cache Request
 
-  input  logic                                             cachereq_val,
-  output logic                                             cachereq_rdy,
+  input   logic                                            cachereq_val,
+  output  logic                                            cachereq_rdy,
 
   // Cache Response
 
-  output logic                                             cacheresp_val,
-  input  logic                                             cacheresp_rdy,
+  output  logic                                            cacheresp_val,
+  input   logic                                            cacheresp_rdy,
 
   // Memory Request
 
-  output logic                                             memreq_val,
-  input  logic                                             memreq_rdy,
+  output  logic                                            memreq_val,
+  input   logic                                            memreq_rdy,
 
   // Memory Response
+  
+  input   logic                                            memresp_val,
+  output  logic                                            memresp_rdy,
 
-  input  logic                                             memresp_val,
-  output logic                                             memresp_rdy,
+  output  logic                                            cachereq_en, 
 
-  // Status Signals
+  input   logic [2:0]                                      cachereq_type, 
+  input   logic [abw-1:0]                                  cachereq_addr, 
+  
+  output  logic                                            tag_array_ren, 
+  output  logic                                            tag_array_wen, 
+  
+  input   logic                                            tag_match,
+  output  logic                                            write_data_mux_sel,
+  output  logic                                            evict_addr_reg_en,
+  output  logic                                            memreq_addr_mux_sel, 
+  output  logic [2:0]                                      cacheresp_type,
 
-  input logic [2:0]      cachereq_type,
-  input logic [abw-1:0]  cachereq_addr,
-  input logic            tag_match
-
-  // Control Signals
-
-  output logic         cachereq_en,
-  output logic         memresp_en,
-  output logic         refill_mux_sel,
-  output logic         tag_array_wen,
-  output logic         tag_array_ren,
-  output logic         data_array_wen,
-  output logic         data_array_ren,
-  output logic [15:0]  data_array_wben,                  
-  output logic         read_data_reg_en,
-  output logic         read_tag_reg_en,
-  output logic         memreq_tag_mux_sel,
-  output logic [1:0]   read_byte_mux_sel,
-  output logic [2:0]   cacheresp_type,
-  output logic [2:0]   memreq_type,
+  output  logic                                            memresp_en,
+  output  logic                                            data_array_ren,
+  output  logic                                            data_array_wen,
+  output  logic [15:0]                                     data_array_wben,
+  output  logic                                            read_data_reg_en,
+  output  logic [2:0]                                      read_word_mux_sel,
+  output  logic [2:0]                                      memreq_type
 
  );
-
-
-  //========================================================================
-  // Control and status signal structs (for internal use only)
-  //========================================================================
-
-  // Control signals (ctrl->dpath)
-
-  typedef struct packed {
-
-    logic         cachereq_en,          // Enable for cache request message registers
-    logic         memresp_en,           // Enable for memory response enable register
-    logic         refill_mux_sel,       // Sel for cache line refill mux behind data array
-    logic         tag_array_wen,        // Write enable for tag array
-    logic         tag_array_ren,        // Read enable for tag array
-    logic         data_array_wen,       // Write enable for data array
-    logic         data_array_ren,       // Read enable for data array
-    logic [15:0]  data_array_wben,      // Write byte enable for data array             
-    logic         read_data_reg_en,     // Enable for data array output register
-    logic         read_tag_reg_en,      // Enable for tag array output register
-    logic         memreq_tag_mux_sel,   // Sel for memory request tag mux in front of tag array output register
-    logic [1:0]   read_byte_mux_sel,    // Sel for read byte select mux in front of data array output register
-    logic [2:0]   cacheresp_type,       // read/write/init for cache response message
-    logic [2:0]   memreq_type,          // read/write/init for memory request message
-
-  } lab3_mem_cs_t;
-
 
   //----------------------------------------------------------------------
   // State Definitions
   //----------------------------------------------------------------------
 
-  typedef enum logic [$clog2(4)-1:0] {
+  typedef enum logic [$clog2(12)-1:0] {
     STATE_IDLE,
     STATE_TAG_CHECK,
     STATE_INIT_DATA_ACCESS,
-    STATE_WAIT
+    STATE_READ_DATA_ACCESS,
+    STATE_WRITE_DATA_ACCESS,
+    STATE_WAIT,
+    STATE_EVICT_PREPARE,
+    STATE_EVICT_REQUEST,
+    STATE_EVICT_WAIT,
+    STATE_REFILL_REQUEST,
+    STATE_REFILL_WAIT,
+    STATE_REFILL_UPDATE
   } state_t;
 
 
@@ -118,6 +100,7 @@ module lab3_mem_BlockingCacheBaseCtrl
 
   state_t state_reg;
   state_t state_next;
+  state_t state_prev;
 
   always @( posedge clk ) begin
     if ( reset ) begin
@@ -128,130 +111,232 @@ module lab3_mem_BlockingCacheBaseCtrl
     end
   end
 
+  // State Transition Logic
 
-  //----------------------------------------------------------------------
-  // State Transitions
-  //----------------------------------------------------------------------
-
-
-  always @(*) begin
+    always @(*) begin
 
     state_next = state_reg;
 
     case ( state_reg )
 
-      STATE_IDLE:             if ( cachereq_val && cachereq_rdy ) begin
-                                state_next = STATE_TAG_CHECK;
-                              end
-      STATE_TAG_CHECK: 
-                              if ( 1 ) begin
-                                state_next = STATE_INIT_DATA_ACCESS;
-                              end
-      STATE_INIT_DATA_ACCESS: if ( 1 ) begin
-                                state_next = STATE_WAIT;
-                              end
-
-      STATE_WAIT:             if ( cacheresp_rdy ) begin
-                                state_next = STATE_IDLE;
-                              end
-
+      STATE_IDLE:               
+        if ( cachereq_val && cachereq_rdy ) begin
+          state_next = STATE_TAG_CHECK;
+        end
+        else begin
+          state_next = STATE_IDLE;
+        end
+      STATE_TAG_CHECK:
+        if ( cachereq_type == `VC_MEM_REQ_MSG_TYPE_WRITE_INIT) begin
+          state_next = STATE_INIT_DATA_ACCESS;
+        end
+        else if ( cachereq_type == `VC_MEM_REQ_MSG_TYPE_READ && tag_match) begin
+          state_next = STATE_READ_DATA_ACCESS;
+        end
+        else begin
+          state_next = STATE_IDLE;
+        end
+      STATE_INIT_DATA_ACCESS:
+        if ( cacheresp_val && cacheresp_rdy ) begin
+          state_next = STATE_IDLE;
+        end
+        else begin
+          state_next = STATE_WAIT;
+          state_prev = STATE_INIT_DATA_ACCESS;
+        end
+      STATE_WAIT:
+        if ( cacheresp_val && cacheresp_rdy ) begin
+          state_next = STATE_IDLE;
+        end
+      STATE_READ_DATA_ACCESS:
+        if ( cacheresp_val && cacheresp_rdy ) begin
+          state_next = STATE_IDLE;
+        end
+        else begin
+          state_next = STATE_WAIT;
+          state_prev = STATE_READ_DATA_ACCESS;
+        end
+      default:
+        state_next = STATE_IDLE;
     endcase
-
   end
 
+  // HELPER FOR wben BITS
 
-  //----------------------------------------------------------------------
-  // State Outputs
-  //----------------------------------------------------------------------
-  
-  // CONVENTION FROM DATAPATH DIAGRAM:
-  // top mux line selected by 0, bottom line by max mux-sel value
-  
-  localparam x   = 1'bx;
+  logic [15:0] wb;
+  logic [1:0]  wsel;
+
+  assign wsel = cachereq_addr[3:2];     
+
+  always @(*) begin
+    case ( cachereq_addr[3:2] )
+      00: wb = 16'b0000000000001111;
+      01: wb = 16'b0000000011110000;
+      10: wb = 16'b0000111100000000;
+      11: wb = 16'b1111000000000000;
+    endcase
+  end
+
+  // END HELPER
+
+  // REGISTER FILES
+  logic [$clog2(nblocks)-1:0] v_read_addr;
+  logic [$clog2(nblocks)-1:0] v_write_addr;
+
+  logic v_write_en;
+  logic v_read_data;
+  logic v_write_data;
+
+  vc_ResetRegfile_1r1w #(1,nblocks) valid_regfile
+  (
+    .clk        (clk),
+    .reset      (reset),
+
+    .read_addr  (v_read_addr),
+    .read_data  (v_read_data),
+
+    .write_en   (v_write_en),
+    .write_addr (v_write_addr),
+    .write_data (v_write_data)
+  );
+
+  logic [$clog2(nblocks)-1:0] d_read_addr;
+  logic [$clog2(nblocks)-1:0] d_write_addr;
+
+  logic d_write_en;
+  logic d_read_data;
+  logic d_write_data;
+
+  vc_ResetRegfile_1r1w #(1,nblocks) dirty_regfile
+  (
+    .clk        (clk),
+    .reset      (reset),
+
+    .read_addr  (d_read_addr),
+    .read_data  (d_read_data),
+
+    .write_en   (d_write_en),
+    .write_addr (d_write_addr),
+    .write_data (d_write_data)
+  );
+
+  // END REGISTER FILES
+
+  // SET REGISTER FILES
+
+  localparam y = 1'b1;
+  localparam n = 1'b0;
+  localparam x = 1'bx;
+
+  assign v_write_addr = cachereq_addr[7:4];
+  assign d_write_addr = cachereq_addr[7:4];
+
+  always @(*) begin
+    if ( state_reg == STATE_INIT_DATA_ACCESS ) begin
+      v_write_en = y;
+      d_write_en = n;
+    end
+    else begin
+      v_write_en = n;
+      d_write_en = n;
+    end
+  end
+
+  // END SET REGISTER FILES
+
 
   task set_cs
   (
-    input logic         cs_cachereq_rdy,
-    input logic         cs_cacheresp_val,
-    input logic         cs_memreq_val,
-    input logic         cs_memresp_rdy,
-    input logic         cs_cachereq_en,
-    input logic         cs_memresp_en,
-    input logic         cs_refill_mux_sel,
-    input logic         cs_tag_array_wen,
-    input logic         cs_tag_array_ren,
-    input logic         cs_data_array_wen,
-    input logic         cs_data_array_ren,
-    input logic [15:0]  cs_data_array_wben,                  
-    input logic         cs_read_data_reg_en,
-    input logic         cs_read_tag_reg_en,
-    input logic         cs_memreq_tag_mux_sel,
-    input logic [1:0]   cs_read_byte_mux_sel,
-    input logic [2:0]   cs_cacheresp_type,
-    input logic [2:0]   cs_memreq_type
+    input  logic          cs_cachereq_rdy,
+    input  logic          cs_cacheresp_val,
+    input  logic          cs_memreq_val,
+    input  logic          cs_memresp_rdy,
+    input  logic          cs_cachereq_en, 
+    input  logic          cs_tag_array_ren, 
+    input  logic          cs_tag_array_wen,
+    input  logic          cs_write_data_mux_sel,
+    input  logic          cs_evict_addr_reg_en,
+    input  logic          cs_memreq_addr_mux_sel, 
+    input  logic [2:0]    cs_cacheresp_type,
+    input  logic          cs_memresp_en,
+    input  logic          cs_data_array_ren,
+    input  logic          cs_data_array_wen,
+    input  logic [15:0]   cs_data_array_wben,
+    input  logic          cs_read_data_reg_en,
+    input  logic [1:0]    cs_read_word_mux_sel,
+    input  logic [2:0]    cs_memreq_type
   );
   begin
-    cachereq_rdy          = cs_cachereq_rdy;
-    cacheresp_val         = cs_cacheresp_val;
-    memreq_val            = cs_memreq_val;
-    memresp_rdy           = cs_memresp_rdy;
-    cs.cachereq_en        = cs_cachereq_en;
-    cs.memresp_en         = cs_memresp_en;
-    cs.refill_mux_sel     = cs_refill_mux_sel;
-    cs.tag_array_wen      = cs_tag_array_wen;
-    cs.tag_array_ren      = cs_tag_array_ren;
-    cs.data_array_wen     = cs_data_array_wen;
-    cs.data_array_ren     = cs_data_array_ren;
-    cs.data_array_wben    = cs_data_array_wben;
-    cs.read_data_reg_en   = cs_read_data_reg_en;
-    cs.read_tag_reg_en    = cs_read_tag_reg_en;
-    cs.memreq_tag_mux_sel = cs_memreq_tag_mux_sel;
-    cs.read_byte_mux_sel  = cs_read_byte_mux_sel;
-    cs.cacheresp_type     = cs_cacheresp_type;
-    cs.cs_memreq_type     = cs_memreq_type;
+    cachereq_rdy         =    cs_cachereq_rdy;      
+    cacheresp_val        =    cs_cacheresp_val;      
+    memreq_val           =    cs_memreq_val;    
+    memresp_rdy          =    cs_memresp_rdy;
+    cachereq_en          =    cs_cachereq_en;   
+    tag_array_ren        =    cs_tag_array_ren;      
+    tag_array_wen        =    cs_tag_array_wen;      
+    write_data_mux_sel   =    cs_write_data_mux_sel;            
+    evict_addr_reg_en    =    cs_evict_addr_reg_en;          
+    memreq_addr_mux_sel  =    cs_memreq_addr_mux_sel;            
+    cacheresp_type       =    cs_cacheresp_type;        
+    memresp_en           =    cs_memresp_en;          
+    data_array_ren       =    cs_data_array_ren;        
+    data_array_wen       =    cs_data_array_wen;        
+    data_array_wben      =    cs_data_array_wben;        
+    read_data_reg_en     =    cs_read_data_reg_en;          
+    read_word_mux_sel    =    cs_read_word_mux_sel;          
+    memreq_type          =    cs_memreq_type;    
   end
   endtask
 
+  localparam nwb = 16'dx;
 
-  // Set outputs using a control signal "table"
+  logic [idw:0] rwm;
+  assign rwm = {1'b0 , cachereq_addr[idw+4-1:4]};
 
+  localparam dm = 3'b100;
+  localparam wx = 3'bx;
+
+  localparam ev = 1'b0;
+  localparam ad = 1'b1;
+
+  localparam rd = 3'd0;
+  localparam wr = 3'd1;
+  localparam in = 3'd2;
+  localparam tx = 3'dx;
+  logic [2:0] wt;
   always @(*) begin
-
-    set_cs( x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x );
-
-    case ( state_reg )
-      
-      // cachereq  cacheresp  memreq  memresp  cachereq  memresp  refill  tag_array  tag_array  data_array  data_array  data_array  read_data  read_tag  memreq_tag  read_byte   cacheresp  memreq
-      // rdy       val        val     rdy      en        en       mux_sel wen        ren        wen         ren         wben (16)   reg_en     reg_en    mux_sel     mux_sel (2) type (3)   type (3)
-      
-      STATE_IDLE:               set_cs( 1,  0,  0,  0,  0, 0, x, 0, 0, 0, 0, 16'bx, 0, 0, x, 2'bxx, 3'bxxx, 3'bxxx ); 
-      STATE_TAG_CHECK: 
-                                set_cs( 0,  0,  0,  0,  1, 0, x, 0, 1, 0, 0, 16'bx, 0, 0, x, 2'bxx, 3'bxxx, 3'bxxx ); 
-      STATE_INIT_DATA_ACCESS    set_cs( 0,  0,  0,  0,  1, 0, 0, 1, 0, 1, 0, 16'bx, 0, 0, x, 2'bxx, 3'bxxx, 3'bxxx );            
-      STATE_WAIT:               set_cs( 0,  0,  0,  0,  0, 0, x, 0, 0, 0, 0, 16'bx, 0, 0, x, 2'bxx, 3'bxxx, 3'bxxx ); 
-
-    endcase
-
+    if (state_prev == STATE_INIT_DATA_ACCESS) begin
+      wt = in;
+    end
+    else if (state_prev == STATE_READ_DATA_ACCESS) begin
+      wt = rd;
+    end
+    else begin
+      wt = tx;
+    end
   end
 
 
-  // Unpack cs struct control signals
 
-   assign cachereq_en        = cs.cachereq_en;
-   assign memresp_en         = cs.memresp_en;
-   assign refill_mux_sel     = cs.refill_mux_sel;
-   assign tag_array_wen      = cs.tag_array_wen;
-   assign tag_array_ren      = cs.tag_array_ren;
-   assign data_array_wen     = cs.data_array_wen;
-   assign data_array_ren     = cs.data_array_ren;
-   assign data_array_wben    = cs.data_array_wben;
-   assign read_data_reg_en   = cs.read_data_reg_en;
-   assign read_tag_reg_en    = cs.read_tag_reg_en;
-   assign memreq_tag_mux_sel = cs.memreq_tag_mux_sel;
-   assign read_byte_mux_sel  = cs.read_byte_mux_sel;
-   assign cacheresp_type     = cs.cacheresp_type;
-   assign cs_memreq_type     = cs.memreq_type;
+  localparam r = 1'b0;
+  localparam m = 1'b1;
 
+  always @(*) begin
+
+    case ( state_reg )
+                              //       C   C   M   M    C   TAG  TAG  WD EA MRQ CRSP M   DTA DTA DTA  RD   RD  MREQ
+                              //       REQ RSP REQ RSP  REQ REN  WEN  MX EN ADR TYPE RSP ARR ARR ARR  DTA  WR  TYPE
+                              //       RDY VAL VAL RDY  EN       |    |  |  MX  |    EN  REN WEN WBEN REN  MX  |  
+      STATE_IDLE              :set_cs( y,  n,  n,  n,   y,  n,   n,   x, n,  x, tx,  n,  n,  n,  nwb, n,   wx, tx  );
+      STATE_TAG_CHECK         :set_cs( n,  n,  n,  n,   n,  y,   n,   x, n,  x, tx,  n,  n,  n,  nwb, n,   wx, tx  );
+      STATE_INIT_DATA_ACCESS  :set_cs( n,  n,  n,  n,   n,  n,   y,   r, n,  x, in,  n,  n,  y,   wb, n,   dm, tx  );
+      STATE_WAIT              :set_cs( n,  y,  n,  n,   n,  n,   n,   x, n,  x, wt,  n,  n,  n,  nwb, n,   dm, tx  );
+      STATE_READ_DATA_ACCESS  :set_cs( n,  n,  n,  n,   n,  y,   n,   x, n,  x, rd,  n,  y,  n,  nwb, y,  rwm, tx  );
+      default                 :set_cs( n,  n,  n,  n,   n,  n,   n,   x, n,  x, tx,  n,  n,  n,  nwb, n,   wx, tx  );
+    endcase
+
+  end
+>>>>>>> hit-path-akshay
 
 endmodule
 
