@@ -79,18 +79,18 @@ module lab3_mem_BlockingCacheBaseCtrl
   //----------------------------------------------------------------------
 
   typedef enum logic [$clog2(12)-1:0] {
-    STATE_IDLE,
-    STATE_TAG_CHECK,
-    STATE_INIT_DATA_ACCESS,
-    STATE_READ_DATA_ACCESS,
-    STATE_WRITE_DATA_ACCESS,
-    STATE_WAIT,
-    STATE_EVICT_PREPARE,
-    STATE_EVICT_REQUEST,
-    STATE_EVICT_WAIT,
-    STATE_REFILL_REQUEST,
-    STATE_REFILL_WAIT,
-    STATE_REFILL_UPDATE
+    STATE_IDLE,                     // 0
+    STATE_TAG_CHECK,                // 1      
+    STATE_INIT_DATA_ACCESS,         // 2            
+    STATE_READ_DATA_ACCESS,         // 3            
+    STATE_WRITE_DATA_ACCESS,        // 4              
+    STATE_WAIT,                     // 5
+    STATE_EVICT_PREPARE,            // 6          
+    STATE_EVICT_REQUEST,            // 7          
+    STATE_EVICT_WAIT,               // 8      
+    STATE_REFILL_REQUEST,           // 9          
+    STATE_REFILL_WAIT,              // A        
+    STATE_REFILL_UPDATE             // B        
   } state_t;
 
 
@@ -426,7 +426,7 @@ module lab3_mem_BlockingCacheBaseCtrl
                               //       REQ RSP REQ RSP  REG REN  WEN  MX EN ADR TYPE RSP ARR ARR ARR  REG  WR  TYPE
                               //       RDY VAL VAL RDY  EN       |    |  |  MX  |    EN  REN WEN WBEN EN   MX  |  
       STATE_IDLE              :set_cs( y,  n,  n,  n,   y,  n,   n,   x, n,  x, tx,  n,  n,  n,  nwb, n,   wx, tx  );
-      STATE_TAG_CHECK         :set_cs( n,  n,  n,  n,   n,  y,   n,   x, y,  x, tx,  n,  n,  n,  nwb, n,   wx, tx  );
+      STATE_TAG_CHECK         :set_cs( n,  n,  n,  n,   n,  y,   n,   x, n,  x, tx,  n,  n,  n,  nwb, n,   wx, tx  );
       STATE_INIT_DATA_ACCESS  :set_cs( n,  n,  n,  n,   n,  n,   y,   r, n,  x, in,  n,  n,  y,   wb, n,   dm, tx  );
       STATE_WAIT              :set_cs( n,  y,  n,  n,   n,  n,   n,   x, n,  x, wtr, n,  n,  n,  nwb, n,  wtm, tx  );
       STATE_READ_DATA_ACCESS  :set_cs( n,  n,  n,  n,   n,  y,   n,   x, n,  x, rd,  n,  y,  n,  nwb, y,  rwm, tx  );
@@ -434,7 +434,7 @@ module lab3_mem_BlockingCacheBaseCtrl
       STATE_REFILL_REQUEST    :set_cs( n,  n,  y,  n,   n,  n,   n,   x, n,  a, tx,  n,  n,  n,  nwb, n,   wx, rd  );
       STATE_REFILL_WAIT       :set_cs( n,  n,  n,  y,   n,  n,   n,   x, n,  x, tx,  y,  n,  n,  nwb, n,   wx, tx  );
       STATE_REFILL_UPDATE     :set_cs( n,  n,  n,  n,   n,  n,   y,   m, n,  x, tx,  n,  n,  y,  all, n,   wx, tx  );
-      STATE_EVICT_PREPARE     :set_cs( n,  n,  n,  n,   n,  n,   n,   x, y,  e, tx,  n,  y,  n,  nwb, y,   wx, tx  );
+      STATE_EVICT_PREPARE     :set_cs( n,  n,  n,  n,   n,  y,   n,   x, y,  e, tx,  n,  y,  n,  nwb, y,   wx, tx  );
       STATE_EVICT_REQUEST     :set_cs( n,  n,  y,  n,   n,  n,   n,   x, n,  e, tx,  n,  n,  n,  nwb, n,   wx, wr  );
       STATE_EVICT_WAIT        :set_cs( n,  n,  n,  y,   n,  n,   n,   x, n,  x, tx,  n,  n,  n,  nwb, n,   wx, tx  );
       default                 :set_cs( n,  n,  n,  n,   n,  n,   n,   x, n,  x, tx,  n,  n,  n,  nwb, n,   wx, tx  );

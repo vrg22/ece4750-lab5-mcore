@@ -156,10 +156,10 @@ module lab3_mem_BlockingCacheBaseDpath
   );
   
   logic [idw-1:0]             idx;
-  logic [abw-1-(idw+odw+2):0] tag;
+  logic [abw-1-(idw+odw+2):0] curr_tag;
       
   assign idx = cachereq_addr[idw+4-1:4];
-  assign tag = cachereq_addr[abw-1:idw+4];  
+  assign curr_tag = cachereq_addr[abw-1:idw+4];  
   
   // SRAMs
 
@@ -174,7 +174,7 @@ module lab3_mem_BlockingCacheBaseDpath
     .write_en       (tag_array_wen),
     .write_byte_en  (3'b111),
     .write_addr     (idx),
-    .write_data     (tag)
+    .write_data     (curr_tag)
   );
 
   logic [clw-1:0]             cache_data;
@@ -193,7 +193,7 @@ module lab3_mem_BlockingCacheBaseDpath
 
   vc_EqComparator #(abw-(idw+odw+2)) tag_comparator
   (
-    .in0            (tag),
+    .in0            (curr_tag),
     .in1            (read_tag),
     .out            (tag_match)
   );
@@ -202,7 +202,7 @@ module lab3_mem_BlockingCacheBaseDpath
 
   // 2 bits zero for offset alignment
   // 2 bits zero for byte alignment
-  assign  mk_addr = {tag, idx, 4'b0};
+  assign  mk_addr = {read_tag, idx, 4'b0};
 
 //-----------------------------------------------------------------------------
 // Stage 1
