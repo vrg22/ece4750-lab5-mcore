@@ -132,7 +132,7 @@ module lab3_mem_BlockingCacheBaseDpath
   );
 
   logic [clw-1:0] repl_cachereq;
-  logic [clw-1:0] write_data;
+  logic [clw-1:0] wd;
   
   assign repl_cachereq= {cachereq_data, cachereq_data, cachereq_data, cachereq_data};
   
@@ -141,7 +141,7 @@ module lab3_mem_BlockingCacheBaseDpath
     .in0      (repl_cachereq),
     .in1      (memresp_data),
     .sel      (write_data_mux_sel),
-    .out      (write_data)
+    .out      (wd)
   );
   
   logic [idw-1:0]             idx;
@@ -177,7 +177,7 @@ module lab3_mem_BlockingCacheBaseDpath
     .write_en       (data_array_wen),
     .write_byte_en  (data_array_wben),
     .write_addr     (idx),
-    .write_data     (write_data)
+    .write_data     (wd)
   );
 
   vc_EqComparator #(abw-(idw+odw+2)) tag_comparator
