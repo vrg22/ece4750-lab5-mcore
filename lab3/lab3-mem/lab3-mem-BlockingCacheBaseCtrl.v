@@ -384,13 +384,13 @@ module lab3_mem_BlockingCacheBaseCtrl
 
   always @(*) begin
     case ( cachereq_addr[3:2] )
-      00: wb = 16'b0000000000001111;
-      01: wb = 16'b0000000011110000;
-      10: wb = 16'b0000111100000000;
-      11: wb = 16'b1111000000000000;
+      00: wb = 16'h000f;
+      01: wb = 16'h00f0;
+      10: wb = 16'h0f00;
+      11: wb = 16'hf000;
     endcase
   end
-  localparam all = 16'hf;
+  localparam all = 16'hffff;
 
   localparam r = 1'b0;
   localparam m = 1'b1;
