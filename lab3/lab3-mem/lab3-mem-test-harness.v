@@ -437,10 +437,7 @@ module top;
   `VC_TEST_CASE_BEGIN( 3, "basic test case 3: read hit path (non-dirty miss)" )
   begin
     init_test_case( 0, 0, 0 );
-    load_mem( 32'h00000100, 32'h00000001 );
-    load_mem( 32'h00000104, 32'h00000002 );
-    load_mem( 32'h00000108, 32'h00000003 );
-    load_mem( 32'h0000010c, 32'h00000004 );
+    load_mem( 32'h00000100, 128'h00000004000000030000000200000001 );
 
     // Initialize Port
 
@@ -456,9 +453,6 @@ module top;
     init_port( c_req_rd, 8'h01, 32'h00000108, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h00000003 );
     init_port( c_req_rd, 8'h01, 32'h0000010c, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h00000004 );
 
-    init_port( c_req_rd, 8'h01, 32'h00000004, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h0a000000 );
-    init_port( c_req_rd, 8'h01, 32'h00000000, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h0a0b0c0d );
-    
     run_test;
   end
   `VC_TEST_CASE_END
