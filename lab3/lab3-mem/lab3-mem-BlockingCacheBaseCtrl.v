@@ -22,32 +22,33 @@ module lab3_mem_BlockingCacheBaseCtrl
   parameter abw     = 32,             // Short name for addr bitwidth
   parameter clw     = 128,            // Short name for cacheline bitwidth
   parameter nblocks = size*8/clw,     // Number of blocks in the cache
+  parameter idw     = $clog2(nblocks),// Short name for index width
 
   parameter o = p_opaque_nbits
 )
 (
-  input  logic                                             clk,
-  input  logic                                             reset,
+  input   logic                                            clk,
+  input   logic                                            reset,
 
   // Cache Request
 
-  input  logic                                             cachereq_val,
-  output logic                                             cachereq_rdy,
+  input   logic                                            cachereq_val,
+  output  logic                                            cachereq_rdy,
 
   // Cache Response
 
-  output logic                                             cacheresp_val,
-  input  logic                                             cacheresp_rdy,
+  output  logic                                            cacheresp_val,
+  input   logic                                            cacheresp_rdy,
 
   // Memory Request
 
-  output logic                                             memreq_val,
-  input  logic                                             memreq_rdy,
+  output  logic                                            memreq_val,
+  input   logic                                            memreq_rdy,
 
   // Memory Response
 
-  input  logic                                             memresp_val,
-  output logic                                             memresp_rdy,
+  input   logic                                            memresp_val,
+  output  logic                                            memresp_rdy,
 
   output  logic                                            cachereq_en, 
 
@@ -122,14 +123,17 @@ module lab3_mem_BlockingCacheBaseCtrl
           state_next = STATE_TAG_CHECK;
         end
         else begin
-          state_next = STATE_WAIT;
+          state_next = STATE_IDLE;
         end
       STATE_TAG_CHECK:
         if ( cachereq_type == `VC_MEM_REQ_MSG_TYPE_WRITE_INIT) begin
           state_next = STATE_INIT_DATA_ACCESS;
         end
+        else if ( cachereq_type == `VC_MEM_REQ_MSG_TYPE_READ && tag_match) begin
+          state_next = STATE_READ_DATA_ACCESS;
+        end
         else begin
-          state_next = STATE_WAIT;
+          state_next = STATE_IDLE;
         end
       STATE_INIT_DATA_ACCESS:
         if ( cacheresp_val && cacheresp_rdy ) begin
@@ -141,6 +145,13 @@ module lab3_mem_BlockingCacheBaseCtrl
       STATE_WAIT:
         if ( cacheresp_val && cacheresp_rdy ) begin
           state_next = STATE_IDLE;
+        end
+      STATE_READ_DATA_ACCESS:
+        if ( cacheresp_val && cacheresp_rdy ) begin
+          state_next = STATE_IDLE;
+        end
+        else begin
+          state_next = STATE_WAIT;
         end
       default:
         state_next = STATE_IDLE;
@@ -208,6 +219,26 @@ module lab3_mem_BlockingCacheBaseCtrl
 
   // END REGISTER FILES
 
+  // SET REGISTER FILES
+
+  localparam y = 1'b1;
+  localparam n = 1'b0;
+  localparam x = 1'bx;
+
+  assign v_write_addr = cachereq_addr[7:4];
+  assign d_write_addr = cachereq_addr[7:4];
+
+  always @(*) begin
+    if ( state_reg == STATE_INIT_DATA_ACCESS ) begin
+      v_write_en = y;
+    end
+    else begin
+      v_write_en = n;
+    end
+  end
+
+  // END SET REGISTER FILES
+
 
   task set_cs
   (
@@ -252,16 +283,11 @@ module lab3_mem_BlockingCacheBaseCtrl
   end
   endtask
 
-  localparam y = 1'b1;
-  localparam n = 1'b0;
-  localparam x = 1'bx;
-
   localparam nwb = 16'dx;
 
-  localparam ze = 3'b000;
-  localparam fs = 3'b001;
-  localparam sn = 3'b010;
-  localparam th = 3'b011;
+  logic [idw:0] rwm;
+  assign rwm = {1'b0 , cachereq_addr[idw+4-1:4]};
+
   localparam dm = 3'b100;
   localparam wx = 3'bx;
 
@@ -286,6 +312,7 @@ module lab3_mem_BlockingCacheBaseCtrl
       STATE_TAG_CHECK         :set_cs( n,  n,  n,  n,   n,  y,   n,   x, n,  x, tx,  n,  n,  n,  nwb, n,   wx, tx  );
       STATE_INIT_DATA_ACCESS  :set_cs( n,  y,  n,  n,   n,  n,   y,   r, n,  x, in,  n,  n,  y,   wb, n,   dm, tx  );
       STATE_WAIT              :set_cs( n,  y,  n,  n,   n,  n,   n,   x, n,  x, in,  n,  n,  n,  nwb, n,   dm, tx  );
+      STATE_READ_DATA_ACCESS  :set_cs( n,  n,  n,  n,   n,  y,   n,   x, n,  x, rd,  n,  y,  n,  nwb, y,  rwm, tx  );
       default                 :set_cs( n,  n,  n,  n,   n,  n,   n,   x, n,  x, tx,  n,  n,  n,  nwb, n,   wx, tx  );
     endcase
 
