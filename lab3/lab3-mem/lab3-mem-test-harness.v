@@ -383,7 +383,6 @@ module top;
     init_port( c_req_in, 8'h00, 32'h0000000c, 2'd0, 32'h0000000d, c_resp_in, 8'h00, 2'd0, 32'h???????? ); // write word  0x0000000c
     init_port( c_req_in, 8'h00, 32'h00000010, 2'd0, 32'h0000000e, c_resp_in, 8'h00, 2'd0, 32'h???????? ); // write word  0x00000010
 
-
     init_port( c_req_rd, 8'h01, 32'h00000000, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h0a0b0c0d ); // read  word  0x00000000
     init_port( c_req_rd, 8'h01, 32'h00000004, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h000b0c0d ); // read  word  0x00000004
     init_port( c_req_rd, 8'h01, 32'h00000008, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h00000c0d ); // read  word  0x00000008
@@ -395,6 +394,10 @@ module top;
   end
   `VC_TEST_CASE_END
 
+  //----------------------------------------------------------------------
+  // Basic Test Case #2: Write Hit Path (clean)
+  //----------------------------------------------------------------------
+
   `VC_TEST_CASE_BEGIN( 2, "basic test case 2: write hit path (clean)" )
   begin
     init_test_case( 0, 0, 0 );
@@ -404,10 +407,24 @@ module top;
     //         ------------- memory request --------------------  --------- memory response ----------
     //         type      opaque addr          len   data          type       opaque len   data
 
-    init_port( c_req_in, 8'h00, 32'h00000000, 2'd0, 32'h0a0b0c0d, c_resp_in, 8'h00, 2'd0, 32'h???????? ); // write word  0x00000000
-    init_port( c_req_wr, 8'h01, 32'h00000000, 2'd0, 32'h00000c0d, c_resp_wr, 8'h01, 2'd0, 32'h???????? ); // read  word  0x00000000
-    init_port( c_req_rd, 8'h01, 32'h00000000, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h00000c0d );
+    init_port( c_req_in, 8'h00, 32'h00000020, 2'd0, 32'habcdef00, c_resp_in, 8'h00, 2'd0, 32'h???????? ); // init  word  0x00000020
+    init_port( c_req_in, 8'h00, 32'h00000030, 2'd0, 32'h00000fab, c_resp_in, 8'h00, 2'd0, 32'h???????? ); // write word  0x00000030
+    init_port( c_req_in, 8'h00, 32'h00000034, 2'd0, 32'h10000001, c_resp_in, 8'h00, 2'd0, 32'h???????? ); // write word  0x00000034
+    init_port( c_req_wr, 8'h01, 32'h00000038, 2'd0, 32'h00000002, c_resp_wr, 8'h01, 2'd0, 32'h???????? ); // write word  0x00000038
+    init_port( c_req_wr, 8'h01, 32'h0000003c, 2'd0, 32'h00000003, c_resp_wr, 8'h01, 2'd0, 32'h???????? ); // write word  0x0000003c
 
+    init_port( c_req_rd, 8'h01, 32'h00000020, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'habcdef00 );
+
+    init_port( c_req_rd, 8'h01, 32'h00000030, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h00000fab );
+    init_port( c_req_wr, 8'h01, 32'h00000030, 2'd0, 32'h00000004, c_resp_wr, 8'h01, 2'd0, 32'h???????? ); // write word  0x00000030
+    init_port( c_req_rd, 8'h01, 32'h00000030, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h00000004 );
+
+    init_port( c_req_rd, 8'h01, 32'h00000038, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h00000002 );
+    init_port( c_req_wr, 8'h01, 32'h00000038, 2'd0, 32'h0000000f, c_resp_wr, 8'h01, 2'd0, 32'h???????? ); // write word  0x00000038
+    init_port( c_req_rd, 8'h01, 32'h00000038, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h0000000f );
+
+    init_port( c_req_rd, 8'h01, 32'h00000034, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h10000001 );
+    init_port( c_req_rd, 8'h01, 32'h0000003c, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h00000003 );    
 
     run_test;
   end
