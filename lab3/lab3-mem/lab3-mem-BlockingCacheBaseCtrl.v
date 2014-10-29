@@ -342,7 +342,7 @@ module lab3_mem_BlockingCacheBaseCtrl
   end
   endtask
 
-  localparam nwb = 16'dx;
+  localparam nwb = 16'd0;
 
   logic [1:0] rwm;
   assign rwm = cachereq_addr[3:2];
