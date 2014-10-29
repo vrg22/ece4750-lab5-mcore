@@ -46,7 +46,31 @@ module lab3_mem_BlockingCacheBaseCtrl
   // Memory Response
 
   input  logic                                             memresp_val,
-  output logic                                             memresp_rdy
+  output logic                                             memresp_rdy,
+
+  output  logic                                            cachereq_en, 
+
+  input   logic [2:0]                                      cachereq_type, 
+  input   logic [abw-1:0]                                  cachereq_addr, 
+  
+  output  logic                                            tag_array_ren, 
+  output  logic                                            tag_array_wen, 
+  
+  input   logic                                            tag_match,
+  output  logic                                            write_data_mux_sel,
+  output  logic                                            evict_addr_reg_en,
+  output  logic                                            memreq_addr_mux_sel, 
+  output  logic [2:0]                                      cacheresp_type,
+
+  output  logic                                            memresp_en,
+  output  logic                                            refill_mux_sel,
+  output  logic                                            data_array_ren,
+  output  logic                                            data_array_wen,
+  output  logic [15:0]                                     data_array_wben,
+  output  logic                                            read_data_reg_en,
+  output  logic [1:0]                                      read_word_mux_sel,
+  output  logic [2:0]                                      memreq_type
+
  );
 
   // Drop incoming requests
