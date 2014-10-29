@@ -386,10 +386,10 @@ module lab3_mem_BlockingCacheBaseCtrl
   logic [15:0] wb;
   always @(*) begin
     case ( off )
-      00: wb = 16'h000f;
-      01: wb = 16'h00f0;
-      10: wb = 16'h0f00;
-      11: wb = 16'hf000;
+      2'b00: wb = 16'h000f;
+      2'b01: wb = 16'h00f0;
+      2'b10: wb = 16'h0f00;
+      2'b11: wb = 16'hf000;
     endcase
   end
 
