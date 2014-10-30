@@ -8,7 +8,7 @@
 `include "vc-mem-msgs.v"
 `include "vc-srams.v"
 `include "vc-arithmetic.v"
-`include "lab3_mem_BlockingCacheAltWay.v"
+`include "lab3-mem-BlockingCacheAltWay.v"
 
 module lab3_mem_BlockingCacheAltDpath
 #(
@@ -61,7 +61,7 @@ module lab3_mem_BlockingCacheAltDpath
   input  logic                                             memreq_addr_mux_sel, 
   input  logic [2:0]                                       cacheresp_type,
   input  logic [2:0]                                       memreq_type, 
-
+  input  logic                                             way_sel,
 
   output logic [`VC_MEM_RESP_MSG_NBITS(o,dbw)-1:0]         cacheresp_msg,
   output logic [`VC_MEM_REQ_MSG_NBITS(o,abw,clw)-1:0]      memreq_msg
@@ -159,7 +159,8 @@ module lab3_mem_BlockingCacheAltDpath
   );
 
   logic [abw-1:0] memreq_addr_way0;
-  logic [clw-1:0] cacheresp_msg_data_way0;
+  logic [dbw-1:0] cacheresp_msg_data_way0;
+  logic [clw-1:0] valid_cache_data_way0;
   lab3_mem_BlockingCacheAltWay way0
   (
     .clk                    (clk),
@@ -171,16 +172,19 @@ module lab3_mem_BlockingCacheAltDpath
     .data_array_wen         (data_array0_wen),
     .cache_line_write       (wd),
     .data_array_wben        (data_array_wben),
+    .read_data_reg_en       (read_data_reg_en),
     .tag_match              (tag0_match),
     .memreq_addr_mux_sel    (memreq_addr_mux_sel),
     .evict_addr_reg_en      (evict_addr_reg_en),
     .read_word_mux_sel      (read_word_mux_sel),
     .memreq_addr            (memreq_addr_way0),
-    .cacheresp_msg_data     (cacheresp_msg_data_way0)
+    .cacheresp_msg_data     (cacheresp_msg_data_way0),
+    .valid_cache_data       (valid_cache_data_way0)
   );
 
   logic [abw-1:0] memreq_addr_way1;
-  logic [clw-1:0] cacheresp_msg_data_way1;
+  logic [dbw-1:0] cacheresp_msg_data_way1;
+  logic [clw-1:0] valid_cache_data_way1;
   lab3_mem_BlockingCacheAltWay way1
   (
     .clk                    (clk),
@@ -192,14 +196,33 @@ module lab3_mem_BlockingCacheAltDpath
     .data_array_wen         (data_array1_wen),
     .cache_line_write       (wd),
     .data_array_wben        (data_array_wben),
-    .tag_match              (tag0_match),
+    .read_data_reg_en       (read_data_reg_en),
+    .tag_match              (tag1_match),
     .memreq_addr_mux_sel    (memreq_addr_mux_sel),
     .evict_addr_reg_en      (evict_addr_reg_en),
     .read_word_mux_sel      (read_word_mux_sel),
     .memreq_addr            (memreq_addr_way1),
-    .cacheresp_msg_data     (cacheresp_msg_data_way1)
+    .cacheresp_msg_data     (cacheresp_msg_data_way1),
+    .valid_cache_data       (valid_cache_data_way1)
   );
   
+  logic [dbw-1:0] cacheresp_msg_data;
+  vc_Mux2 #(dbw) way_mux_cacheresp_data
+  (
+    .in0      (cacheresp_msg_data_way0),
+    .in1      (cacheresp_msg_data_way1),
+    .sel      (way_sel),
+    .out      (cacheresp_msg_data)
+  );
+
+  logic [dbw-1:0] memreq_addr;
+  vc_Mux2 #(dbw) way_mux_memreq_addr
+  (
+    .in0      (memreq_addr_way0),
+    .in1      (memreq_addr_way1),
+    .sel      (way_sel),
+    .out      (memreq_addr)
+  );
 
   // Pack Cache Response Message
 
@@ -212,6 +235,17 @@ module lab3_mem_BlockingCacheAltDpath
     .msg      (cacheresp_msg)
   );
 
+  logic [clw-1:0] way0_cache_contents;
+  logic [clw-1:0] way1_cache_contents;
+  logic [clw-1:0] memreq_val_cache_contents;
+  vc_Mux2 #(clw) way_mux_memreq
+  (
+    .in0      (way0_cache_contents),
+    .in1      (way1_cache_contents),
+    .sel      (way_sel),
+    .out      (memreq_val_cache_contents)
+  );
+
   // Pack Memory Request Message
 
   vc_MemReqMsgPack #(o,abw,clw) memreq_msg_pack
@@ -220,7 +254,7 @@ module lab3_mem_BlockingCacheAltDpath
     .opaque   (8'b0),
     .addr     (memreq_addr),
     .len      (4'b0),
-    .data     (valid_cache_data),
+    .data     (memreq_val_cache_contents),
     .msg      (memreq_msg)
   );
 

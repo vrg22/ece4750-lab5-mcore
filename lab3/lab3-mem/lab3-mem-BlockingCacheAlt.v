@@ -84,6 +84,7 @@ module lab3_mem_BlockingCacheAlt
   
   logic [2:0]     cacheresp_type;
   logic [2:0]     memreq_type;
+  logic           way_sel;
 
   
   
@@ -150,7 +151,8 @@ module lab3_mem_BlockingCacheAlt
    .memreq_addr_mux_sel (memreq_addr_mux_sel),
 
    .cacheresp_type      (cacheresp_type),
-   .memreq_type         (memreq_type)
+   .memreq_type         (memreq_type),
+   .way_sel             (way_sel)
   );
 
   //----------------------------------------------------------------------
@@ -204,7 +206,8 @@ module lab3_mem_BlockingCacheAlt
    .memreq_addr_mux_sel (memreq_addr_mux_sel),
 
    .cacheresp_type      (cacheresp_type),
-   .memreq_type         (memreq_type)
+   .memreq_type         (memreq_type),
+   .way_sel             (way_sel)
   );
 
 

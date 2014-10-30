@@ -29,6 +29,7 @@ module lab3_mem_BlockingCacheAltWay
   input  logic              data_array_wen,
   input  logic [clw-1:0]    cache_line_write,
   input  logic [15:0]       data_array_wben,
+  input  logic              read_data_reg_en,
 
   output logic              tag_match,
 
@@ -37,7 +38,8 @@ module lab3_mem_BlockingCacheAltWay
   input  logic [2:0]        read_word_mux_sel,  
 
   output logic [abw-1:0]    memreq_addr,
-  output logic [dbw-1:0]    cacheresp_msg_data    
+  output logic [dbw-1:0]    cacheresp_msg_data,
+  output logic [clw-1:0]    valid_cache_data    
 );
 
   logic [idw-1:0]             idx;
@@ -57,7 +59,7 @@ module lab3_mem_BlockingCacheAltWay
     .read_addr      (idx),
     .read_data      (read_tag),
     .write_en       (tag_array_wen),
-    .write_byte_en  (3'b111),
+    .write_byte_en  (4'b1111),
     .write_addr     (idx),
     .write_data     (curr_tag)
   );
@@ -101,7 +103,7 @@ module lab3_mem_BlockingCacheAltWay
   );
 
   logic [abw-1:0] line_alinged_addr; // BELOW LINE HARDCODED, FIX
-  assign line_alinged_addr = { cachereq_addr[abw-1:2+ibw+odw] , 6'b0 };
+  assign line_alinged_addr = { cachereq_addr[abw-1:2+idw+odw] , 6'b0 };
   vc_Mux2 #(abw) memreq_addr_mux
   (
     .in0      (evict_addr),
@@ -110,7 +112,6 @@ module lab3_mem_BlockingCacheAltWay
     .out      (memreq_addr)
   );
 
-  logic [clw-1:0] valid_cache_data;
   vc_EnReg #(clw) read_data_reg
   (
     .clk      (clk),
@@ -119,7 +120,6 @@ module lab3_mem_BlockingCacheAltWay
     .d        (cache_data),
     .q        (valid_cache_data)
   );
-
 
   vc_Mux5 #(dbw) read_word_mux
   (

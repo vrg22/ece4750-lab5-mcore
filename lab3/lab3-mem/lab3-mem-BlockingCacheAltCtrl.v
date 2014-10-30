@@ -50,27 +50,32 @@ module lab3_mem_BlockingCacheAltCtrl
   input   logic                                            memresp_val,
   output  logic                                            memresp_rdy,
 
-  output  logic                                            cachereq_en, 
-
-  input   logic [2:0]                                      cachereq_type, 
-  input   logic [abw-1:0]                                  cachereq_addr, 
-  
-  output  logic                                            tag_array_ren, 
-  output  logic                                            tag_array_wen, 
-  
-  input   logic                                            tag_match,
-  output  logic                                            write_data_mux_sel,
-  output  logic                                            evict_addr_reg_en,
-  output  logic                                            memreq_addr_mux_sel, 
-  output  logic [2:0]                                      cacheresp_type,
-
   output  logic                                            memresp_en,
+  output  logic                                            cachereq_en, 
+  input   logic [2:0]                                      cachereq_type, 
+  input   logic [abw-1:0]                                  cachereq_addr,
+
+  output  logic                                            write_data_mux_sel, 
+  output  logic                                            tag_array_ren, 
+  output  logic                                            tag_array0_wen, 
+  output  logic                                            tag_array1_wen,
+
   output  logic                                            data_array_ren,
-  output  logic                                            data_array_wen,
+  output  logic                                            data_array0_wen,
+  output  logic                                            data_array1_wen,
   output  logic [15:0]                                     data_array_wben,
   output  logic                                            read_data_reg_en,
+
+  input   logic                                            tag0_match,
+  input   logic                                            tag1_match,
+
+  output  logic                                            evict_addr_reg_en,
   output  logic [2:0]                                      read_word_mux_sel,
-  output  logic [2:0]                                      memreq_type
+  output  logic                                            memreq_addr_mux_sel,
+
+  output  logic [2:0]                                      cacheresp_type,
+  output  logic [2:0]                                      memreq_type,
+  output  logic                                            way_sel
 
  );
 
@@ -93,6 +98,12 @@ module lab3_mem_BlockingCacheAltCtrl
     STATE_REFILL_UPDATE             // B        
   } state_t;
 
+  typedef enum logic {
+    W_NONE,
+    W_ZERO,
+    W_ONE
+  } way_t;
+
 
   //----------------------------------------------------------------------
   // State
@@ -102,12 +113,22 @@ module lab3_mem_BlockingCacheAltCtrl
   state_t state_next;
   state_t state_prev;
 
+  way_t way_curr;
+  way_t way_next;
+
   always @( posedge clk ) begin
     if ( reset ) begin
       state_reg <= STATE_IDLE;
     end
     else begin
       state_reg <= state_next;
+    end
+
+    if ( reset ) begin
+      way_t <= W_NONE;
+    end
+    else begin
+      way_curr <= way_next;
     end
   end
 
@@ -126,6 +147,9 @@ module lab3_mem_BlockingCacheAltCtrl
         else begin
           state_next = STATE_IDLE;
         end
+        v_write_en = n;
+        d_write_en = n;
+
       STATE_TAG_CHECK:
         if ( cachereq_type == `VC_MEM_REQ_MSG_TYPE_WRITE_INIT ) begin
           state_next = STATE_INIT_DATA_ACCESS;
@@ -151,6 +175,9 @@ module lab3_mem_BlockingCacheAltCtrl
         else begin
           state_next = STATE_IDLE;
         end
+        v_write_en = n;
+        d_write_en = n;
+
       STATE_INIT_DATA_ACCESS:
         if ( cacheresp_val && cacheresp_rdy ) begin
           state_next = STATE_IDLE;
@@ -159,10 +186,19 @@ module lab3_mem_BlockingCacheAltCtrl
           state_next = STATE_WAIT;
           state_prev = STATE_INIT_DATA_ACCESS;
         end
+        v_write_en = y;
+        v_write_data = 1'b1;
+
+        d_write_en = y;
+        d_write_data = 1'b0;
+
       STATE_WAIT:
         if ( cacheresp_val && cacheresp_rdy ) begin
           state_next = STATE_IDLE;
         end
+        v_write_en = n;
+        d_write_en = n;
+
       STATE_READ_DATA_ACCESS:
         if ( cacheresp_val && cacheresp_rdy ) begin
           state_next = STATE_IDLE;
@@ -171,6 +207,9 @@ module lab3_mem_BlockingCacheAltCtrl
           state_next = STATE_WAIT;
           state_prev = STATE_READ_DATA_ACCESS;
         end
+        v_write_en = n;
+        d_write_en = n;
+
       STATE_WRITE_DATA_ACCESS:
         if ( cacheresp_val && cacheresp_rdy ) begin
           state_next = STATE_IDLE;
@@ -179,6 +218,9 @@ module lab3_mem_BlockingCacheAltCtrl
           state_next = STATE_WAIT;
           state_prev = STATE_WRITE_DATA_ACCESS;
         end
+        d_write_en = y;
+        d_write_data = 1'b1;
+
       STATE_REFILL_REQUEST:
         if ( memreq_rdy ) begin
           state_next = STATE_REFILL_WAIT;
@@ -186,6 +228,9 @@ module lab3_mem_BlockingCacheAltCtrl
         else begin
           state_next = STATE_REFILL_REQUEST;
         end
+        v_write_en = y;
+        v_write_data = 1'b0;
+
       STATE_REFILL_WAIT:
         if( !memresp_val ) begin
           state_next = STATE_REFILL_WAIT;
@@ -193,18 +238,27 @@ module lab3_mem_BlockingCacheAltCtrl
         else begin
           state_next = STATE_REFILL_UPDATE;
         end
+        v_write_en = n;
+        d_write_en = n;
+
       STATE_REFILL_UPDATE:
-      if (cachereq_type == `VC_MEM_REQ_MSG_TYPE_READ) begin
-        state_next = STATE_READ_DATA_ACCESS;
-      end
-      else begin
-        state_next = STATE_WRITE_DATA_ACCESS;
-      end
-        
-      default:
-        state_next = STATE_IDLE;
+        if (cachereq_type == `VC_MEM_REQ_MSG_TYPE_READ) begin
+          state_next = STATE_READ_DATA_ACCESS;
+        end
+        else begin
+          state_next = STATE_WRITE_DATA_ACCESS;
+        end
+        v_write_en = y;
+        v_write_data = 1'b1;
+
+        d_write_en = y;
+        d_write_data = 1'b0;
+
       STATE_EVICT_PREPARE:
         state_next = STATE_EVICT_REQUEST;
+        v_write_en = n;
+        d_write_en = n;
+
       STATE_EVICT_REQUEST:
         if ( memreq_rdy ) begin
           state_next = STATE_EVICT_WAIT;
@@ -212,6 +266,12 @@ module lab3_mem_BlockingCacheAltCtrl
         else begin
           state_next = STATE_EVICT_REQUEST;
         end
+        v_write_en = y;
+        v_write_data = 1'b0;
+
+        d_write_en = y;
+        d_write_data = 1'b0;
+
       STATE_EVICT_WAIT:
         if( !memresp_val ) begin
           state_next = STATE_EVICT_WAIT;
@@ -219,6 +279,14 @@ module lab3_mem_BlockingCacheAltCtrl
         else begin
           state_next = STATE_REFILL_REQUEST;
         end
+        v_write_en = n;
+        d_write_en = n;
+
+      default:
+        state_next = STATE_IDLE;
+        v_write_en = n;
+        d_write_en = n;
+        
     endcase
   end
 
@@ -278,41 +346,25 @@ module lab3_mem_BlockingCacheAltCtrl
 
   always @(*) begin
     if ( state_reg == STATE_IDLE ) begin
-      v_write_en = n;
-      d_write_en = n;
+      
     end
     else if ( state_reg == STATE_TAG_CHECK ) begin
-      v_write_en = n;
-      d_write_en = n;
+      
     end
     else if ( state_reg == STATE_INIT_DATA_ACCESS ) begin
-      v_write_en = y;
-      v_write_data = 1'b1;
-
-      d_write_en = y;
-      d_write_data = 1'b0;
+      
     end
     else if ( state_reg == STATE_WRITE_DATA_ACCESS ) begin
-      d_write_en = y;
-      d_write_data = 1'b1;
+      
     end
     else if ( state_reg == STATE_REFILL_REQUEST ) begin
-      v_write_en = y;
-      v_write_data = 1'b0;
+      
     end
     else if ( state_reg == STATE_EVICT_REQUEST ) begin
-      v_write_en = y;
-      v_write_data = 1'b0;
-
-      d_write_en = y;
-      d_write_data = 1'b0;
+      
     end
     else if ( state_reg == STATE_REFILL_UPDATE ) begin
-      v_write_en = y;
-      v_write_data = 1'b1;
-
-      d_write_en = y;
-      d_write_data = 1'b0;
+      
     end
     else begin
       v_write_en = n;
@@ -322,51 +374,7 @@ module lab3_mem_BlockingCacheAltCtrl
 
   // END SET REGISTER FILES
 
-
-  task set_cs
-  (
-    input  logic          cs_cachereq_rdy,
-    input  logic          cs_cacheresp_val,
-    input  logic          cs_memreq_val,
-    input  logic          cs_memresp_rdy,
-    input  logic          cs_cachereq_en, 
-    input  logic          cs_tag_array_ren, 
-    input  logic          cs_tag_array_wen,
-    input  logic          cs_write_data_mux_sel,
-    input  logic          cs_evict_addr_reg_en,
-    input  logic          cs_memreq_addr_mux_sel, 
-    input  logic [2:0]    cs_cacheresp_type,
-    input  logic          cs_memresp_en,
-    input  logic          cs_data_array_ren,
-    input  logic          cs_data_array_wen,
-    input  logic [15:0]   cs_data_array_wben,
-    input  logic          cs_read_data_reg_en,
-    input  logic [1:0]    cs_read_word_mux_sel,
-    input  logic [2:0]    cs_memreq_type
-  );
-  begin
-    cachereq_rdy         =    cs_cachereq_rdy;      
-    cacheresp_val        =    cs_cacheresp_val;      
-    memreq_val           =    cs_memreq_val;    
-    memresp_rdy          =    cs_memresp_rdy;
-    cachereq_en          =    cs_cachereq_en;   
-    tag_array_ren        =    cs_tag_array_ren;      
-    tag_array_wen        =    cs_tag_array_wen;      
-    write_data_mux_sel   =    cs_write_data_mux_sel;            
-    evict_addr_reg_en    =    cs_evict_addr_reg_en;          
-    memreq_addr_mux_sel  =    cs_memreq_addr_mux_sel;            
-    cacheresp_type       =    cs_cacheresp_type;        
-    memresp_en           =    cs_memresp_en;          
-    data_array_ren       =    cs_data_array_ren;        
-    data_array_wen       =    cs_data_array_wen;        
-    data_array_wben      =    cs_data_array_wben;        
-    read_data_reg_en     =    cs_read_data_reg_en;          
-    read_word_mux_sel    =    cs_read_word_mux_sel;          
-    memreq_type          =    cs_memreq_type;    
-  end
-  endtask
-
-  localparam nwb = 16'd0;
+    localparam nwb = 16'd0;
 
   logic [2:0] crt;
   assign crt = cachereq_type;
@@ -427,6 +435,50 @@ module lab3_mem_BlockingCacheAltCtrl
 
   localparam e = 1'b0;
   localparam a = 1'b1;
+
+
+  task set_cs
+  (
+    input  logic          cs_cachereq_rdy,
+    input  logic          cs_cacheresp_val,
+    input  logic          cs_memreq_val,
+    input  logic          cs_memresp_rdy,
+    input  logic          cs_cachereq_en, 
+    input  logic          cs_tag_array_ren, 
+    input  logic          cs_tag_array_wen,
+    input  logic          cs_write_data_mux_sel,
+    input  logic          cs_evict_addr_reg_en,
+    input  logic          cs_memreq_addr_mux_sel, 
+    input  logic [2:0]    cs_cacheresp_type,
+    input  logic          cs_memresp_en,
+    input  logic          cs_data_array_ren,
+    input  logic          cs_data_array_wen,
+    input  logic [15:0]   cs_data_array_wben,
+    input  logic          cs_read_data_reg_en,
+    input  logic [1:0]    cs_read_word_mux_sel,
+    input  logic [2:0]    cs_memreq_type
+  );
+  begin
+    cachereq_rdy         =    cs_cachereq_rdy;      
+    cacheresp_val        =    cs_cacheresp_val;      
+    memreq_val           =    cs_memreq_val;    
+    memresp_rdy          =    cs_memresp_rdy;
+    cachereq_en          =    cs_cachereq_en;   
+    tag_array_ren        =    cs_tag_array_ren;      
+    tag_array_wen        =    cs_tag_array_wen;      
+    write_data_mux_sel   =    cs_write_data_mux_sel;            
+    evict_addr_reg_en    =    cs_evict_addr_reg_en;          
+    memreq_addr_mux_sel  =    cs_memreq_addr_mux_sel;            
+    cacheresp_type       =    cs_cacheresp_type;        
+    memresp_en           =    cs_memresp_en;          
+    data_array_ren       =    cs_data_array_ren;        
+    data_array_wen       =    cs_data_array_wen;        
+    data_array_wben      =    cs_data_array_wben;        
+    read_data_reg_en     =    cs_read_data_reg_en;          
+    read_word_mux_sel    =    cs_read_word_mux_sel;          
+    memreq_type          =    cs_memreq_type;    
+  end
+  endtask
 
   always @(*) begin
 

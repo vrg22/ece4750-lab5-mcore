@@ -221,7 +221,7 @@ module lab3_mem_BlockingCacheBaseDpath
   logic [abw-1:0] line_alinged_addr;
 
   // hardcoded, fix
-  assign line_alinged_addr = { cachereq_addr[abw-1:2+ibw+odw] , 7'b0 };
+  assign line_alinged_addr = { cachereq_addr[abw-1:2+idw+odw] , 7'b0 };
   logic [abw-1:0] memreq_addr;
   vc_Mux2 #(abw) memreq_addr_mux
   (
