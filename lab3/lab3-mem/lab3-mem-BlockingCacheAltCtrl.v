@@ -98,7 +98,7 @@ module lab3_mem_BlockingCacheAltCtrl
     STATE_REFILL_UPDATE             // B        
   } state_t;
 
-  typedef enum logic {
+  typedef enum logic [$clog2(3)-1:0] {
     W_NONE,
     W_ZERO,
     W_ONE
@@ -125,7 +125,7 @@ module lab3_mem_BlockingCacheAltCtrl
     end
 
     if ( reset ) begin
-      way_t <= W_NONE;
+      way_curr <= W_NONE;
     end
     else begin
       way_curr <= way_next;
