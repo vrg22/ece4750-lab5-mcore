@@ -563,7 +563,7 @@ module top;
     //         type      opaque addr          len   data          type       opaque len   data
 
     init_port( c_req_in, 8'h00, 32'h00000000, 2'd0, 32'h0a0b0c0d, c_resp_in, 8'h00, 2'd0, 32'h???????? ); 
-    init_port( c_req_wr, 8'h01, 32'h00000004, 2'd0, 32'h21112111, c_resp_in, 8'h01, 2'd0, 32'h???????? );    // need to write for eviction to happen
+    init_port( c_req_wr, 8'h01, 32'h00000004, 2'd0, 32'h21112111, c_resp_wr, 8'h01, 2'd0, 32'h???????? );    // need to write for eviction to happen
     init_port( c_req_rd, 8'h01, 32'h00000100, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h00000001 );
     init_port( c_req_rd, 8'h01, 32'h00000000, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h0a0b0c0d ); 
     init_port( c_req_rd, 8'h01, 32'h00000200, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h00000005 ); 
@@ -596,7 +596,12 @@ module top;
     init_port( c_req_in, 8'h00, 32'h00000000, 2'd0, 32'h0a0b0c0d, c_resp_in, 8'h00, 2'd0, 32'h???????? );       // Fill way 0
     init_port( c_req_in, 8'h00, 32'h00000100, 2'd0, 32'h0a0b0c0d, c_resp_in, 8'h00, 2'd0, 32'h???????? ); 
     init_port( c_req_in, 8'h00, 32'h00000010, 2'd0, 32'h0a0b0c0d, c_resp_in, 8'h00, 2'd0, 32'h???????? );       // Fill way 1
-    init_port( c_req_in, 8'h00, 32'h00000110, 2'd0, 32'h0a0b0c0d, c_resp_in, 8'h00, 2'd0, 32'h???????? );     
+    init_port( c_req_in, 8'h00, 32'h00000110, 2'd0, 32'h0a0b0c0d, c_resp_in, 8'h00, 2'd0, 32'h???????? ); 
+
+    init_port( c_req_wr, 8'h01, 32'h00000010, 2'd0, 32'hffffffff, c_resp_wr, 8'h01, 2'd0, 32'h???????? );       // write to 0x00000010 for way 1 LRU check
+
+    init_port( c_req_rd, 8'h01, 32'h00000200, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h00000001 );       // special LRU replacement logic test case
+    init_port( c_req_rd, 8'h01, 32'h00000210, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h00000005 );
 
     init_port( c_req_rd, 8'h01, 32'h00000200, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h00000001 );       // read miss to way 0
     init_port( c_req_rd, 8'h01, 32'h00000210, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h00000005 );       // read miss to way 1
