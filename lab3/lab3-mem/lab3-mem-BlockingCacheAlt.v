@@ -234,6 +234,7 @@ module lab3_mem_BlockingCacheAlt
       ctrl.STATE_EVICT_PREPARE:          vc_trace.append_str( trace_str, "(EP)" );
       ctrl.STATE_EVICT_REQUEST:          vc_trace.append_str( trace_str, "(ER)" );
       ctrl.STATE_EVICT_WAIT:             vc_trace.append_str( trace_str, "(EW)" );
+      ctrl.STATE_FAIL:                   vc_trace.append_str( trace_str, "(FL)" );
       default:                           vc_trace.append_str( trace_str, "(? )" );
 
     endcase

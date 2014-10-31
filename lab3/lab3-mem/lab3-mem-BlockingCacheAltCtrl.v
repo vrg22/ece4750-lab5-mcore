@@ -21,7 +21,8 @@ module lab3_mem_BlockingCacheAltCtrl
   parameter dbw     = 32,             // Short name for data bitwidth
   parameter abw     = 32,             // Short name for addr bitwidth
   parameter clw     = 128,            // Short name for cacheline bitwidth
-  parameter nblocks = size*8/clw,     // Number of blocks in the cache
+  parameter cblocks = size*8/clw,     // Number of blocks in the cache
+  parameter nblocks = cblocks/2,      // Blocks in each way
   parameter idw     = $clog2(nblocks),// Short name for index width
 
   parameter o = p_opaque_nbits
@@ -95,13 +96,14 @@ module lab3_mem_BlockingCacheAltCtrl
     STATE_EVICT_WAIT,               // 8      
     STATE_REFILL_REQUEST,           // 9          
     STATE_REFILL_WAIT,              // A        
-    STATE_REFILL_UPDATE             // B        
+    STATE_REFILL_UPDATE,            // B
+    STATE_FAIL                      // C
   } state_t;
 
   typedef enum logic [$clog2(3)-1:0] {
-    W_NONE,
-    W_ZERO,
-    W_ONE
+    W_NONE,                         // 0           
+    W_ZERO,                         // 1           
+    W_ONE                           // 2         
   } way_t;
 
 
@@ -134,6 +136,10 @@ module lab3_mem_BlockingCacheAltCtrl
 
   // State Transition Logic
 
+  localparam req_rd = `VC_MEM_REQ_MSG_TYPE_WRITE_INIT;
+  localparam req_wr = `VC_MEM_RESP_MSG_TYPE_WRITE;
+  localparam req_in = `VC_MEM_REQ_MSG_TYPE_WRITE_INIT;
+
     always @(*) begin
 
     state_next = state_reg;
@@ -143,150 +149,165 @@ module lab3_mem_BlockingCacheAltCtrl
       STATE_IDLE:               
         if ( cachereq_val && cachereq_rdy ) begin
           state_next = STATE_TAG_CHECK;
+          way_next = W_NONE;
         end
         else begin
           state_next = STATE_IDLE;
+          way_next = W_NONE;
         end
-        v_write_en = n;
-        d_write_en = n;
-
       STATE_TAG_CHECK:
-        if ( cachereq_type == `VC_MEM_REQ_MSG_TYPE_WRITE_INIT ) begin
-          state_next = STATE_INIT_DATA_ACCESS;
+        if ( !tag0_match && !tag1_match ) begin
+          if ( cachereq_type == req_in && c_read_data == 1'b1 ) begin
+            state_next = STATE_INIT_DATA_ACCESS;
+            way_next = W_ZERO;
+          end
+          else if ( cachereq_type == req_in && c_read_data == 1'b0 ) begin
+            state_next = STATE_INIT_DATA_ACCESS;
+            way_next = W_ONE;
+          end
+          else if ( c_read_data == 1'b1 && !d_read0_data ) begin
+            state_next = STATE_REFILL_REQUEST;
+            way_next = W_ZERO;
+          end
+          else if ( c_read_data == 1'b0 && !d_read1_data ) begin
+            state_next = STATE_REFILL_REQUEST;
+            way_next = W_ONE;
+          end
+          else if ( c_read_data == 1'b1 && d_read0_data ) begin
+            state_next = STATE_EVICT_PREPARE;
+            way_next = W_ZERO;
+          end
+          else if ( c_read_data == 1'b0 && d_read1_data ) begin
+            state_next = STATE_EVICT_PREPARE;
+            way_next = W_ONE;
+          end
+          else begin
+            state_next = STATE_FAIL;
+            way_next = W_NONE;
+          end
         end
-        else if ( cachereq_type == `VC_MEM_REQ_MSG_TYPE_READ && tag_match && v_read_data ) begin
-          state_next = STATE_READ_DATA_ACCESS;
-        end
-        else if ( cachereq_type == `VC_MEM_RESP_MSG_TYPE_WRITE && tag_match && v_read_data ) begin
-          state_next = STATE_WRITE_DATA_ACCESS;
-        end
-        else if ( cachereq_type == `VC_MEM_REQ_MSG_TYPE_READ && !d_read_data && !tag_match ) begin
-          state_next = STATE_REFILL_REQUEST;
-        end
-        else if ( cachereq_type == `VC_MEM_REQ_MSG_TYPE_WRITE && !d_read_data && !tag_match ) begin
-          state_next = STATE_REFILL_REQUEST;
-        end
-        else if ( cachereq_type == `VC_MEM_REQ_MSG_TYPE_READ && d_read_data && !tag_match ) begin
-          state_next = STATE_EVICT_PREPARE;
-        end
-        else if ( cachereq_type == `VC_MEM_REQ_MSG_TYPE_WRITE && d_read_data && !tag_match ) begin
-          state_next = STATE_EVICT_PREPARE;
-        end
-        else begin
-          state_next = STATE_IDLE;
-        end
-        v_write_en = n;
-        d_write_en = n;
-
+      else if ( tag0_match && v_read0_data && !tag1_match ) begin
+        if ( cachereq_type == req_in ) begin
+            state_next = STATE_INIT_DATA_ACCESS;
+            way_next = W_ZERO;
+          end
+          else if ( cachereq_type == req_rd ) begin
+            state_next = STATE_READ_DATA_ACCESS;
+            way_next = W_ZERO;
+          end
+          else if ( cachereq_type == req_wr) begin
+            state_next = STATE_WRITE_DATA_ACCESS;
+            way_next = W_ZERO;
+          end
+      end
+      else if ( tag1_match && v_read1_data && !tag0_match ) begin
+        if ( cachereq_type == req_in ) begin
+            state_next = STATE_INIT_DATA_ACCESS;
+            way_next = W_ONE;
+          end
+          else if ( cachereq_type == req_rd ) begin
+            state_next = STATE_READ_DATA_ACCESS;
+            way_next = W_ONE;
+          end
+          else if ( cachereq_type == req_wr) begin
+            state_next = STATE_WRITE_DATA_ACCESS;
+            way_next = W_ONE;
+          end
+      end
+      else begin
+        state_next = STATE_FAIL;
+        way_next = W_ZERO;
+      end
       STATE_INIT_DATA_ACCESS:
         if ( cacheresp_val && cacheresp_rdy ) begin
           state_next = STATE_IDLE;
+          way_next = way_curr;
         end
         else begin
           state_next = STATE_WAIT;
           state_prev = STATE_INIT_DATA_ACCESS;
+          way_next = way_curr;
         end
-        v_write_en = y;
-        v_write_data = 1'b1;
-
-        d_write_en = y;
-        d_write_data = 1'b0;
-
       STATE_WAIT:
         if ( cacheresp_val && cacheresp_rdy ) begin
           state_next = STATE_IDLE;
+          way_next = way_curr;
         end
-        v_write_en = n;
-        d_write_en = n;
-
       STATE_READ_DATA_ACCESS:
         if ( cacheresp_val && cacheresp_rdy ) begin
           state_next = STATE_IDLE;
+          way_next = way_curr;
         end
         else begin
           state_next = STATE_WAIT;
           state_prev = STATE_READ_DATA_ACCESS;
+          way_next = way_curr;
         end
-        v_write_en = n;
-        d_write_en = n;
-
       STATE_WRITE_DATA_ACCESS:
         if ( cacheresp_val && cacheresp_rdy ) begin
           state_next = STATE_IDLE;
+          way_next = way_curr;
         end
         else begin
           state_next = STATE_WAIT;
           state_prev = STATE_WRITE_DATA_ACCESS;
+          way_next = way_curr;
         end
-        d_write_en = y;
-        d_write_data = 1'b1;
-
       STATE_REFILL_REQUEST:
         if ( memreq_rdy ) begin
           state_next = STATE_REFILL_WAIT;
+          way_next = way_curr;
         end
         else begin
           state_next = STATE_REFILL_REQUEST;
+          way_next = way_curr;
         end
-        v_write_en = y;
-        v_write_data = 1'b0;
-
       STATE_REFILL_WAIT:
         if( !memresp_val ) begin
           state_next = STATE_REFILL_WAIT;
+          way_next = way_curr;
         end
         else begin
           state_next = STATE_REFILL_UPDATE;
+          way_next = way_curr;
         end
-        v_write_en = n;
-        d_write_en = n;
-
       STATE_REFILL_UPDATE:
         if (cachereq_type == `VC_MEM_REQ_MSG_TYPE_READ) begin
           state_next = STATE_READ_DATA_ACCESS;
+          way_next = way_curr;
         end
         else begin
           state_next = STATE_WRITE_DATA_ACCESS;
+          way_next = way_curr;
         end
-        v_write_en = y;
-        v_write_data = 1'b1;
-
-        d_write_en = y;
-        d_write_data = 1'b0;
-
       STATE_EVICT_PREPARE:
+      begin
         state_next = STATE_EVICT_REQUEST;
-        v_write_en = n;
-        d_write_en = n;
-
+        way_next = way_curr;
+      end
       STATE_EVICT_REQUEST:
         if ( memreq_rdy ) begin
           state_next = STATE_EVICT_WAIT;
+          way_next = way_curr;
         end
         else begin
           state_next = STATE_EVICT_REQUEST;
+          way_next = way_curr;
         end
-        v_write_en = y;
-        v_write_data = 1'b0;
-
-        d_write_en = y;
-        d_write_data = 1'b0;
-
       STATE_EVICT_WAIT:
         if( !memresp_val ) begin
           state_next = STATE_EVICT_WAIT;
+          way_next = way_curr;
         end
         else begin
           state_next = STATE_REFILL_REQUEST;
+          way_next = way_curr;
         end
-        v_write_en = n;
-        d_write_en = n;
-
       default:
+      begin
         state_next = STATE_IDLE;
-        v_write_en = n;
-        d_write_en = n;
-        
+        way_next = W_ZERO;
+      end
     endcase
   end
 
@@ -294,41 +315,91 @@ module lab3_mem_BlockingCacheAltCtrl
   logic [$clog2(nblocks)-1:0] v_read_addr;
   logic [$clog2(nblocks)-1:0] v_write_addr;
 
-  logic v_write_en;
-  logic v_read_data;
-  logic v_write_data;
 
-  vc_ResetRegfile_1r1w #(1,nblocks) valid_regfile
+  logic v_read0_data;
+  logic v_write0_data;
+  logic v_write0_en;
+  vc_ResetRegfile_1r1w #(1,nblocks) valid_regfile0
   (
     .clk        (clk),
     .reset      (reset),
 
     .read_addr  (v_read_addr),
-    .read_data  (v_read_data),
+    .read_data  (v_read0_data),
 
-    .write_en   (v_write_en),
+    .write_en   (v_write0_en),
     .write_addr (v_write_addr),
-    .write_data (v_write_data)
+    .write_data (v_write0_data)
+  );
+
+  logic v_read1_data;
+  logic v_write1_data;
+  logic v_write1_en;
+  vc_ResetRegfile_1r1w #(1,nblocks) valid_regfile1
+  (
+    .clk        (clk),
+    .reset      (reset),
+
+    .read_addr  (v_read_addr),
+    .read_data  (v_read1_data),
+
+    .write_en   (v_write1_en),
+    .write_addr (v_write_addr),
+    .write_data (v_write1_data)
   );
 
   logic [$clog2(nblocks)-1:0] d_read_addr;
   logic [$clog2(nblocks)-1:0] d_write_addr;
 
-  logic d_write_en;
-  logic d_read_data;
-  logic d_write_data;
 
-  vc_ResetRegfile_1r1w #(1,nblocks) dirty_regfile
+  logic d_read0_data;
+  logic d_write0_data;
+  logic d_write0_en;
+  vc_ResetRegfile_1r1w #(1,nblocks) dirty_regfile0
   (
     .clk        (clk),
     .reset      (reset),
 
     .read_addr  (d_read_addr),
-    .read_data  (d_read_data),
+    .read_data  (d_read0_data),
 
-    .write_en   (d_write_en),
+    .write_en   (d_write0_en),
     .write_addr (d_write_addr),
-    .write_data (d_write_data)
+    .write_data (d_write0_data)
+  );
+
+  logic d_read1_data;
+  logic d_write1_data;
+  logic d_write1_en;
+  vc_ResetRegfile_1r1w #(1,nblocks) dirty_regfile1
+  (
+    .clk        (clk),
+    .reset      (reset),
+
+    .read_addr  (d_read_addr),
+    .read_data  (d_read1_data),
+
+    .write_en   (d_write1_en),
+    .write_addr (d_write_addr),
+    .write_data (d_write1_data)
+  );
+
+  logic [$clog2(nblocks)-1:0] c_read_addr;
+  logic [$clog2(nblocks)-1:0] c_write_addr;
+  logic c_read_data;
+  logic c_write_data;
+  logic c_write_en;
+  vc_ResetRegfile_1r1w #(1,nblocks,1) count_regfile
+  (
+    .clk        (clk),
+    .reset      (reset),
+
+    .read_addr  (c_read_addr),
+    .read_data  (c_read_data),
+
+    .write_en   (c_write_en),
+    .write_addr (c_write_addr),
+    .write_data (c_write_data)
   );
 
   // END REGISTER FILES
@@ -339,38 +410,172 @@ module lab3_mem_BlockingCacheAltCtrl
   localparam n = 1'b0;
   localparam x = 1'bx;
 
-  assign v_read_addr  = cachereq_addr[7:4];
-  assign d_read_addr  = cachereq_addr[7:4];
-  assign v_write_addr = cachereq_addr[7:4];
-  assign d_write_addr = cachereq_addr[7:4];
+  assign v_read_addr  = cachereq_addr[6:4];
+  assign d_read_addr  = cachereq_addr[6:4];
+  assign c_read_addr  = cachereq_addr[6:4];
+  assign v_write_addr = cachereq_addr[6:4];
+  assign d_write_addr = cachereq_addr[6:4];
+  assign c_write_addr = cachereq_addr[6:4];
 
   always @(*) begin
     if ( state_reg == STATE_IDLE ) begin
-      
+      v_write0_en = n;
+      d_write0_en = n;
+
+      c_write_en = n;
+
+      v_write1_en = n;
+      d_write1_en = n;
     end
     else if ( state_reg == STATE_TAG_CHECK ) begin
-      
+      v_write0_en = n;
+      d_write0_en = n;
+
+      c_write_en = n;
+
+      v_write1_en = n;
+      d_write1_en = n;
     end
     else if ( state_reg == STATE_INIT_DATA_ACCESS ) begin
-      
+      if ( way_curr == W_ZERO ) begin
+        v_write0_en = y;
+        v_write0_data = 1'b1;
+
+        c_write_en = y;
+        c_write_data = 1'b0;
+
+        d_write0_en = y;
+        d_write0_data = 1'b0;
+
+        v_write1_en = n;
+        d_write1_en = n;
+      end
+      else if ( way_curr == W_ONE ) begin
+        v_write1_en = y;
+        v_write1_data = 1'b1;
+
+        c_write_en = y;
+        c_write_data = 1'b0;
+        
+        d_write1_en = y;
+        d_write1_data = 1'b0;
+
+        v_write0_en = n;
+        d_write0_en = n;
+      end
+    end
+    else if ( state_reg == STATE_READ_DATA_ACCESS ) begin
+      if ( way_curr == W_ZERO ) begin
+        c_write_en = y;
+        c_write_data = 1'b0;
+      end
+      else if ( way_curr == W_ONE ) begin
+        c_write_en = y;
+        c_write_data = 1'b1;
+      end
     end
     else if ( state_reg == STATE_WRITE_DATA_ACCESS ) begin
-      
+      if ( way_curr == W_ZERO ) begin
+        d_write0_en = y;
+        d_write0_data = 1'b1;
+
+        c_write_en = y;
+        c_write_data = 1'b0;
+
+        d_write1_en = n;
+      end
+      else if ( way_curr == W_ONE ) begin
+        d_write1_en = y;
+        d_write1_data = 1'b1;
+
+        c_write_en = y;
+        c_write_data = 1'b1;
+
+        d_write0_en = n;
+      end
     end
     else if ( state_reg == STATE_REFILL_REQUEST ) begin
-      
+      if ( way_curr == W_ZERO ) begin
+        v_write0_en = y;
+        v_write0_data = 1'b0;
+
+        v_write1_data = n;
+      end
+      else if ( way_curr == W_ONE ) begin
+        v_write1_en = y;
+        v_write1_data = 1'b0;
+
+        v_write0_data = n;
+      end
     end
     else if ( state_reg == STATE_EVICT_REQUEST ) begin
-      
+      if ( way_curr == W_ZERO ) begin
+        v_write0_en = y;
+        v_write0_data = 1'b0;
+
+        d_write0_en = y;
+        d_write0_data = 1'b0;
+
+        v_write1_en = n;
+        d_write1_en = n;
+      end
+      else if ( way_curr == W_ONE ) begin
+        v_write1_en = y;
+        v_write1_data = 1'b0;
+
+        d_write1_en = y;
+        d_write1_data = 1'b0;
+
+        v_write0_en = n;
+        d_write0_en = n;
+      end
     end
     else if ( state_reg == STATE_REFILL_UPDATE ) begin
-      
+      if ( way_curr == W_ZERO ) begin
+        v_write0_en = y;
+        v_write0_data = 1'b1;
+
+        d_write0_en = y;
+        d_write0_data = 1'b0;
+
+        v_write1_en = n;
+        d_write1_en = n;
+      end
+      else if ( way_curr == W_ONE ) begin
+        v_write1_en = y;
+        v_write1_data = 1'b1;
+
+        d_write1_en = y;
+        d_write1_data = 1'b0;
+
+        v_write0_en = n;
+        d_write0_en = n;
+      end
     end
     else begin
-      v_write_en = n;
-      d_write_en = n;
+      v_write0_en = n;
+      d_write0_en = n;
+
+      c_write_en = n;
+
+      v_write1_en = n;
+      d_write1_en = n;
     end
   end
+
+  always @(*) begin
+    if ( way_curr == W_ZERO ) begin
+      way_sel = 1'b0;
+    end
+    else if ( way_curr == W_ONE ) begin
+      way_sel = 1'b1;
+    end
+    else begin
+      way_sel = 1'bx;
+    end
+  end
+
+  // END SET REGISTER FILES
 
   // END SET REGISTER FILES
 
@@ -464,19 +669,42 @@ module lab3_mem_BlockingCacheAltCtrl
     memreq_val           =    cs_memreq_val;    
     memresp_rdy          =    cs_memresp_rdy;
     cachereq_en          =    cs_cachereq_en;   
-    tag_array_ren        =    cs_tag_array_ren;      
-    tag_array_wen        =    cs_tag_array_wen;      
+    tag_array_ren        =    cs_tag_array_ren;  
+    // TAG ARRAY WEN. SEE IF STATEMENT BELOW  
     write_data_mux_sel   =    cs_write_data_mux_sel;            
     evict_addr_reg_en    =    cs_evict_addr_reg_en;          
     memreq_addr_mux_sel  =    cs_memreq_addr_mux_sel;            
     cacheresp_type       =    cs_cacheresp_type;        
     memresp_en           =    cs_memresp_en;          
     data_array_ren       =    cs_data_array_ren;        
-    data_array_wen       =    cs_data_array_wen;        
+    // DATA ARRAY WEN. SEE IF STATEMENT BELOW        
     data_array_wben      =    cs_data_array_wben;        
     read_data_reg_en     =    cs_read_data_reg_en;          
     read_word_mux_sel    =    cs_read_word_mux_sel;          
-    memreq_type          =    cs_memreq_type;    
+    memreq_type          =    cs_memreq_type; 
+
+    if ( way_curr == W_ZERO ) begin
+      tag_array0_wen = cs_tag_array_wen;
+      data_array0_wen = cs_data_array_wen;
+
+      tag_array1_wen = n;
+      data_array1_wen = n;
+    end
+    else if ( way_curr == W_ONE ) begin
+      tag_array1_wen = cs_tag_array_wen;
+      data_array1_wen = cs_data_array_wen;
+
+      tag_array0_wen = n;
+      data_array0_wen = n;
+    end
+    else begin
+      tag_array0_wen = n;
+      data_array0_wen = n;
+
+      tag_array1_wen = n;
+      data_array1_wen = n;
+    end
+
   end
   endtask
 
@@ -498,6 +726,7 @@ module lab3_mem_BlockingCacheAltCtrl
       STATE_EVICT_PREPARE     :set_cs( n,  n,  n,  n,   n,  y,   n,   x, y,  e, tx,  n,  y,  n,  nwb, y,   wx, tx  );
       STATE_EVICT_REQUEST     :set_cs( n,  n,  y,  n,   n,  n,   n,   x, n,  e, tx,  n,  n,  n,  nwb, n,   wx, wr  );
       STATE_EVICT_WAIT        :set_cs( n,  n,  n,  y,   n,  n,   n,   x, n,  x, tx,  n,  n,  n,  nwb, n,   wx, tx  );
+      STATE_FAIL              :set_cs( n,  y,  n,  n,   n,  n,   n,   x, n,  x, tx,  n,  n,  n,  nwb, n,   wx, tx  );
       default                 :set_cs( n,  n,  n,  n,   n,  n,   n,   x, n,  x, tx,  n,  n,  n,  nwb, n,   wx, tx  );
     endcase
 

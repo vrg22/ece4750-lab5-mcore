@@ -51,18 +51,24 @@ module lab3_mem_BlockingCacheAltWay
   // SRAMs
 
   logic [abw-1-(idw+odw+2):0]   read_tag;
-  vc_CombinationalSRAM_1rw #(abw-(idw+odw+2),nblocks) tag_array
+
+  logic [abw-1:0]               read_tag_from_sram;
+  logic [abw-1:0]               write_tag_to_sram;
+  assign write_tag_to_sram = { 7'b0 , curr_tag };
+  vc_CombinationalSRAM_1rw #(abw,nblocks) tag_array
   (
     .clk            (clk),
     .reset          (reset),
     .read_en        (tag_array_ren),
     .read_addr      (idx),
-    .read_data      (read_tag),
+    .read_data      (read_tag_from_sram),
     .write_en       (tag_array_wen),
     .write_byte_en  (4'b1111),
     .write_addr     (idx),
-    .write_data     (curr_tag)
+    .write_data     (write_tag_to_sram)
   );
+
+  assign read_tag = read_tag_from_sram[abw-1-(idw+odw+2):0];
 
   logic [clw-1:0]             cache_data;
   vc_CombinationalSRAM_1rw #(clw,nblocks) data_array
