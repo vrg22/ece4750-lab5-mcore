@@ -10,6 +10,7 @@ lab3_mem_srcs = \
   lab3-mem-BlockingCacheBaseDpath.v \
   lab3-mem-BlockingCacheBaseCtrl.v \
   lab3-mem-BlockingCacheBase.v \
+  lab3-mem-BlockingCacheAltWay.v \
   lab3-mem-BlockingCacheAltDpath.v \
   lab3-mem-BlockingCacheAltCtrl.v \
   lab3-mem-BlockingCacheAlt.v \
