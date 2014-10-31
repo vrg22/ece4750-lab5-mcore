@@ -29,9 +29,9 @@ Changing the roles from Lab 2, we assigned Vivek to be the architect, Akshay to 
 Our initial project roadmap was rather aggressive and required us to be finished by Sunday, October 26\textsuperscript{st}, since we planned on trying out an extension or two for this lab. The Gantt Chart with both the planned and actual roadmaps overlaid is shown in Figure~\ref{fig:gantt}. Clearly, we couldn't meet the aggressive deadlines we set initially although we did manage to complete the lab before the actual deadline. \\
 
 The work was divided as follows:
-Vivek 
-Akshay worked on most of the baseline implementation, worked on the alternative implementation, and created the testing suite for the baseline implementation.
-Avinash wrote most of the writeup, worked on part of the baseline implementation, and created the testing suite for the alternative implementation. \\
+Vivek worked on the random testing and part of the writeup.
+Akshay worked on most of the baseline implementation and alternative implementations, and created the directed testing suite for the baseline implementation.
+Avinash wrote most of the writeup, worked on part of the baseline implementation, and created the directed testing suite for the alternative implementation. \\
 
 															% ADD INFO ON DEBUGGING WORK 
 
@@ -43,26 +43,29 @@ Avinash wrote most of the writeup, worked on part of the baseline implementation
 
 \section{Baseline Design}
 
-The baseline design for this lab is a 256B direct-mapped, write-back, write-allocate cache. The baseline design was split into control, datapath, and top-level modules to make design and debugging easier but also to enforce the design principles of modularity, hierarchy, and encapsulation for a design of this level of complexity. The cache control is managed by a finite state machine (FSM) controller that deals with states with one or more steps per state during which control signals are fed out to the datapath and status signals are received in return. State machine and datapath diagrams for the baseline design are shown in Figures and respectively. We utilize val/ready interfaces for instruction/data memory requests which allows memory systems of varying latencies to be composed with the cache.The interface for the direct-mapped cache consists of the following inputs: clock and reset signals, the test source/cache request message and valid signal, cache response ready signal (from the test sink/processor), memory request ready signal, and the memory response message and valid signal. The outputs are: the cache request ready signal, cache response message and valid signal, memory request message and valid signal, as well as the memory response ready signal. We began working on the design by first fully creating the datapath and then adding the different paths: init transaction, read hit path, write hit path, refill path, and evict path. Since the cache is write-back, write-allocate, we write only to the cache on a write hit and load the cache line from memory (and then write to the cache) on a write miss. Also, we maintain two register files in the control module for keeping track of valid and dirty cache lines. This information is necessary for determining whether evictions are required on cache read/write misses. \\
+The baseline design for this lab is a 256B direct-mapped, write-back, write-allocate cache. The baseline design was split into control, datapath, and top-level modules to make design and debugging easier but also to enforce the design principles of modularity, hierarchy, and encapsulation for a design of this level of complexity. The cache control is managed by a finite state machine (FSM) controller that deals with states with one or more steps per state during which control signals are fed out to the datapath and status signals are received in return. State machine and datapath diagrams for the baseline design are shown in Figures \ref{fig:state} and \ref{fig:baseline} and respectively. We utilize val/ready interfaces for instruction/data memory requests which allows memory systems of varying latencies to be composed with the cache.The interface for the direct-mapped cache consists of the following inputs: clock and reset signals, the test source/cache request message and valid signal, cache response ready signal (from the test sink/processor), memory request ready signal, and the memory response message and valid signal. The outputs are: the cache request ready signal, cache response message and valid signal, memory request message and valid signal, as well as the memory response ready signal. We began working on the design by first fully creating the datapath and then adding the different paths: init transaction, read hit path, write hit path, refill path, and evict path. Since the cache is write-back, write-allocate, we write only to the cache on a write hit and load the cache line from memory (and then write to the cache) on a write miss. Also, we maintain two register files in the control module for keeping track of valid and dirty cache lines. This information is necessary for determining whether evictions are required on cache read/write misses. \\
 
 
 \section{Alternative Design}
 
-The alternative design for this lab is a 256B two-way write-back, write-allocate set-associative cache. Just like the baseline design, the alternative design was split into control, datapath, and top-level modules, with control being managed by a FSM controller. State machine and datapath diagrams for the alternative design are shown in Figures and respectively. The main datapath changes that had to be made to the baseline design to create the alternative design involved duplicating the tag array and tag check logic. The modifications made to the control logic were more extensive, however. These modifications include having two valid/dirty bits for each way and more complex logic to locate sources of conflict misses in the two tag arrays.  \\
+The alternative design for this lab is a 256B two-way write-back, write-allocate set-associative cache. Just like the baseline design, the alternative design was split into control, datapath, and top-level modules, with control being managed by a FSM controller. State machine and datapath diagrams for the alternative design are shown in Figures \ref{fig:state} and \ref{fig:alt} respectively. The state diagram is the same for both the baseline and alternative designs since the only difference in their control logic lies 
+
+The main datapath changes that had to be made to the baseline design to create the alternative design involved duplicating the tag array and tag check logic. The modifications made to the control logic were more extensive, however. These modifications include having two valid/dirty bits for each way and more complex logic to locate sources of conflict misses in the two tag arrays.  \\
+
+
+% modularity and fail cases
 
 
 
 \section{Testing Strategy}
 
-We began the testing process by writing and running directed tests for each of the 5 different paths (init, hit, miss, refill, evict) as they were implemented. These tests were first run on the functional model to ensure correctness after which they were run on the baseline implementation. A similar process was carried out for the alternative implementation. The first 6 directed test cases we wrote tested read/write hit/miss functionality for clean/dirty cases. These test cases were aimed at the baseline implementation while the rest of our test cases were aimed at the alternative implementation; even though all the tests are needed to ultimately forge comparisons between the baseline and alternative designs, the test cases aimed at the alternative design were intended to test certain characteristics specific to a set-associative cache, e.g. testing control logic for determining the source of conflict misses (in either way) and testing the LRU replacement policy.
+We began the testing process by writing and running directed tests for each of the 5 different paths (init, hit, miss, refill, evict) as they were implemented. These tests were first run on the functional model to ensure correctness after which they were run on the baseline implementation. A similar process was carried out for the alternative implementation. The first 6 directed test cases we wrote tested read/write hit/miss functionality for clean/dirty cases. These test cases were aimed at the baseline implementation while the rest of our test cases were aimed at the alternative implementation; even though all the tests are needed to ultimately forge comparisons between the baseline and alternative designs, the test cases aimed at the alternative design were intended to test certain characteristics specific to a set-associative cache, e.g. testing control logic for determining the source of conflict misses (in either way) and testing the least recently used (LRU) replacement policy. We ensured that read misses were correctly handled by the cache controller with a LRU replacement policy by filling up both cache ways for one set of instructions and causing read misses to those cache lines. However, in order to specifically target the LRU control logic, i.e. determine whether or not the least recently used cache line is selected correctly, we modified the alternative design control logic to output \texttt{h'0a} if the way 0 cache line was replaced and a \texttt{h'0b} as opaque bits if the way 1 cache line was replaced. We then created directed tests that wrote the expected opaque bits to the test sink to verify correct implementation of the LRU replacement policy. This modification was clearly meant for test purposes only and so we commented out all the code for these special tests once we were done testing. 
 
 
 																	% RANDOM TESTING
 
+																	% BUGS
 
-% The directed test cases were made to cover all types of possible inputs, including zeros and ones, small and large numbers, positive and negative numbers, and combinations of these. Furthermore, random test source/sink delays were also added to the stall/bubble (long) tests that tested the val/rdy microprotocol. Test case inputs were varied according to the instruction being tested. For this lab, directed tests were a good choice, because they give us the ability to individually target PARCv2 instructions. Incremental design was possible because we had a separate tests for each instruction. A summary of all the different types of test cases is given in Table~\ref{table:tests}. \\
-
-% We only encountered two bugs with our baseline design, both of which were identified by the benchmark tests provided to us. We initially encountered a few failed directed tests, although closer inspection revealed that the issue was with incorrect test case outputs rather than with the baseline design or implementation. The first actual issue we encountered with the baseline design was with the \texttt{mul} instruction. One specific test case that issued \texttt{mfc0, mfc0,} and \texttt{mul} instructions together failed. This had to do with faulty stall logic for the \texttt{mul} instruction, which was promptly corrected. Following this, our baseline implementation failed the \texttt{vvadd-unopt} benchmark test although it passed the \texttt{vvadd-opt} test. This time the error was with the \texttt{sw} instruction stall logic. It turned out that we were not accounting for data dependencies involving the address register for the \texttt{sw} instruction (e.g. \texttt{R8} in \texttt{sw R4, 0(R8)}). After fixing this error, our baseline implementation ran successfully on all directed and benchmark tests. \\ 
 
 Ultimately both the base and alternative designs worked correctly with all test cases.  \\
 
@@ -152,24 +155,23 @@ Ultimately both the base and alternative designs worked correctly with all test 
 % \end{center}
 
 
-\pagebreak[4]
 
 % % Figure: Gantt Chart
 
-% \begin{figure}[b]
-% \centering
-% \includegraphics[scale=0.5, angle=90]{gantt}
-% \caption{Gantt Chart}
-% \label{fig:gantt}
-% \end{figure}
+\begin{figure}[b]
+\centering
+\includegraphics[scale=0.5, angle=90]{gantt}
+\caption{Gantt Chart}
+\label{fig:gantt}
+\end{figure}
 
-% Figure: Baseline FSM Control Unit State Diagram
+% Figure: FSM Control Unit State Diagram
 
 \begin{figure}[b]
 \centering
-\includegraphics[scale=0.8]{baselinestate}
+\includegraphics[scale=0.8]{state}
 \caption{Baseline FSM Control Unit State Diagram}
-\label{fig:baselinestate}
+\label{fig:state}
 \end{figure}
 
 % % Figure: Baseline Design Datapath Diagram
@@ -178,27 +180,18 @@ Ultimately both the base and alternative designs worked correctly with all test 
 \centering
 \includegraphics[scale=0.6]{baseline}
 \caption{Baseline Design Datapath Diagram}
-\label{fig:baseline.jpg}
+\label{fig:baseline}
 \end{figure}
 
 
-% % Figure: Alternative Design State Machine Diagram
-
-% \begin{figure}[b]
-% \centering
-% \includegraphics[scale=0.5]{altstate}
-% \caption{Alternative Design State Machine Diagram}
-% \label{fig:altstate}
-% \end{figure}
-
 % % Figure: Alternative Design Datapath Diagram
 
-% \begin{figure}[b]
-% \centering
-% \includegraphics[scale=0.5]{alt}
-% \caption{Alternative Design Datapath Diagram}
-% \label{fig:alt}
-% \end{figure}
+\begin{figure}[b]
+\centering
+\includegraphics[scale=0.8]{alt}
+\caption{Alternative Design Datapath Diagram}
+\label{fig:alt}
+\end{figure}
 
 
 
