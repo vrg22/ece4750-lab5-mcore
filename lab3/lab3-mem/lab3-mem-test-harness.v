@@ -364,6 +364,13 @@ module top;
   end
   endtask
 
+
+
+  //----------------------------------------------------------------------
+  // Directed Test Cases
+  //----------------------------------------------------------------------
+
+
   //----------------------------------------------------------------------
   // Basic Test Case #1: Read Hit Path (clean)
   //----------------------------------------------------------------------
@@ -571,45 +578,41 @@ module top;
 
 
   //----------------------------------------------------------------------
-  // ALternative Test Case #2: Capacity Misses
+  // ALternative Test Case #2: LRU Replacement Policy
   //----------------------------------------------------------------------
 
-  /*`VC_TEST_CASE_BEGIN( 8, "alternative test case 2: capacity misses" )
+  `VC_TEST_CASE_BEGIN( 8, "alternative test case 2: LRU replacement policy" )
   begin
     init_test_case( 0, 0, 0 );
-    load_mem( 32'h00000100, 128'h00000004000000030000000200000001 );
-    load_mem( 32'h00000200, 128'h00000008000000070000000600000005 );
-    load_mem( 32'h00000300, 128'h0000000d0000000c0000000b0000000a );
-    load_mem( 32'h00000400, 128'h0000000f0000000e0000000d0000000c );
+    load_mem( 32'h00000200, 128'h00000004000000030000000200000001 );
+    load_mem( 32'h00000210, 128'h00000008000000070000000600000005 );
 
     // Initialize Port
 
     //         ------------- memory request --------------------  --------- memory response ----------
     //         type      opaque addr          len   data          type       opaque len   data
 
-    init_port( c_req_in, 8'h00, 32'h00000000, 2'd0, 32'h0a0b0c0d, c_resp_in, 8'h00, 2'd0, 32'h???????? ); 
-    init_port( c_req_rd, 8'h01, 32'h00000100, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h00000001 );
-    init_port( c_req_rd, 8'h01, 32'h00000000, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h0a0b0c0d ); 
-    init_port( c_req_rd, 8'h01, 32'h00000200, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h00000005 ); 
-    init_port( c_req_rd, 8'h01, 32'h00000100, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h00000001 );
-    init_port( c_req_rd, 8'h01, 32'h00000300, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h0000000a ); 
-    init_port( c_req_rd, 8'h01, 32'h00000200, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h00000005 );
-    init_port( c_req_rd, 8'h01, 32'h00000400, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h0000000c ); 
-    init_port( c_req_rd, 8'h01, 32'h00000300, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h0000000a );
+    init_port( c_req_in, 8'h00, 32'h00000000, 2'd0, 32'h0a0b0c0d, c_resp_in, 8'h00, 2'd0, 32'h???????? );       // Fill way 0
+    init_port( c_req_in, 8'h00, 32'h00000100, 2'd0, 32'h0a0b0c0d, c_resp_in, 8'h00, 2'd0, 32'h???????? ); 
+    init_port( c_req_in, 8'h00, 32'h00000010, 2'd0, 32'h0a0b0c0d, c_resp_in, 8'h00, 2'd0, 32'h???????? );       // Fill way 1
+    init_port( c_req_in, 8'h00, 32'h00000110, 2'd0, 32'h0a0b0c0d, c_resp_in, 8'h00, 2'd0, 32'h???????? );     
+
+    init_port( c_req_rd, 8'h01, 32'h00000200, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h00000001 );       // read miss to way 0
+    init_port( c_req_rd, 8'h01, 32'h00000210, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h01, 2'd0, 32'h00000005 );       // read miss to way 1
 
     run_test;
   end
-  `VC_TEST_CASE_END*/
+  `VC_TEST_CASE_END
 
 
-  //----------------------------------------------------------------------
-  // Directed Test Cases
-  //----------------------------------------------------------------------
 
   //----------------------------------------------------------------------
   // Random Tests
   //----------------------------------------------------------------------
 
+
+
   `VC_TEST_SUITE_END
+
 endmodule
 
