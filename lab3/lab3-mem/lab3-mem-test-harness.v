@@ -630,13 +630,12 @@ module top;
   `VC_TEST_CASE_BEGIN( 10, "Current Bug Catch test" )
   begin
     init_test_case( 0, 0, 0 );
-    load_mem( 32'h00001000, 128'h00000003_00000002_00000001_00000000 );
+    load_mem( 32'h00000000, 128'h00000003_00000002_00000001_00000000 );
     load_mem( 32'h00001010, 128'h00000007_00000006_00000005_00000004 );
     load_mem( 32'h00001020, 128'h0000000b_0000000a_00000009_00000008 );
 
 
-    init_port( c_req_rd, 8'h00, 32'h00001000, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h00, 2'd0, 32'h00000000 );
-    init_port( c_req_rd, 8'h00, 32'h00001010, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h00, 2'd0, 32'h00000004 );
+    init_port( c_req_rd, 8'h00, 32'h00000000, 2'd0, 32'hxxxxxxxx, c_resp_rd, 8'h00, 2'd0, 32'h00000000 );
 
     run_test;
   end

@@ -90,7 +90,9 @@ module lab3_mem_BlockingCacheBaseCtrl
     STATE_EVICT_WAIT,               // 8      
     STATE_REFILL_REQUEST,           // 9          
     STATE_REFILL_WAIT,              // A        
-    STATE_REFILL_UPDATE             // B        
+    STATE_REFILL_UPDATE,            // B
+    STATE_FAIL0,                    // C
+    STATE_FAIL1                     // D        
   } state_t;
 
 
@@ -136,20 +138,20 @@ module lab3_mem_BlockingCacheBaseCtrl
         else if ( cachereq_type == `VC_MEM_RESP_MSG_TYPE_WRITE && tag_match && v_read_data ) begin
           state_next = STATE_WRITE_DATA_ACCESS;
         end
-        else if ( cachereq_type == `VC_MEM_REQ_MSG_TYPE_READ && !d_read_data && !tag_match ) begin
+        else if ( cachereq_type == `VC_MEM_REQ_MSG_TYPE_READ && !d_read_data ) begin
           state_next = STATE_REFILL_REQUEST;
         end
-        else if ( cachereq_type == `VC_MEM_REQ_MSG_TYPE_WRITE && !d_read_data && !tag_match ) begin
+        else if ( cachereq_type == `VC_MEM_REQ_MSG_TYPE_WRITE && !d_read_data ) begin
           state_next = STATE_REFILL_REQUEST;
         end
-        else if ( cachereq_type == `VC_MEM_REQ_MSG_TYPE_READ && d_read_data && !tag_match ) begin
+        else if ( cachereq_type == `VC_MEM_REQ_MSG_TYPE_READ && d_read_data ) begin
           state_next = STATE_EVICT_PREPARE;
         end
-        else if ( cachereq_type == `VC_MEM_REQ_MSG_TYPE_WRITE && d_read_data && !tag_match ) begin
+        else if ( cachereq_type == `VC_MEM_REQ_MSG_TYPE_WRITE && d_read_data  ) begin
           state_next = STATE_EVICT_PREPARE;
         end
         else begin
-          state_next = STATE_IDLE;
+          state_next = STATE_FAIL0;
         end
       STATE_INIT_DATA_ACCESS:
         if ( cacheresp_val && cacheresp_rdy ) begin
@@ -200,9 +202,10 @@ module lab3_mem_BlockingCacheBaseCtrl
       else begin
         state_next = STATE_WRITE_DATA_ACCESS;
       end
-        
+      STATE_FAIL0:
+        state_next = STATE_FAIL1;
       default:
-        state_next = STATE_IDLE;
+        state_next = STATE_FAIL1;
       STATE_EVICT_PREPARE:
         state_next = STATE_EVICT_REQUEST;
       STATE_EVICT_REQUEST:
@@ -446,6 +449,8 @@ module lab3_mem_BlockingCacheBaseCtrl
       STATE_EVICT_PREPARE     :set_cs( n,  n,  n,  n,   n,  y,   n,   x, y,  e, tx,  n,  y,  n,  nwb, y,   wx, tx  );
       STATE_EVICT_REQUEST     :set_cs( n,  n,  y,  n,   n,  n,   n,   x, n,  e, tx,  n,  n,  n,  nwb, n,   wx, wr  );
       STATE_EVICT_WAIT        :set_cs( n,  n,  n,  y,   n,  n,   n,   x, n,  x, tx,  n,  n,  n,  nwb, n,   wx, tx  );
+      STATE_FAIL0             :set_cs( n,  n,  n,  n,   n,  n,   n,   x, n,  x, tx,  n,  n,  n,  nwb, n,   wx, tx  );
+      STATE_FAIL1             :set_cs( n,  y,  n,  n,   n,  n,   n,   x, n,  x, tx,  n,  n,  n,  nwb, n,   wx, tx  );
       default                 :set_cs( n,  n,  n,  n,   n,  n,   n,   x, n,  x, tx,  n,  n,  n,  nwb, n,   wx, tx  );
     endcase
 

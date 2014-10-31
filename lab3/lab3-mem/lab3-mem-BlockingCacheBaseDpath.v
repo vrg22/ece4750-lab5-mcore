@@ -219,10 +219,12 @@ module lab3_mem_BlockingCacheBaseDpath
   );
 
   logic [abw-1:0] memreq_addr;
+  logic [abw-1:0] aligned_addr;
+  assign aligned_addr = cachereq_addr & 32'hffffffff;
   vc_Mux2 #(abw) memreq_addr_mux
   (
     .in0      (evict_addr),
-    .in1      (cachereq_addr),
+    .in1      (aligned_addr),
     .sel      (memreq_addr_mux_sel),
     .out      (memreq_addr)
   );
