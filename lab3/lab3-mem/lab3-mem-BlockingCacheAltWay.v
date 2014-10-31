@@ -108,12 +108,10 @@ module lab3_mem_BlockingCacheAltWay
     .q      (evict_addr)
   );
 
-  logic [abw-1:0] line_alinged_addr; // BELOW LINE HARDCODED, FIX
-  assign line_alinged_addr = { cachereq_addr[abw-1:2+idw+odw] , 7'b0 };
   vc_Mux2 #(abw) memreq_addr_mux
   (
     .in0      (evict_addr),
-    .in1      (line_alinged_addr),
+    .in1      (cachereq_addr),
     .sel      (memreq_addr_mux_sel),
     .out      (memreq_addr)
   );

@@ -101,9 +101,9 @@ module lab3_mem_BlockingCacheAltCtrl
   } state_t;
 
   typedef enum logic [$clog2(3)-1:0] {
-    W_NONE,                         // 0           
-    W_ZERO,                         // 1           
-    W_ONE                           // 2         
+    W_ZERO,                         // 0           
+    W_ONE,                           // 1  
+    W_NONE                          // 2           
   } way_t;
 
 
