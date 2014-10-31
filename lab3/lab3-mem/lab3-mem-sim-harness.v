@@ -477,7 +477,7 @@ module top;
     #1;
 
     // we use a fixed delay of 20 cycles in the memory
-    init_delays( 0, 0, 0, 0 );
+    init_delays( 0, 0, 19, 0 );
 
     if          ( input_dataset == "loop-1d"   ) begin
       `include "lab3-mem-gen-input_loop-1d.py.v"
