@@ -97,7 +97,7 @@ elif sys.argv[1] == "loop-3d":
         print_cache_read( addr, (addr - base_addr)/4 )
 
 #--------------------------------------------------------------------------------
-# Random test 1:  Simple address patterns, single request type, with random data
+# Random test 1:  Simple address pattern, single request type, with random data
 #--------------------------------------------------------------------------------
 # accesses for a[] in:
 # for ( i = 0; i < 100; i++ )
@@ -123,7 +123,7 @@ if sys.argv[1] == "rand_1":
     print_cache_read( addr, ref_mem[j] )	#Check against rem_mem value
 
 #--------------------------------------------------------------------------------
-# Random test 2: Random address patterns, request types, and data
+# Random test 2: Random address pattern, request types, and data
 #--------------------------------------------------------------------------------
 # Random address pattern here: make random memory reads in a fixed memory range,
 #                              but make a specific access only up to 2 times
