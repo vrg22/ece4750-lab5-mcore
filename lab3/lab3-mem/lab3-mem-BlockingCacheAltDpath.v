@@ -235,17 +235,6 @@ module lab3_mem_BlockingCacheAltDpath
     .msg      (cacheresp_msg)
   );
 
-  logic [clw-1:0] way0_cache_contents;
-  logic [clw-1:0] way1_cache_contents;
-  logic [clw-1:0] memreq_val_cache_contents;
-  vc_Mux2 #(clw) way_mux_memreq
-  (
-    .in0      (way0_cache_contents),
-    .in1      (way1_cache_contents),
-    .sel      (way_sel),
-    .out      (memreq_val_cache_contents)
-  );
-
   // Pack Memory Request Message
 
   vc_MemReqMsgPack #(o,abw,clw) memreq_msg_pack
@@ -254,7 +243,7 @@ module lab3_mem_BlockingCacheAltDpath
     .opaque   (8'b0),
     .addr     (memreq_addr),
     .len      (4'b0),
-    .data     (memreq_val_cache_contents),
+    .data     (128'hxxxxxxxxxxxxxxxx),
     .msg      (memreq_msg)
   );
 
