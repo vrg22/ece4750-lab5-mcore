@@ -34,10 +34,7 @@ Akshay worked on most of the baseline implementation and alternative implementat
 Avinash wrote most of the writeup, worked on part of the baseline implementation, and created the directed testing suite for the alternative implementation.
 All team members worked on debugging the RTL logic and test cases. \\
 
-
-% During the initial meeting on September 14, we planned to simultaneously begin the baseline implementation and the writing of directed tests the next day itself. However, various conflicts came up and we couldn't begin either of these until September 20. Akshay and Vivek worked on the baseline implementation which progressed quickly while Vivek and Avinash started the directed tests which took nearly until the end to write due to the sheer number of instructions compared to the first lab. Each test was incrementally tested on the ISA Simulator and with the baseline implementation once it was ready. All team members worked on debugging the Verilog code for the RTL implementations once the baseline implementation was done, while Vivek and Avinash debugged the test cases they worked on incrementally. We ran the 5 provided benchmarks on the baseline as well, which yielded 2 bugs that our directed tests didn't catch. Debugging the baseline was relatively straightforward since we only got 2 bugs which were resolved quickly. Once the baseline implementation was verified, Akshay began the alternative implementation which didn't take too long since adding the bypass logic and modifiying the control logic was relatively simple compared to the baseline implementation. Avinash worked on the lab report throughout this time. \\
-
-% Starting the lab earlier would have allowed us to build some extensions, although we are glad we were able to finish the assigned work on time and were able to test and evaluate our designs thoroughly. 
+The work was approached by simultaneously starting the baseline implementation and testing, followed by the lab writeup shortly after. Baseline paths that were completed were promptly tested. As soon as the baseline implementation was complete and successfully tested, we moved on to the alternative design implementation and testing (which included adding additional test cases for the alternative design). Even though we assigned different roles to each of the team members, different team members took the initiative to work on different aspects of the lab and so we all ended up getting a thorough understanding of all parts of the lab. Starting the lab earlier would have allowed us to build some extensions, although we are glad we were able to finish the assigned work on time and were able to test and evaluate our designs thoroughly. 
 
 
 \section{Baseline Design}
@@ -51,16 +48,11 @@ The alternative design for this lab is a 256B two-way write-back, write-allocate
 The main datapath changes that had to be made to the baseline design to create the alternative design involved duplicating the tag array and tag check logic. The modifications made to the control logic were more extensive, however. These modifications include having different valid, dirty, and count (for LRU) register files for each way, more complex logic to determine which way to write to, and logic to implement the LRU replacement policy. Furthermore, we tried to improve the modularity of our design by refactoring the tag/data arrays and output logic into separate ``way modules'' (in file ``lab3-mem-BlockingCacheAltWay.v''), which reduced the chance of errors and confusion during design. These way modules can be seen in the alternative design datapath diagram shown in Figure \ref{fig:alt}, while a sneak-peek into a way module itself is shown in Figure \ref{fig:way}.  \\
 
 
-																	% FAIL CASES
-
-
-
 \section{Testing Strategy}
 
-We began the testing process by writing and running directed tests for each of the 5 different paths (init, hit, miss, refill, evict) as they were implemented. These tests were first run on the functional model to ensure correctness after which they were run on the baseline implementation. A similar process was carried out for the alternative implementation. The first 6 directed test cases we wrote tested read/write hit/miss functionality for clean/dirty cases. These test cases were aimed at the baseline implementation while the rest of our test cases were aimed at the alternative implementation; even though all the tests are needed to ultimately forge comparisons between the baseline and alternative designs, the test cases aimed at the alternative design were intended to test certain characteristics specific to a set-associative cache, e.g. testing control logic for determining the source of conflict misses (in either way) and testing the least recently used (LRU) replacement policy. We ensured that read misses were correctly handled by the cache controller with a LRU replacement policy by filling up both cache ways for one set of instructions and causing read misses to those cache lines. However, in order to specifically target the LRU control logic, i.e. determine whether or not the least recently used cache line is selected correctly, we modified the alternative design control logic to output \texttt{h'0a} if the way 0 cache line was replaced and a \texttt{h'0b} as opaque bits if the way 1 cache line was replaced. We then created directed tests that wrote the expected opaque bits to the test sink to verify correct implementation of the LRU replacement policy. This modification was clearly meant for test purposes only and so we commented out all the code for these special tests once we were done testing. We also made two additional states called FAIL0 and FAIL1 in the baseline implementation so that we could use trace instead of gtkwave to debug.
+We began the testing process by writing and running directed tests for each of the 5 different paths (init, hit, miss, refill, evict) as they were implemented. These tests were first run on the functional model to ensure correctness after which they were run on the baseline implementation. A similar process was carried out for the alternative implementation. The first 6 directed test cases we wrote tested read/write hit/miss functionality for clean/dirty cases. These test cases were aimed at the baseline implementation while the rest of our test cases were aimed at the alternative implementation; even though all the tests are needed to ultimately forge comparisons between the baseline and alternative designs, the test cases aimed at the alternative design were intended to test certain characteristics specific to a set-associative cache, e.g. testing control logic for determining the source of conflict misses (in either way) and testing the least recently used (LRU) replacement policy. We ensured that read misses were correctly handled by the cache controller with a LRU replacement policy by filling up both cache ways for one set of instructions and causing read misses to those cache lines. However, in order to specifically target the LRU control logic, i.e. determine whether or not the least recently used cache line is selected correctly, we modified the alternative design control logic to output \texttt{h'0a} if the way 0 cache line was replaced and a \texttt{h'0b} as opaque bits if the way 1 cache line was replaced. We then created directed tests that wrote the expected opaque bits to the test sink to verify correct implementation of the LRU replacement policy. This modification was clearly meant for test purposes only and so we removed the code for these special tests once we were done testing. We also made two additional states called FAIL0 and FAIL1 in the baseline implementation so that we could use trace instead of gtkwave to debug (and observe the states). \\
 
-
-																	% RANDOM TESTING
+Following completion of the directed tests, we were able to write and run random tests. Specifically, these tests randomized memory accesses, the type of accesses, and data values written/read in memory. This was done by modifying the provided Python script \texttt{lab3-mem-gen-input.py} to take additional arguments specifying a particular random test and putting the resulting Python code in a separate python file \texttt{ubmark-randtest-suite.py}. As a result, we were able to generate a couple varieties of random tests to more broadly evaluate our design. The first random test simply loaded random data across a fixed memory address space and then made sequential (word) accesses in that address space. The second random test goes a few steps further. Like the previous test, it started by loading random data across a fixed memory address space. However, it then randomized both the addresses of data accesses within that space and the type of access (read or write). While doing all this, it did not allow a particular address to be accessed more than twice for either type of access - this effectively ``spreads'' accesses across the address space, yet still allows for scenarios where a particular memory address that was initialized to a particular value would be overwritten and read.
 
 																	% BUGS
 
@@ -70,7 +62,11 @@ Ultimately both the base and alternative designs worked correctly with all test 
 
 \section{Evaluation}
 
-As soon as the baseline and alternative implementations were completed, we proceeded to test the performance of the models. In order to achieve this, the simulator harness was built and run (using the given datasets) to generate the total number of cycles and the average number of cycles per transaction for the base and alternative designs. We also added our own datasets to the harness to compare the performance of the two models in different targeted scenarios. The results of the simulator for each dataset and design are summarized in Table~\ref{tab:cycles}. \\
+As soon as the baseline and alternative implementations were completed, we proceeded to test the performance of the models. In order to achieve this, the simulator harness was built and run (using the given datasets) to generate the total number of cycles and the average number of cycles per transaction for the base and alternative designs. We also added our own datasets to the harness to compare the performance of the two models in different targeted scenarios. The results of the simulator for each dataset and design are summarized in Table~\ref{tab:eval} and the Average Memory Access Latency (AMAL) results are summarized in Table \ref{tab:amal} for clarity. As Table~\ref{tab:eval} shows, we tested the baseline and alternative implementations on the loop-1D, loop-2D, and loop-3D datasets. These datasets access sequential memory locations based on an offset/s for n-dimensions (where n $\epsilon$ \{1,2,3\}). Therefore we expected to see much slower performance for both the baseline and alternative implementations as n is increased. \\
+
+The results in Table~\ref{tab:eval} clearly show the performance improvement of the alternative implementation over the baseline implementation. The number of cycles utilized was more or less the same for both implementations for all but the loop-3d dataset. The number of cache accesses were the same for both models as expected (by design). Now the number of hits were far greater and the number of misses were far less for the alternative implementation over the baseline implementation. 
+
+One possible explanation for the less-than-stellar performance difference of the set-associative cache over the direct-mapped cache is that this difference will be better seen for small datasets since the alternative implementation is of low associativity (2 ways).  
 
 % Since we are comparing different pipelined processors on the \textit{same program}, the only factors affecting our performance are the cycle time (CT) and cycles per instruction (CPI).
 % To a first approximation, we can assume that the clock cycle time is the same across the processors. \\
@@ -79,7 +75,7 @@ As soon as the baseline and alternative implementations were completed, we proce
 % If we look at Table~\ref{tab:cycles}, our fully bypassed processor has the higest CPI.
 % However, it is interesting to look at the performace as various bypass paths are implemented.
 % Looking at vvadd-unopt, we see that after the first bypass path is implemented, its performance stagnates.
-% This is because CPI is incredibly reliant on the program that is running. 
+% This i s because CPI is incredibly reliant on the program that is running. 
 % We need to remember this when we run our benchmarks. 
 % They may not be representative of programs in the wild. 
 % However, assuming that our benchmarks do mirror programs running on our processor, the fully bypassed processor performs equally or better than other processors in all cases. Better is defined as having a lower CPI. \\
@@ -100,58 +96,52 @@ As soon as the baseline and alternative implementations were completed, we proce
 \section {Tables and Diagrams}
 
 
-% Table: test types
+% % Table: Eval - Performance
 
-% \begin{table}[h]
-% \begin{center}
-% \begin{tabular}{| c | c |}
-% \hline
-% \multicolumn{2}{|c|}{Types of Directed Test Cases}   \\
-% \hline
-% \textbf{Type}                         &    \textbf{Description}  	\\   \hline      
-% Basic            					  &           					\\
-% Bypassing                             &								\\
-% Value: Arithmetic           		  &          					\\        
-% Value: Source/Destination             & 							\\
-% Stalls/Bypass 						  & 							\\
-% \hline                                                 
-% \end{tabular}
-% \caption{Types of Directed Test Cases} 
-% \label{table:tests}
-% \end{center}
-% \end{table}
-
-
-% % Table: execution cycles for evaluation
-
-\begin{center}
 \begin{table}[h]
-\begin{tabular} {|l | r | r | r | r | r |}
+\begin{center}
+\begin{tabular} {|l | r | r | r | r | r | r | r | r | r | r |}
 
 \hline
-\textbf{Design}    & \textbf{vvadd-unopt} & \textbf{vvadd-opt} & \textbf{cmplx-mult} & \textbf{bin-search} & \textbf{masked-filt} \\
+\textbf{Design}    & \textbf{Cycles} & \textbf{Cache} & \textbf{Hits} & \textbf{Misses} & \textbf{Miss} & \textbf{Memory} & \textbf{Refills} & \textbf{Evicts} & \textbf{AMAL} \\
+&&\textbf{Accesses}&&&\textbf{Rate}&\textbf{Accesses}&&& \\
 \hline
-Baseline:    Num. Cycles                 &    2009    &   584    &   5621   &  4532	&	5985					\\
-Baseline: 	 Num. Instructions           &      907      &   532    &   1707   & 1527 &	1350					\\
-Baseline:    Avg. Cycles / Transaction    &    2.21    &  1.10     &  3.29    & 2.97	&	4.43					\\
-
-Bypass-X: Num. Cycles                 &    1709    &   584    &  2475    & 5621	&		4182				\\
-Bypass-X: Num. Instructions           &      907      &    532   &   1527   & 1707 &		1350				\\
-Bypass-X: Avg. Cycles / Transaction    &     1.88   &    1.10   &   1.62   & 3.29	&	3.10				    \\
-
-Bypass-XM: Num. Cycles                 &    1209    &   584    &  2376    & 5421	&		4073				\\
-Bypass-XM: Num. Instructions           &      907      &    532   &   1527   & 1707 &		1350				\\
-Bypass-XM: Avg. Cycles / Transaction    &     1.33   &    1.10   &   1.56   & 3.18	&	3.01				    \\
-
-Bypass-XMW: Num. Cycles                 &    1209    &   584    &  2342    & 5321	&		3903				\\
-Bypass-XMW: Num. Instructions           &      907      &    532   &   1527   & 1707 &		1350				\\
-Bypass-XMW: Avg. Cycles / Transaction    &     1.88   &    1.10   &   1.53   & 3.12	&	2.89				    \\
+Baseline - loop 1D       &  951   &  100   &  75   &  25  &	 25.0\%  &  25  &  25  &  0  &  9.510000	\\
+Baseline - loop 2D 	     &  4135  &  500   &  403  &  97  &	 19.4\%  &  97  &  97  &  0  &  8.270000	\\
+Baseline - loop 3D       &  2081  &  80    &  0    &  80  &	 100.0\% &  80  &  80  &  0  &  26.012500	\\
+\hline
+Alternative - loop 1D    &  951   &  100   &  75   &  25  &	 25.0\%  &  25  &  25  &  0  &  9.510000	\\
+Alternative - loop 2D    &  4751  &  500   &  375  &  125 &	 25.0\%  &  125 &  125 &  0  &  9.502000	\\
+Alternative - loop 3D    &  673   &  80    &  64   &  16  &	 20.0\%  &  16  &  16  &  0  &  8.4125000	\\
 \hline                    
 \end{tabular}
 \caption{Baseline v. Alternative Design Performance}
-\label{tab:cycles}
-\end{table}
+\label{tab:eval}
 \end{center}
+\end{table}
+
+
+% % Table: Eval - Performance/AMAL
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular} {|l | r |}
+
+\hline
+\textbf{Design} & \textbf{AMAL} \\
+\hline
+lab3-mem-sim-base-loop-1d.out & 9.510000  \\
+lab3-mem-sim-base-loop-2d.out & 8.270000  \\
+lab3-mem-sim-base-loop-3d.out & 26.012500 \\
+lab3-mem-sim-alt-loop-1d.out  & 9.510000  \\
+lab3-mem-sim-alt-loop-1d.out  & 9.502000  \\
+lab3-mem-sim-alt-loop-1d.out  & 8.412500  \\
+\hline
+\end{tabular}
+\caption{Baseline v. Alternative Design AMAL}
+\label{tab:amal}
+\end{center}
+\end{table}
 
 
 
