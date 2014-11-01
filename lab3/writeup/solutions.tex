@@ -1,0 +1,211 @@
+
+\documentclass[10pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{setspace}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{listings}
+
+
+\begin{document}
+
+\title{ECE 4750 Lab 3: Blocking Cache}
+\author{Avinash Navada (abn44) \& Akshay Dongaonkar (akd54) \& Vivek Gaddam (vrg22)}
+\maketitle
+
+
+\section{Introduction}
+
+One of the main factors affecting processor performance is memory latency. Accessing main memory can take hundreds of cycles, which could potentially reduce the impact of any ingenious processor architectural modifications. One way to reduce the effect of this memory delay is to incorporate a cache into the architecture: a relatively small, fast memory (usually SRAM) that holds instructions and/or data that the processor can access without having to go to the (slower) main memory. Since caches are much smaller than main memory, the cache controller needs to be selective about the type of data that is stored and so aims to capitalize on temporal and spatial locality when fetching cache lines. In this lab, we design and synthesize two different cache architectures.  \\
+
+Our baseline design was a direct-mapped cache and our alternative design was a two-way set-associative cache, both of 256B capacity. In a direct-mapped cache, any location in memory maps to exactly one location in the cache, whereas in a n-way set-associative cache, any location in memory can map to one of n different locations (or ways). This means that there would be less conflict misses with the set-associative cache since multiple memory locations with the same index bits can be mapped to the cache simultaneously, which would lead to an improvement in the average memory access latency (AMAL) over a direct-mapped cache. Therefore we expect an improvement in the AMAL for our two-way set-associative cache design over the direct-mapped cache design.
+
+
+\section{Project Management}
+
+We assigned Vivek to be the architect, Akshay to be the verification lead, and Avinash to be the design lead.
+Our initial project roadmap was rather aggressive and required us to be finished by Sunday, October 26\textsuperscript{st}, since we planned on trying out an extension or two for this lab. The Gantt Chart with both the planned and actual roadmaps overlaid is shown in Figure~\ref{fig:gantt}. Clearly, we couldn't meet the aggressive deadlines we set initially although we did manage to complete the lab before the actual deadline. \\
+
+The work was divided as follows:
+Vivek worked on the random testing and part of the writeup.
+Akshay worked on most of the baseline implementation and alternative implementations, and created the directed testing suite for the baseline implementation.
+Avinash wrote most of the writeup, worked on part of the baseline implementation, and created the directed testing suite for the alternative implementation.
+All team members worked on debugging the RTL logic and test cases. \\
+
+
+% During the initial meeting on September 14, we planned to simultaneously begin the baseline implementation and the writing of directed tests the next day itself. However, various conflicts came up and we couldn't begin either of these until September 20. Akshay and Vivek worked on the baseline implementation which progressed quickly while Vivek and Avinash started the directed tests which took nearly until the end to write due to the sheer number of instructions compared to the first lab. Each test was incrementally tested on the ISA Simulator and with the baseline implementation once it was ready. All team members worked on debugging the Verilog code for the RTL implementations once the baseline implementation was done, while Vivek and Avinash debugged the test cases they worked on incrementally. We ran the 5 provided benchmarks on the baseline as well, which yielded 2 bugs that our directed tests didn't catch. Debugging the baseline was relatively straightforward since we only got 2 bugs which were resolved quickly. Once the baseline implementation was verified, Akshay began the alternative implementation which didn't take too long since adding the bypass logic and modifiying the control logic was relatively simple compared to the baseline implementation. Avinash worked on the lab report throughout this time. \\
+
+% Starting the lab earlier would have allowed us to build some extensions, although we are glad we were able to finish the assigned work on time and were able to test and evaluate our designs thoroughly. 
+
+
+\section{Baseline Design}
+
+The baseline design for this lab is a 256B direct-mapped, write-back, write-allocate cache. The baseline design was split into control, datapath, and top-level modules to make design and debugging easier but also to enforce the design principles of modularity, hierarchy, and encapsulation for a design of this level of complexity. The cache control is managed by a finite state machine (FSM) controller that deals with states with one or more steps per state during which control signals are fed out to the datapath and status signals are received in return. State machine and datapath diagrams for the baseline design are shown in Figures \ref{fig:state} and \ref{fig:baseline} and respectively. We utilize val/ready interfaces for instruction/data memory requests which allows memory systems of varying latencies to be composed with the cache.The interface for the direct-mapped cache consists of the following inputs: clock and reset signals, the test source/cache request message and valid signal, cache response ready signal (from the test sink/processor), memory request ready signal, and the memory response message and valid signal. The outputs are: the cache request ready signal, cache response message and valid signal, memory request message and valid signal, as well as the memory response ready signal. We began working on the design by first fully creating the datapath and then adding the different paths: init transaction, read hit path, write hit path, refill path, and evict path. Since the cache is write-back, write-allocate, we write only to the cache on a write hit and load the cache line from memory (and then write to the cache) on a write miss. Also, we maintain two register files in the control module for keeping track of valid and dirty cache lines. This information is necessary for determining whether evictions are required on cache read/write misses. \\
+
+
+\section{Alternative Design}
+
+The alternative design for this lab is a 256B two-way write-back, write-allocate set-associative cache. Just like the baseline design, the alternative design was split into control, datapath, and top-level modules, with control being managed by a FSM controller. The alternative design has a least recently used (LRU) replacement policy for choosing which cache lines to replace on read/write misses. State machine and datapath diagrams for the alternative design are shown in Figures \ref{fig:state} and \ref{fig:alt} respectively. The state diagram is the same for both the baseline and alternative designs since the only difference in their control logic lies in that hit and miss transitions are defined differently: for the baseline design, there is only one tag array to get a hit/miss from whereas for the alternative design, we would get a hit if either tag array has registered a hit and a miss if both tag arrays register misses. 
+The main datapath changes that had to be made to the baseline design to create the alternative design involved duplicating the tag array and tag check logic. The modifications made to the control logic were more extensive, however. These modifications include having different valid, dirty, and count (for LRU) register files for each way, more complex logic to determine which way to write to, and logic to implement the LRU replacement policy. Furthermore, we tried to improve the modularity of our design by refactoring the tag/data arrays and output logic into separate ``way modules'' (in file ``lab3-mem-BlockingCacheAltWay.v''), which reduced the chance of errors and confusion during design. These way modules can be seen in the alternative design datapath diagram shown in Figure \ref{fig:alt}, while a sneak-peek into a way module itself is shown in Figure \ref{fig:way}.  \\
+
+
+																	% FAIL CASES
+
+
+
+\section{Testing Strategy}
+
+We began the testing process by writing and running directed tests for each of the 5 different paths (init, hit, miss, refill, evict) as they were implemented. These tests were first run on the functional model to ensure correctness after which they were run on the baseline implementation. A similar process was carried out for the alternative implementation. The first 6 directed test cases we wrote tested read/write hit/miss functionality for clean/dirty cases. These test cases were aimed at the baseline implementation while the rest of our test cases were aimed at the alternative implementation; even though all the tests are needed to ultimately forge comparisons between the baseline and alternative designs, the test cases aimed at the alternative design were intended to test certain characteristics specific to a set-associative cache, e.g. testing control logic for determining the source of conflict misses (in either way) and testing the least recently used (LRU) replacement policy. We ensured that read misses were correctly handled by the cache controller with a LRU replacement policy by filling up both cache ways for one set of instructions and causing read misses to those cache lines. However, in order to specifically target the LRU control logic, i.e. determine whether or not the least recently used cache line is selected correctly, we modified the alternative design control logic to output \texttt{h'0a} if the way 0 cache line was replaced and a \texttt{h'0b} as opaque bits if the way 1 cache line was replaced. We then created directed tests that wrote the expected opaque bits to the test sink to verify correct implementation of the LRU replacement policy. This modification was clearly meant for test purposes only and so we commented out all the code for these special tests once we were done testing. We also made two additional states called FAIL0 and FAIL1 in the baseline implementation so that we could use trace instead of gtkwave to debug.
+
+
+																	% RANDOM TESTING
+
+																	% BUGS
+
+
+Ultimately both the base and alternative designs worked correctly with all test cases.  \\
+
+
+\section{Evaluation}
+
+As soon as the baseline and alternative implementations were completed, we proceeded to test the performance of the models. In order to achieve this, the simulator harness was built and run (using the given datasets) to generate the total number of cycles and the average number of cycles per transaction for the base and alternative designs. We also added our own datasets to the harness to compare the performance of the two models in different targeted scenarios. The results of the simulator for each dataset and design are summarized in Table~\ref{tab:cycles}. \\
+
+% Since we are comparing different pipelined processors on the \textit{same program}, the only factors affecting our performance are the cycle time (CT) and cycles per instruction (CPI).
+% To a first approximation, we can assume that the clock cycle time is the same across the processors. \\
+
+% If we make that approximation, the only factor left is cycles per instruction. 
+% If we look at Table~\ref{tab:cycles}, our fully bypassed processor has the higest CPI.
+% However, it is interesting to look at the performace as various bypass paths are implemented.
+% Looking at vvadd-unopt, we see that after the first bypass path is implemented, its performance stagnates.
+% This is because CPI is incredibly reliant on the program that is running. 
+% We need to remember this when we run our benchmarks. 
+% They may not be representative of programs in the wild. 
+% However, assuming that our benchmarks do mirror programs running on our processor, the fully bypassed processor performs equally or better than other processors in all cases. Better is defined as having a lower CPI. \\
+
+% Our first approximation may not be correct though!
+% We may have added a critical path to our datapath when we added a bypass.
+% Looking at our datapath diagram, we postulate that our critical path goes through the multiplier.
+% This is reinforced by the results of the complex multiply benchmark.
+% We waste about three cycles obtaining a result from the multiplier.
+% However, since we use a val/rdy microprotocol, if the multiplier is not being used we can reduce our clock cycle time.
+% We postulate then that our critical path for non val/rdy microprotocol affected components includes the ALU, the bypass into op1, and the mux selecting between the two.
+% This may affect performance. We need to do a better study of the tradeoffs to correctly predict.
+
+
+\pagebreak[4]
+
+
+\section {Tables and Diagrams}
+
+
+% Table: test types
+
+% \begin{table}[h]
+% \begin{center}
+% \begin{tabular}{| c | c |}
+% \hline
+% \multicolumn{2}{|c|}{Types of Directed Test Cases}   \\
+% \hline
+% \textbf{Type}                         &    \textbf{Description}  	\\   \hline      
+% Basic            					  &           					\\
+% Bypassing                             &								\\
+% Value: Arithmetic           		  &          					\\        
+% Value: Source/Destination             & 							\\
+% Stalls/Bypass 						  & 							\\
+% \hline                                                 
+% \end{tabular}
+% \caption{Types of Directed Test Cases} 
+% \label{table:tests}
+% \end{center}
+% \end{table}
+
+
+% % Table: execution cycles for evaluation
+
+\begin{center}
+\begin{table}[h]
+\begin{tabular} {|l | r | r | r | r | r |}
+
+\hline
+\textbf{Design}    & \textbf{vvadd-unopt} & \textbf{vvadd-opt} & \textbf{cmplx-mult} & \textbf{bin-search} & \textbf{masked-filt} \\
+\hline
+Baseline:    Num. Cycles                 &    2009    &   584    &   5621   &  4532	&	5985					\\
+Baseline: 	 Num. Instructions           &      907      &   532    &   1707   & 1527 &	1350					\\
+Baseline:    Avg. Cycles / Transaction    &    2.21    &  1.10     &  3.29    & 2.97	&	4.43					\\
+
+Bypass-X: Num. Cycles                 &    1709    &   584    &  2475    & 5621	&		4182				\\
+Bypass-X: Num. Instructions           &      907      &    532   &   1527   & 1707 &		1350				\\
+Bypass-X: Avg. Cycles / Transaction    &     1.88   &    1.10   &   1.62   & 3.29	&	3.10				    \\
+
+Bypass-XM: Num. Cycles                 &    1209    &   584    &  2376    & 5421	&		4073				\\
+Bypass-XM: Num. Instructions           &      907      &    532   &   1527   & 1707 &		1350				\\
+Bypass-XM: Avg. Cycles / Transaction    &     1.33   &    1.10   &   1.56   & 3.18	&	3.01				    \\
+
+Bypass-XMW: Num. Cycles                 &    1209    &   584    &  2342    & 5321	&		3903				\\
+Bypass-XMW: Num. Instructions           &      907      &    532   &   1527   & 1707 &		1350				\\
+Bypass-XMW: Avg. Cycles / Transaction    &     1.88   &    1.10   &   1.53   & 3.12	&	2.89				    \\
+\hline                    
+\end{tabular}
+\caption{Baseline v. Alternative Design Performance}
+\label{tab:cycles}
+\end{table}
+\end{center}
+
+
+
+% % Figure: Gantt Chart
+
+\begin{figure}[b]
+\centering
+\includegraphics[scale=0.5, angle=90]{gantt}
+\caption{Gantt Chart}
+\label{fig:gantt}
+\end{figure}
+
+% Figure: FSM Control Unit State Diagram
+
+\begin{figure}[b]
+\centering
+\includegraphics[scale=0.8]{state}
+\caption{Baseline FSM Control Unit State}
+\label{fig:state}
+\end{figure}
+
+% % Figure: Baseline Design Datapath Diagram
+
+\begin{figure}[b]
+\centering
+\includegraphics[scale=0.6]{baseline}
+\caption{Baseline Design Datapath}
+\label{fig:baseline}
+\end{figure}
+
+
+% % Figure: Alternative Design Datapath Diagram
+
+\begin{figure}[b]
+\centering
+\includegraphics[scale=0.8]{alt}
+\caption{Alternative Design Datapath}
+\label{fig:alt}
+\end{figure}
+
+% % Figure: Way Module
+
+\begin{figure}[b]
+\centering
+\includegraphics[scale=0.9]{way}
+\caption{Way Module}
+\label{fig:way}
+\end{figure}
+
+
+\end{document}
+
+
+
+
+
+
