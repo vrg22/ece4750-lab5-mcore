@@ -13,9 +13,6 @@
 
 subprojs = \
   vc \
-  ex-regincr \
-  ex-sorter \
-  ex-gcd \
   pisa \
   lab4-net \
 
