@@ -1,9 +1,12 @@
 build
+aclocal.m4
+configure.ac
 # Object files
 *.o
 *.ko
 *.obj
 *.elf
+*.out
 
 # Libraries
 *.lib
