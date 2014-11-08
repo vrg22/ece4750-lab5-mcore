@@ -1,5 +1,5 @@
 //========================================================================
-// lab4-net-RouterBase
+// lab4-net-RouterBase     //rando
 //========================================================================
 
 `ifndef LAB4_NET_ROUTER_BASE_V
@@ -76,7 +76,93 @@ module lab4_net_RouterBase
   logic                       in2_deq_rdy;
   logic [c_net_msg_nbits-1:0] in2_deq_msg;
 
+  //Free entry signals
+  logic [1:0]                 num_free_west;
+  logic [1:0]                 num_free_east;
+
+  //----------------------------------------------------------------------
+  // Datapath
+  //----------------------------------------------------------------------
+
   // instantiate input queues, crossbar and control modules here
+
+  //Input Queues
+  vc_Queue#(`VC_QUEUE_NORMAL,c_net_msg_nbits,4) in0_queue
+  (
+    .clk      (clk),
+    .reset    (reset),
+
+    .enq_val  (in0_val),
+    .enq_rdy  (in0_rdy),
+    .enq_msg  (in0_msg),
+
+    .deq_val  (in0_deq_val),
+    .deq_rdy  (in0_deq_rdy),
+    .deq_msg  (in0_deq_msg),
+
+    .num_free_entries (num_free_west)
+  );
+
+  vc_Queue#(`VC_QUEUE_NORMAL,c_net_msg_nbits,4) in1_queue
+  (
+    .clk      (clk),
+    .reset    (reset),
+
+    .enq_val  (in1_val),
+    .enq_rdy  (in1_rdy),
+    .enq_msg  (in1_msg),
+
+    .deq_val  (in1_deq_val),
+    .deq_rdy  (in1_deq_rdy),
+    .deq_msg  (in1_deq_msg),
+
+    .num_free_entries ()
+  );
+
+  vc_Queue#(`VC_QUEUE_NORMAL,c_net_msg_nbits,4) in2_queue
+  (
+    .clk      (clk),
+    .reset    (reset),
+
+    .enq_val  (in2_val),
+    .enq_rdy  (in2_rdy),
+    .enq_msg  (in2_msg),
+
+    .deq_val  (in2_deq_val),
+    .deq_rdy  (in2_deq_rdy),
+    .deq_msg  (in2_deq_msg),
+
+    .num_free_entries (num_free_east)
+  );
+
+
+  //Crossbar
+  logic [1:0]                 xbar_sel0;
+  logic [1:0]                 xbar_sel1;
+  logic [1:0]                 xbar_sel2;
+
+  vc_Crossbar3#(c_net_msg_nbits) xbar
+  (
+    .in0      (in0_deq_msg),
+    .in1      (in1_deq_msg),
+    .in2      (in2_deq_msg),
+
+    .sel0     (xbar_sel0),
+    .sel1     (xbar_sel1),
+    .sel2     (xbar_sel2),
+
+    .out0     (out0_msg),
+    .out1     (out1_msg),
+    .out2     (out2_msg),
+  );
+
+  //Control Modules
+  
+
+
+  //----------------------------------------------------------------------
+  // Control
+  //----------------------------------------------------------------------
 
   // the following is a placeholder, delete
 

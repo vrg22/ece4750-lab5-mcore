@@ -26,10 +26,20 @@ module lab4_net_RouterInputCtrl
   input  logic [2:0]              grants
 );
 
+
+
+
   // add logic here
+  //compute requests based on algorithm, 
+  //use dest, val rdy, grants to figure out whether or not to
+  //set the rdy 
 
   assign in_rdy = 0;
   assign reqs = 0;
+
+
+
+
 
 endmodule
 
