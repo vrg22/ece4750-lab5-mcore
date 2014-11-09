@@ -31,8 +31,8 @@ module lab4_net_RouterInputCtrl
                 3'b010;   /*Reached Destination*/
 
   //If what we are requesting is what is being granted, ready to dequeue
-  // assign in_rdy = (grants == reqs) && in_val;
-  assign in_rdy = (grants == reqs);      //WHAT IS PURPOSE OF IN_VAL as an INPUT to this module?
+  // assign in_rdy = (grants == reqs);
+  assign in_rdy = ((grants & reqs) == reqs);      //WHAT IS PURPOSE OF IN_VAL as an INPUT to this module?
 
 endmodule
 

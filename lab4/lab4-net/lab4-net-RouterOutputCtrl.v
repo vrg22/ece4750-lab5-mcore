@@ -5,6 +5,9 @@
 `ifndef LAB4_NET_ROUTER_OUTPUT_CTRL_V
 `define LAB4_NET_ROUTER_OUTPUT_CTRL_V
 
+`include "vc-arbiters.v"
+
+
 module lab4_net_RouterOutputCtrl
 (
   input  logic       clk,
@@ -29,14 +32,18 @@ module lab4_net_RouterOutputCtrl
     .grants    (grants)   // (one-hot) 1 is req won grant
   );
 
-  always @(posedge clk) begin
-    /*assign*/ xbar_sel <= (grants == 3'b001) ? 2'b00 :
+
+
+  // Q: Why didn't the below work when clocked?
+
+  // always @(posedge clk) begin
+    assign xbar_sel = (grants == 3'b001) ? 2'b00 :
                     (grants == 3'b010) ? 2'b01 :
                     (grants == 3'b100) ? 2'b10 :
                     2'b11;  //CHECK!
 
-    /*assign*/ out_val <= (xbar_sel != 2'b11) && (reqs != 3'b000); //HOW TO DETERMINE??
-  end
+    assign out_val = (xbar_sel != 2'b11) && (reqs != 3'b000); //HOW TO DETERMINE??
+  // end
 
 endmodule
 

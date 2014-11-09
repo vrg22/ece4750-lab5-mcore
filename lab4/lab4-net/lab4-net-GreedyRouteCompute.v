@@ -36,14 +36,19 @@ module lab4_net_GreedyRouteCompute
   // Make a macro and stuff?
   always @(*) begin
   	if (dest > cur) begin
-  		if (dest == cur)
-  			reqs = 3'b010;
-      else if (dest - cur > 4)
-  			reqs = 3'b001; //East: assume east is direction of increasing router numbers
+      if (dest - cur > 4)
+  			reqs = 3'b100; 
   		else
-  			reqs = 3'b100;
-  		// end
+  			reqs = 3'b001;  //East: assume east is direction of increasing router numbers
   	end
+    else if (cur > dest) begin
+      if (cur - dest > 4)
+        reqs = 3'b001;  //East: assume east is direction of increasing router numbers
+      else
+        reqs = 3'b100;
+    end
+    else // (dest == cur)
+      reqs = 3'b010;
   end
 
 endmodule

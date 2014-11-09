@@ -77,9 +77,10 @@ module lab4_net_RouterBase
   logic                       in2_deq_rdy;
   logic [c_net_msg_nbits-1:0] in2_deq_msg;
 
-  //Free entry signals
-  logic [1:0]                 num_free_west;
-  logic [1:0]                 num_free_east;
+  // Free entry signals - NOTE the extra bit in each to allow it to represent 
+  // the n+1 possible values in an n-element queue
+  logic [2:0]                 num_free_west;
+  logic [2:0]                 num_free_east;
 
   //----------------------------------------------------------------------
   // Datapath
@@ -248,7 +249,7 @@ module lab4_net_RouterBase
     .grants   (in_grants2)
   );
 
-  lab4_net_RouterInputTerminalCtrl#(p_router_id, p_num_routers /*Free bits*/) in1_ctrl //Input/Output Terminal Port
+  lab4_net_RouterInputTerminalCtrl#(p_router_id, p_num_routers, 3 /*Free bits = 2 or 3?*/) in1_ctrl //Input/Output Terminal Port
   (
     .dest               (dest1),
 

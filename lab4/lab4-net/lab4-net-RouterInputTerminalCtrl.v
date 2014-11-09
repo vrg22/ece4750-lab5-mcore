@@ -5,6 +5,9 @@
 `ifndef LAB4_NET_ROUTER_INPUT_TERMINAL_CTRL_V
 `define LAB4_NET_ROUTER_INPUT_TERMINAL_CTRL_V
 
+`include "lab4-net-GreedyRouteCompute.v"
+
+
 module lab4_net_RouterInputTerminalCtrl
 #(
   parameter p_router_id      = 0,
@@ -39,11 +42,11 @@ module lab4_net_RouterInputTerminalCtrl
     // .grants   (grants),
     .reqs     (reqs)
   );
-  assign reqs = (in_val) ? reqs : 3'b000;     //CORRECT?
+  // assign reqs = (in_val) ? reqs : 3'b000;     //CORRECT?
 
   //If what we are requesting is what is being granted, ready to dequeue
-  // assign in_rdy = (grants == reqs) && in_val;
-  assign in_rdy = (grants == reqs);      //WHAT IS PURPOSE OF IN_VAL as an INPUT to this module?
+  // assign in_rdy = (grants == reqs);
+  assign in_rdy = ((grants & reqs) == reqs);      //WHAT IS PURPOSE OF IN_VAL as an INPUT to this module?
 
 endmodule
 
