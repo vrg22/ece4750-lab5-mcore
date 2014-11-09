@@ -14,6 +14,8 @@ lab4_net_srcs = \
   lab4-net-RingNetBase.v \
   lab4-net-RouterAlt.v \
   lab4-net-RingNetAlt.v \
+  lab4-net-GreedyRouteCompute.v \
+  #lab4-net-AdaptiveRouteCompute.v \
 
 lab4_net_test_srcs = \
   lab4-net-RingNetFL.t.v \
