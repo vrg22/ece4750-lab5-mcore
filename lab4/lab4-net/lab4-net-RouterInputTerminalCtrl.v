@@ -30,8 +30,7 @@ module lab4_net_RouterInputTerminalCtrl
   input  logic [2:0]              grants
 );
 
-  // assign in_rdy = 0;
-  // assign reqs = 0;
+  logic [2:0]              reqs_temp;
 
   //Greedy, Deterministic Routing Algorithm
   lab4_net_GreedyRouteCompute#(p_router_id, p_num_routers) greedy_algorithm
@@ -40,9 +39,10 @@ module lab4_net_RouterInputTerminalCtrl
     // .in_val   (in_val),
     // .in_rdy   (in_rdy),
     // .grants   (grants),
-    .reqs     (reqs)
+    .reqs     (reqs_temp)
   );
-  // assign reqs = (in_val) ? reqs : 3'b000;     //CORRECT?
+  
+  assign reqs = (in_val) ? reqs_temp : 3'b000;     //CORRECT?
 
   //If what we are requesting is what is being granted, ready to dequeue
   // assign in_rdy = (grants == reqs);
