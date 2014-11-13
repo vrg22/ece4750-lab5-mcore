@@ -37,15 +37,15 @@ module lab4_net_GreedyRouteCompute
   always @(*) begin
   	if (dest > cur) begin
       if (dest - cur > 4)
-  			reqs = 3'b100; 
+  			reqs = 3'b001; 
   		else
-  			reqs = 3'b001;  //East: assume east is direction of increasing router numbers
+  			reqs = 3'b100;  //East: assume east is direction of increasing router numbers
   	end
     else if (cur > dest) begin
       if (cur - dest > 4)
-        reqs = 3'b001;  //East: assume east is direction of increasing router numbers
+        reqs = 3'b100;  //East: assume east is direction of increasing router numbers
       else
-        reqs = 3'b100;
+        reqs = 3'b001;
     end
     else // (dest == cur)
       reqs = 3'b010;

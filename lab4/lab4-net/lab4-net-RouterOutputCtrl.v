@@ -28,20 +28,17 @@ module lab4_net_RouterOutputCtrl
     .clk       (clk),
     .reset     (reset),
 
-    .reqs      (reqs),    // 1 = making a req, 0 = no req
-    .grants    (grants)   // (one-hot) 1 is req won grant
+    .reqs      (reqs),          // 1 = making a req, 0 = no req
+    .grants    (grants)         // (one-hot) 1 is req won grant
   );
 
 
-  // Q: Why didn't the below work when clocked?
-
-  // always @(posedge clk) begin
-    assign xbar_sel = (grants == 3'b001) ? 2'b00 :
-                    (grants == 3'b010) ? 2'b01 :
-                    (grants == 3'b100) ? 2'b10 :
+  assign xbar_sel = (grants == 3'b001 && out_rdy) ? 2'b00 :
+                    (grants == 3'b010 && out_rdy) ? 2'b01 :
+                    (grants == 3'b100 && out_rdy) ? 2'b10 :
                     2'b11;  //CHECK!
 
-    assign out_val = (grants != 3'b000) && (reqs != 3'b000);
+  assign out_val = (grants != 3'b000) && (reqs != 3'b000);
     // assign out_val = (xbar_sel != 2'b11) && (reqs != 3'b000); //HOW TO DETERMINE??
                      // && (out_rdy);
   // end
@@ -50,8 +47,6 @@ module lab4_net_RouterOutputCtrl
   // //Wires
   // logic  [1:0] xbar_sel_next;
   // logic        out_val_next;
-
-
 
   // //Arbiter to arbitrate access to resources
   // vc_RoundRobinArb #(3) RR_arbiter
@@ -62,7 +57,6 @@ module lab4_net_RouterOutputCtrl
   //   .reqs      (reqs),    // 1 = making a req, 0 = no req
   //   .grants    (grants)   // (one-hot) 1 is req won grant
   // );
-
 
   // //Combinational Logic
   // always @(*) begin

@@ -54,13 +54,13 @@ module top;
   end
   endtask
 
-  // Test case
+  // Test cases
 
   //----------------------------------------------------------------------
-  // basic test
+  // basic test 1: sending a message to self
   //----------------------------------------------------------------------
 
-  `VC_TEST_CASE_BEGIN( 1, "basic test" )
+  `VC_TEST_CASE_BEGIN( 1, "basic test 1: sending a message to self" )
   begin
 
     // Testing sending a message to self
@@ -72,6 +72,32 @@ module top;
   `VC_TEST_CASE_END
 
   // add more test cases
+
+  //----------------------------------------------------------------------
+  // basic test 2: sending a message east
+  //----------------------------------------------------------------------
+
+  `VC_TEST_CASE_BEGIN( 2, "basic test 2: sending a message east" )
+  begin
+
+    //  dest  val   rdy   reqs    grants
+    t1( 3'h7, 1'b1, 1'b1, 3'b100, 3'b1xx );
+
+  end
+  `VC_TEST_CASE_END
+
+  //----------------------------------------------------------------------
+  // basic test 3: sending a message west
+  //----------------------------------------------------------------------
+
+  `VC_TEST_CASE_BEGIN( 3, "basic test 3: sending a message west" )
+  begin
+
+    //  dest  val   rdy   reqs    grants
+    t1( 3'h0, 1'b1, 1'b1, 3'b001, 3'bxx1 );
+
+  end
+  `VC_TEST_CASE_END
 
   `VC_TEST_SUITE_END
 endmodule

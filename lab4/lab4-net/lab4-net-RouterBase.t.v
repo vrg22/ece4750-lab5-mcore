@@ -326,13 +326,20 @@ module top;
     input logic [31:0] sink_max_delay
   );
   begin
-    // we also reset the src/sink indexes
+    // we also reset the src/sink indexes and put x's in index 0
     th_src_index[0] = 0;
     th_src_index[1] = 0;
     th_src_index[2] = 0;
     th_sink_index[0] = 0;
     th_sink_index[1] = 0;
     th_sink_index[2] = 0;
+
+    th.src0.src.m[0] = 'hx;
+    th.src1.src.m[0] = 'hx;
+    th.src2.src.m[0] = 'hx;
+    th.sink0.sink.m[0] = 'hx;
+    th.sink1.sink.m[0] = 'hx;
+    th.sink2.sink.m[0] = 'hx;
 
     th_src_max_delay  = src_max_delay;
     th_sink_max_delay = sink_max_delay;
@@ -465,10 +472,10 @@ module top;
   endtask
 
   //----------------------------------------------------------------------
-  // basic test
+  // basic test 1: send a message to self
   //----------------------------------------------------------------------
 
-  `VC_TEST_CASE_BEGIN( 1, "basic test" )
+  `VC_TEST_CASE_BEGIN( 1, "basic test 1: send a message to self" )
   begin
     init_rand_delays( 0, 0 );
 
@@ -485,6 +492,41 @@ module top;
 
 
   // add more test cases
+
+  //----------------------------------------------------------------------
+  // basic test 2: send a message east
+  //----------------------------------------------------------------------
+
+  `VC_TEST_CASE_BEGIN( 2, "basic test 2: send a message east" )
+  begin
+    init_rand_delays( 0, 0 );
+
+    //            port  port
+    //            in    out   src   dest  opq    payload
+    init_net_msg( 2'h2, 2'h2, 3'h2, 3'h5, 8'h00, 8'hff );
+
+    run_test;
+
+  end
+  `VC_TEST_CASE_END
+
+  //----------------------------------------------------------------------
+  // basic test 3: send a message west
+  //----------------------------------------------------------------------
+
+  `VC_TEST_CASE_BEGIN( 3, "basic test 3: send a message west" )
+  begin
+    init_rand_delays( 0, 0 );
+
+    //            port  port
+    //            in    out   src   dest  opq    payload
+    init_net_msg( 2'h0, 2'h0, 3'h2, 3'h0, 8'h00, 8'hab );
+
+    run_test;
+
+  end
+  `VC_TEST_CASE_END
+
 
   `VC_TEST_SUITE_END
 endmodule

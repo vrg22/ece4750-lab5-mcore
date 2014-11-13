@@ -17,7 +17,7 @@ module lab4_net_RouterInputCtrl
 (
   input  logic [c_dest_nbits-1:0] dest,
 
-  input  logic                    in_val,     //How do we use in_val?
+  input  logic                    in_val,     
   output logic                    in_rdy,
 
   output logic [2:0]              reqs,
@@ -26,13 +26,13 @@ module lab4_net_RouterInputCtrl
 
   // Propagate in current direction or until reaches destination
   assign reqs = (!in_val) ? 3'b000 :            /*Invalid to send now*/
-                (dest > p_router_id) ? 3'b001 : /*East*/
-                (dest < p_router_id) ? 3'b100 : /*West*/
+                (dest > p_router_id) ? 3'b100 : /*East*/
+                (dest < p_router_id) ? 3'b001 : /*West*/
                 3'b010;   /*Reached Destination*/
 
   //If what we are requesting is what is being granted, ready to dequeue
   // assign in_rdy = (grants == reqs);
-  assign in_rdy = ((grants & reqs) == reqs);      //WHAT IS PURPOSE OF IN_VAL as an INPUT to this module?
+  assign in_rdy = ((grants & reqs) == reqs);     
 
 endmodule
 
