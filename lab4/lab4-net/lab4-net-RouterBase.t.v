@@ -30,7 +30,7 @@ module TestHarness
   // Local parameters
 
   localparam c_num_routers = 8;
-  localparam c_router_id   = 2;
+  localparam c_router_id   = 2;                                 // Default 2. Change to 0 for Basic Test 4 and to 7 for Basic Test 5
   localparam c_net_msg_nbits = `VC_NET_MSG_NBITS(p,o,s);
 
   // shorter names
@@ -494,16 +494,16 @@ module top;
   // add more test cases
 
   //----------------------------------------------------------------------
-  // basic test 2: send a message east
+  // basic test 2: send a message east, dest-src less than 4
   //----------------------------------------------------------------------
 
-  `VC_TEST_CASE_BEGIN( 2, "basic test 2: send a message east" )
+  `VC_TEST_CASE_BEGIN( 2, "basic test 2: send a message east, dest-src less than 4" )
   begin
     init_rand_delays( 0, 0 );
 
     //            port  port
     //            in    out   src   dest  opq    payload
-    init_net_msg( 2'h2, 2'h2, 3'h2, 3'h5, 8'h00, 8'hff );
+    init_net_msg( 2'h2, 2'h2, 3'h0, 3'h4, 8'h00, 8'hff );      // tests "extreme case" of sending from 7 to 0 CCW 
 
     run_test;
 
@@ -511,21 +511,55 @@ module top;
   `VC_TEST_CASE_END
 
   //----------------------------------------------------------------------
-  // basic test 3: send a message west
+  // basic test 3: send a message west, dest-src less than 4
   //----------------------------------------------------------------------
 
-  `VC_TEST_CASE_BEGIN( 3, "basic test 3: send a message west" )
+  `VC_TEST_CASE_BEGIN( 3, "basic test 3: send a message west, dest-src less than 4" )
   begin
     init_rand_delays( 0, 0 );
 
     //            port  port
     //            in    out   src   dest  opq    payload
-    init_net_msg( 2'h0, 2'h0, 3'h2, 3'h0, 8'h00, 8'hab );
+    init_net_msg( 2'h0, 2'h0, 3'h4, 3'h1, 8'h00, 8'hab );     // tests "extreme case" of sending from 0 to 7 CW 
 
     run_test;
 
   end
   `VC_TEST_CASE_END
+
+  /* //----------------------------------------------------------------------
+  // basic test 4: send a message east, dest-src greater than 4
+  //----------------------------------------------------------------------
+
+  `VC_TEST_CASE_BEGIN( 4, "basic test 4: send a message east, dest-src greater than than 4" )                   // CHANGE ROUTER ID TO 0 FOR BASIC TEST 4
+  begin
+    init_rand_delays( 0, 0 );
+
+    //            port  port
+    //            in    out   src   dest  opq    payload
+    init_net_msg( 2'h0, 2'h1, 3'h7, 3'h0, 8'h00, 8'hab );     // tests "extreme case" of sending from 7 to 0 CW 
+
+    run_test;
+
+  end
+  `VC_TEST_CASE_END */
+
+  /* //----------------------------------------------------------------------
+  // basic test 5: send a message west, dest-src greater than 4
+  //----------------------------------------------------------------------
+
+  `VC_TEST_CASE_BEGIN( 5, "basic test 5: send a message west, dest-src greater than than 4" )                   // CHANGE ROUTER ID TO 7 FOR BASIC TEST 5
+  begin
+    init_rand_delays( 0, 0 );
+
+    //            port  port
+    //            in    out   src   dest  opq    payload
+    init_net_msg( 2'h2, 2'h1, 3'h0, 3'h7, 8'h00, 8'hab );     // tests "extreme case" of sending from 0 to 7 CW 
+
+    run_test;
+
+  end
+  `VC_TEST_CASE_END */
 
 
   `VC_TEST_SUITE_END

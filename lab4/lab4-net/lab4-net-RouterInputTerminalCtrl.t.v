@@ -22,7 +22,7 @@ module top;
 
   lab4_net_RouterInputTerminalCtrl
   #(
-    .p_router_id      (2),                // change to 6 for test case 5. Other tests should fail
+    .p_router_id      (2),                // Default 2. Change to 7 for Basic Test 5. Other tests should fail
     .p_num_routers    (8),
     .p_num_free_nbits (2)
   )
@@ -122,11 +122,11 @@ module top;
   end
   `VC_TEST_CASE_END  
 
-/*  //----------------------------------------------------------------------              CHANGE ROUTER ID TO 6 FOR TEST CASE 5
+  /* //----------------------------------------------------------------------              // CHANGE ROUTER ID TO 7 FOR BASIC TEST 5
   // basic test 5: dest smaller than source, route east
   //----------------------------------------------------------------------
 
-  `VC_TEST_CASE_BEGIN( 5, "basic test 5: dest smaller than source, route east" )
+  `VC_TEST_CASE_BEGIN( 5, "basic test 5: dest smaller than source, route east" )          // tests equidistance routing
   begin
 
     //  dest  val   rdy   fr_w  fr_e  reqs    grants

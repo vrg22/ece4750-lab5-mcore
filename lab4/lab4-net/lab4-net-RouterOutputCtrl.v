@@ -21,6 +21,7 @@ module lab4_net_RouterOutputCtrl
   output logic [1:0] xbar_sel
 );
 
+ logic [2:0] grants_temp;
 
   //Arbiter to arbitrate access to resources
   vc_RoundRobinArb #(3) RR_arbiter
@@ -28,51 +29,19 @@ module lab4_net_RouterOutputCtrl
     .clk       (clk),
     .reset     (reset),
 
-    .reqs      (reqs),          // 1 = making a req, 0 = no req
-    .grants    (grants)         // (one-hot) 1 is req won grant
+    .reqs      (reqs),              // 1 = making a req, 0 = no req
+    .grants    (grants_temp)        // (one-hot) 1 is req won grant
   );
 
+  assign xbar_sel = (grants_temp == 3'b001) ? 2'b00 :       // west
+                    (grants_temp == 3'b010) ? 2'b01 :       // east
+                    (grants_temp == 3'b100) ? 2'b10 :       // self
+                    2'b11;  
 
-  assign xbar_sel = (grants == 3'b001 && out_rdy) ? 2'b00 :
-                    (grants == 3'b010 && out_rdy) ? 2'b01 :
-                    (grants == 3'b100 && out_rdy) ? 2'b10 :
-                    2'b11;  //CHECK!
+  assign grants = out_rdy ? grants_temp : 3'b000;           // ensure packet is not dequeued unless out_rdy is high
 
   assign out_val = (grants != 3'b000) && (reqs != 3'b000);
-    // assign out_val = (xbar_sel != 2'b11) && (reqs != 3'b000); //HOW TO DETERMINE??
-                     // && (out_rdy);
-  // end
 
-
-  // //Wires
-  // logic  [1:0] xbar_sel_next;
-  // logic        out_val_next;
-
-  // //Arbiter to arbitrate access to resources
-  // vc_RoundRobinArb #(3) RR_arbiter
-  // (
-  //   .clk       (clk),
-  //   .reset     (reset),
-
-  //   .reqs      (reqs),    // 1 = making a req, 0 = no req
-  //   .grants    (grants)   // (one-hot) 1 is req won grant
-  // );
-
-  // //Combinational Logic
-  // always @(*) begin
-  //   xbar_sel_next = (grants == 3'b001) ? 2'b00 :
-  //                   (grants == 3'b010) ? 2'b01 :
-  //                   (grants == 3'b100) ? 2'b10 :
-  //                   2'b11;
-
-  //   out_val_next = (grants != 3'b000) && (reqs != 3'b000);
-  // end
-
-  // //Sequential stuff -> All signals should be clock aligned?
-  // always @(posedge clk) begin
-  //   xbar_sel <= xbar_sel_next;
-  //   out_val <= out_val_next;
-  // end
 
 endmodule
 

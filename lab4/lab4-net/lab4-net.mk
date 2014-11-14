@@ -9,6 +9,7 @@ lab4_net_srcs = \
   lab4-net-RingNetFL.v \
   lab4-net-RouterInputCtrl.v \
   lab4-net-RouterInputTerminalCtrl.v \
+  lab4-net-RouterAdaptiveInputTerminalCtrl.v \
   lab4-net-RouterOutputCtrl.v \
   lab4-net-RouterBase.v \
   lab4-net-RingNetBase.v \
@@ -21,6 +22,7 @@ lab4_net_test_srcs = \
   lab4-net-RingNetFL.t.v \
   lab4-net-RouterInputCtrl.t.v \
   lab4-net-RouterInputTerminalCtrl.t.v \
+  lab4-net-RouterAdaptiveInputTerminalCtrl.t.v \
   lab4-net-RouterOutputCtrl.t.v \
   lab4-net-RouterBase.t.v \
   lab4-net-RingNetBase.t.v \

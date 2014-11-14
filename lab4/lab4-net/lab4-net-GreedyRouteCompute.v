@@ -9,7 +9,7 @@ module lab4_net_GreedyRouteCompute
 #(
   parameter p_router_id      = 0,
   parameter p_num_routers    = 8,
-  // parameter p_num_free_nbits = 2,        //Don't need for the greedy
+  parameter p_num_free_nbits = 3,        
 
   // parameter not meant to be set outside this module
   parameter c_dest_nbits = $clog2( p_num_routers )
@@ -20,8 +20,8 @@ module lab4_net_GreedyRouteCompute
   // input  logic                        in_val,
   // output logic                        in_rdy,
 
-  // input  logic [p_num_free_nbits-1:0] num_free_west,
-  // input  logic [p_num_free_nbits-1:0] num_free_east,
+  //input  logic [p_num_free_nbits-1:0] num_free_west,
+  //input  logic [p_num_free_nbits-1:0] num_free_east,
 
   output logic [2:0]                  reqs
   // input  logic [2:0]                  grants
@@ -32,8 +32,8 @@ module lab4_net_GreedyRouteCompute
   // How to get the distance '4' from number of routers? want like floor(num/2)
 
 
+
   // Simple logic: We know what east and west are. we know what dest is.
-  // Make a macro and stuff?
   always @(*) begin
   	if (dest > cur) begin
       if (dest - cur > 4)
