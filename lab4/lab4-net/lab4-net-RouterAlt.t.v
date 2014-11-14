@@ -326,13 +326,20 @@ module top;
     input logic [31:0] sink_max_delay
   );
   begin
-    // we also reset the src/sink indexes
+    // we also reset the src/sink indexes and put x's in index 0
     th_src_index[0] = 0;
     th_src_index[1] = 0;
     th_src_index[2] = 0;
     th_sink_index[0] = 0;
     th_sink_index[1] = 0;
     th_sink_index[2] = 0;
+
+    th.src0.src.m[0] = 'hx;
+    th.src1.src.m[0] = 'hx;
+    th.src2.src.m[0] = 'hx;
+    th.sink0.sink.m[0] = 'hx;
+    th.sink1.sink.m[0] = 'hx;
+    th.sink2.sink.m[0] = 'hx;
 
     th_src_max_delay  = src_max_delay;
     th_sink_max_delay = sink_max_delay;

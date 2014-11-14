@@ -57,10 +57,10 @@ module top;
   endtask
 
   //----------------------------------------------------------------------
-  // basic test
+  // basic test 1: single ready request going west
   //----------------------------------------------------------------------
 
-  `VC_TEST_CASE_BEGIN( 1, "basic test" )
+  `VC_TEST_CASE_BEGIN( 1, "basic test 1: single ready request going west" )
   begin
 
     #1;  t1_reset = 1'b1;
@@ -69,13 +69,47 @@ module top;
     // Testing a single ready request
 
     //  reqs    grants  val   rdy   sel
-    t1( 3'b100, 3'b100, 1'b1, 1'b1, 2'h2 );
+    t1( 3'b001, 3'b001, 1'b1, 1'b1, 2'h0 );
 
   end
   `VC_TEST_CASE_END
 
 
   // add more test cases
+
+  //----------------------------------------------------------------------
+  // basic test 2: single ready request going to self
+  //----------------------------------------------------------------------
+
+  `VC_TEST_CASE_BEGIN( 2, "basic test 2: single ready request going to self" )
+  begin
+
+    #1;  t1_reset = 1'b1;
+    #20; t1_reset = 1'b0;
+
+    //  reqs    grants  val   rdy   sel
+    t1( 3'b010, 3'b010, 1'b1, 1'b1, 2'h1 );
+
+  end
+  `VC_TEST_CASE_END
+
+  //----------------------------------------------------------------------
+  // basic test 3: single ready request going east
+  //----------------------------------------------------------------------
+
+  `VC_TEST_CASE_BEGIN( 3, "basic test 3: single ready request going east" )
+  begin
+
+    #1;  t1_reset = 1'b1;
+    #20; t1_reset = 1'b0;
+
+    //  reqs    grants  val   rdy   sel
+    t1( 3'b100, 3'b100, 1'b1, 1'b1, 2'h2 );
+
+  end
+  `VC_TEST_CASE_END
+
+
   `VC_TEST_SUITE_END
 endmodule
 

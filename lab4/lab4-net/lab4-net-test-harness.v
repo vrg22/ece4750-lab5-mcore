@@ -352,10 +352,10 @@ module top;
   endtask
 
   //----------------------------------------------------------------------
-  // basic test: single source
+  // basic test 1: single source
   //----------------------------------------------------------------------
 
-  `VC_TEST_CASE_BEGIN( 1, "basic test: single source" )
+  `VC_TEST_CASE_BEGIN( 1, "basic test 1: single source" )
   begin
     init_rand_delays( 0, 0 );
 
@@ -375,6 +375,253 @@ module top;
 
 
   // add more test cases
+
+  //----------------------------------------------------------------------
+  // basic test 2: send to self
+  //----------------------------------------------------------------------
+
+  `VC_TEST_CASE_BEGIN( 2, "basic test 2: send to self" )
+  begin
+    init_rand_delays( 0, 0 );
+
+    //            src   dest  opq    payload
+    init_net_msg( 3'h0, 3'h0, 8'h00, 8'hce );
+    init_net_msg( 3'h1, 3'h1, 8'h01, 8'hff );
+    init_net_msg( 3'h2, 3'h2, 8'h02, 8'h80 );
+    init_net_msg( 3'h3, 3'h3, 8'h03, 8'hc0 );
+    init_net_msg( 3'h4, 3'h4, 8'h04, 8'h55 );
+    init_net_msg( 3'h5, 3'h5, 8'h05, 8'h96 );
+    init_net_msg( 3'h6, 3'h6, 8'h06, 8'h32 );
+    init_net_msg( 3'h7, 3'h7, 8'h07, 8'h2e );
+
+    run_test;
+  end
+  `VC_TEST_CASE_END
+
+
+  //----------------------------------------------------------------------
+  // basic test 3: A to B and B to A neighboring
+  //----------------------------------------------------------------------
+
+  `VC_TEST_CASE_BEGIN( 3, "basic test 3: A to B and B to A neighboring" )
+  begin
+    init_rand_delays( 0, 0 );
+
+    //            src   dest  opq    payload
+    init_net_msg( 3'h0, 3'h1, 8'h00, 8'hce );
+    init_net_msg( 3'h1, 3'h0, 8'h01, 8'hff );
+    init_net_msg( 3'h2, 3'h3, 8'h02, 8'h80 );
+    init_net_msg( 3'h3, 3'h2, 8'h03, 8'hc0 );
+    init_net_msg( 3'h4, 3'h5, 8'h04, 8'h55 );
+    init_net_msg( 3'h5, 3'h4, 8'h05, 8'h96 );
+    init_net_msg( 3'h6, 3'h7, 8'h06, 8'h32 );
+    init_net_msg( 3'h7, 3'h6, 8'h07, 8'h2e );
+
+    run_test;
+  end
+  `VC_TEST_CASE_END
+
+
+  //----------------------------------------------------------------------
+  // basic test 4: A to B tornado forwards
+  //----------------------------------------------------------------------
+
+  `VC_TEST_CASE_BEGIN( 4, "basic test 4: A to B tornado forwards" )
+  begin
+    init_rand_delays( 0, 0 );
+
+    //            src   dest  opq    payload
+    init_net_msg( 3'h0, 3'h3, 8'h00, 8'hce );
+    init_net_msg( 3'h1, 3'h4, 8'h01, 8'hff );
+    init_net_msg( 3'h2, 3'h5, 8'h02, 8'h80 );
+    init_net_msg( 3'h3, 3'h6, 8'h03, 8'hc0 );
+    init_net_msg( 3'h4, 3'h7, 8'h04, 8'h55 );
+    init_net_msg( 3'h5, 3'h0, 8'h05, 8'h96 );
+    init_net_msg( 3'h6, 3'h1, 8'h06, 8'h32 );
+    init_net_msg( 3'h7, 3'h2, 8'h07, 8'h2e );
+
+    run_test;
+  end
+  `VC_TEST_CASE_END
+
+
+  //----------------------------------------------------------------------
+  // basic test 5: A to B tornado backwards
+  //----------------------------------------------------------------------
+
+  `VC_TEST_CASE_BEGIN( 5, "basic test 5: A to B tornado backwards" )
+  begin
+    init_rand_delays( 0, 0 );
+
+    //            src   dest  opq    payload
+    init_net_msg( 3'h0, 3'h5, 8'h00, 8'hce );
+    init_net_msg( 3'h1, 3'h6, 8'h01, 8'hff );
+    init_net_msg( 3'h2, 3'h7, 8'h02, 8'h80 );
+    init_net_msg( 3'h3, 3'h0, 8'h03, 8'hc0 );
+    init_net_msg( 3'h4, 3'h1, 8'h04, 8'h55 );
+    init_net_msg( 3'h5, 3'h2, 8'h05, 8'h96 );
+    init_net_msg( 3'h6, 3'h3, 8'h06, 8'h32 );
+    init_net_msg( 3'h7, 3'h4, 8'h07, 8'h2e );
+
+    run_test;
+  end
+  `VC_TEST_CASE_END
+
+
+  //----------------------------------------------------------------------
+  // basic test 6: single destination, last router
+  //----------------------------------------------------------------------
+
+  `VC_TEST_CASE_BEGIN( 6, "basic test 6: single destination, last router" )
+  begin
+    init_rand_delays( 0, 0 );
+
+    //            src   dest  opq    payload
+    init_net_msg( 3'h0, 3'h7, 8'h00, 8'hce );
+    init_net_msg( 3'h1, 3'h7, 8'h01, 8'hff );
+    init_net_msg( 3'h2, 3'h7, 8'h02, 8'h80 );
+    init_net_msg( 3'h3, 3'h7, 8'h03, 8'hc0 );
+    init_net_msg( 3'h4, 3'h7, 8'h04, 8'h55 );
+    init_net_msg( 3'h5, 3'h7, 8'h05, 8'h96 );
+    init_net_msg( 3'h6, 3'h7, 8'h06, 8'h32 );
+    init_net_msg( 3'h7, 3'h7, 8'h07, 8'h2e );
+
+    run_test;
+  end
+  `VC_TEST_CASE_END
+
+
+  //----------------------------------------------------------------------
+  // basic test 7: single destination, first router
+  //----------------------------------------------------------------------
+
+  `VC_TEST_CASE_BEGIN( 7, "basic test 6: single destination, first router" )
+  begin
+    init_rand_delays( 0, 0 );
+
+    //            src   dest  opq    payload
+    init_net_msg( 3'h0, 3'h0, 8'h00, 8'hce );
+    init_net_msg( 3'h1, 3'h0, 8'h01, 8'hff );
+    init_net_msg( 3'h2, 3'h0, 8'h02, 8'h80 );
+    init_net_msg( 3'h3, 3'h0, 8'h03, 8'hc0 );
+    init_net_msg( 3'h4, 3'h0, 8'h04, 8'h55 );
+    init_net_msg( 3'h5, 3'h0, 8'h05, 8'h96 );
+    init_net_msg( 3'h6, 3'h0, 8'h06, 8'h32 );
+    init_net_msg( 3'h7, 3'h0, 8'h07, 8'h2e );
+
+    run_test;
+  end
+  `VC_TEST_CASE_END  
+
+
+  //----------------------------------------------------------------------
+  // basic test 8: A to B neighboring forwards
+  //----------------------------------------------------------------------
+
+  `VC_TEST_CASE_BEGIN( 8, "basic test 8: A to B neighboring, forwards" )
+  begin
+    init_rand_delays( 0, 0 );
+
+    //            src   dest  opq    payload
+    init_net_msg( 3'h0, 3'h1, 8'h00, 8'hce );
+    init_net_msg( 3'h1, 3'h2, 8'h01, 8'hff );
+    init_net_msg( 3'h2, 3'h3, 8'h02, 8'h80 );
+    init_net_msg( 3'h3, 3'h4, 8'h03, 8'hc0 );
+    init_net_msg( 3'h4, 3'h5, 8'h04, 8'h55 );
+    init_net_msg( 3'h5, 3'h6, 8'h05, 8'h96 );
+    init_net_msg( 3'h6, 3'h7, 8'h06, 8'h32 );
+    init_net_msg( 3'h7, 3'h0, 8'h07, 8'h2e );
+
+    run_test;
+  end
+  `VC_TEST_CASE_END  
+
+
+  //----------------------------------------------------------------------
+  // basic test 9: A to B neighboring backwards
+  //----------------------------------------------------------------------
+
+  `VC_TEST_CASE_BEGIN( 9, "basic test 8: A to B neighboring, backwards" )
+  begin
+    init_rand_delays( 0, 0 );
+
+    //            src   dest  opq    payload
+    init_net_msg( 3'h0, 3'h7, 8'h00, 8'hce );
+    init_net_msg( 3'h1, 3'h0, 8'h01, 8'hff );
+    init_net_msg( 3'h2, 3'h1, 8'h02, 8'h80 );
+    init_net_msg( 3'h3, 3'h2, 8'h03, 8'hc0 );
+    init_net_msg( 3'h4, 3'h3, 8'h04, 8'h55 );
+    init_net_msg( 3'h5, 3'h4, 8'h05, 8'h96 );
+    init_net_msg( 3'h6, 3'h5, 8'h06, 8'h32 );
+    init_net_msg( 3'h7, 3'h6, 8'h07, 8'h2e );
+
+    run_test;
+  end
+  `VC_TEST_CASE_END   
+
+
+  //----------------------------------------------------------------------
+  // basic test 10: deadlock
+  //----------------------------------------------------------------------
+
+  `VC_TEST_CASE_BEGIN( 10, "deadlock" )
+  begin
+    init_rand_delays( 0, 0 );
+
+    //            src   dest  opq    payload
+    init_net_msg( 3'h0, 3'h4, 8'h00, 8'hce );             // Fill up input and channel queues in CCW direction
+    init_net_msg( 3'h0, 3'h4, 8'h00, 8'hce );             // by sending 5 packets per router in a tornado pattern
+    init_net_msg( 3'h0, 3'h4, 8'h00, 8'hce ); 
+    init_net_msg( 3'h0, 3'h4, 8'h00, 8'hce );  
+    init_net_msg( 3'h0, 3'h4, 8'h00, 8'hce ); 
+//    init_net_msg( 3'h0, 3'h4, 8'h00, 8'hce ); 
+
+    init_net_msg( 3'h1, 3'h5, 8'h01, 8'hff );
+    init_net_msg( 3'h1, 3'h5, 8'h01, 8'hff );
+    init_net_msg( 3'h1, 3'h5, 8'h01, 8'hff );
+    init_net_msg( 3'h1, 3'h5, 8'h01, 8'hff );
+    init_net_msg( 3'h1, 3'h5, 8'h01, 8'hff );
+//    init_net_msg( 3'h1, 3'h5, 8'h01, 8'hff );  
+
+    init_net_msg( 3'h3, 3'h6, 8'h03, 8'hc0 );
+    init_net_msg( 3'h3, 3'h6, 8'h03, 8'hc0 );
+    init_net_msg( 3'h3, 3'h6, 8'h03, 8'hc0 );
+    init_net_msg( 3'h3, 3'h6, 8'h03, 8'hc0 );
+    init_net_msg( 3'h3, 3'h6, 8'h03, 8'hc0 );
+//    init_net_msg( 3'h3, 3'h6, 8'h03, 8'hc0 );
+
+    init_net_msg( 3'h4, 3'h7, 8'h04, 8'h55 );
+    init_net_msg( 3'h4, 3'h7, 8'h04, 8'h55 );
+    init_net_msg( 3'h4, 3'h7, 8'h04, 8'h55 );
+    init_net_msg( 3'h4, 3'h7, 8'h04, 8'h55 );
+    init_net_msg( 3'h4, 3'h7, 8'h04, 8'h55 );
+//    init_net_msg( 3'h4, 3'h7, 8'h04, 8'h55 );
+
+    init_net_msg( 3'h5, 3'h0, 8'h05, 8'h96 );
+    init_net_msg( 3'h5, 3'h0, 8'h05, 8'h96 );
+    init_net_msg( 3'h5, 3'h0, 8'h05, 8'h96 );
+    init_net_msg( 3'h5, 3'h0, 8'h05, 8'h96 );
+    init_net_msg( 3'h5, 3'h0, 8'h05, 8'h96 );
+//    init_net_msg( 3'h5, 3'h0, 8'h05, 8'h96 );
+
+    init_net_msg( 3'h6, 3'h1, 8'h06, 8'h32 );
+    init_net_msg( 3'h6, 3'h1, 8'h06, 8'h32 );
+    init_net_msg( 3'h6, 3'h1, 8'h06, 8'h32 );
+    init_net_msg( 3'h6, 3'h1, 8'h06, 8'h32 );
+    init_net_msg( 3'h6, 3'h1, 8'h06, 8'h32 );
+//    init_net_msg( 3'h6, 3'h1, 8'h06, 8'h32 );
+
+    init_net_msg( 3'h7, 3'h2, 8'h07, 8'h2e );
+    init_net_msg( 3'h7, 3'h2, 8'h07, 8'h2e );
+    init_net_msg( 3'h7, 3'h2, 8'h07, 8'h2e );
+    init_net_msg( 3'h7, 3'h2, 8'h07, 8'h2e );
+    init_net_msg( 3'h7, 3'h2, 8'h07, 8'h2e );
+ //   init_net_msg( 3'h7, 3'h2, 8'h07, 8'h2e );
+
+    run_test;
+  end
+  `VC_TEST_CASE_END   
+
 
   `VC_TEST_SUITE_END
 endmodule
