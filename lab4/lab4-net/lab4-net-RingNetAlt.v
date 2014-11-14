@@ -134,10 +134,10 @@ module lab4_net_RingNetAlt
         .out2_rdy (forw_out_rdy[`VC_PORT_PICK_FIELD(1,`NEXT(i))]),
         .out2_msg (forw_out_msg[`VC_PORT_PICK_FIELD(m,`NEXT(i))]),
 
-        .forw_free_one  (),                                                   //  FILL IN WITH OUTPUTS FROM MODULE
-        .forw_free_two  (),
-        .backw_free_one (),
-        .backw_free_two ()
+        .forw_free_one  (forw_free_one[`VC_PORT_PICK_FIELD(f,`PREV(i))]),                                                   //  FILL IN WITH OUTPUTS FROM MODULE
+        .forw_free_two  (forw_free_two[`VC_PORT_PICK_FIELD(f,`PREV(i))]),
+        .backw_free_one (backw_free_one[`VC_PORT_PICK_FIELD(f,`PREV(i))]),
+        .backw_free_two (backw_free_two[`VC_PORT_PICK_FIELD(1,`PREV(i))])
       );
 
 
@@ -200,34 +200,32 @@ module lab4_net_RingNetAlt
 
 
   //----------------------------------------------------------------------
-  // Channel generation
+  // Congestion Module generation
   //----------------------------------------------------------------------
 
   generate
-    for ( i = 0; i < c_num_ports; i = i + 1 ) begin: CHANNEL
+    for ( i = 0; i < c_num_ports; i = i + 1 ) begin
 
-      //  INSERT CONGESTION MODULE HERE
-
-      vc_Queue
-      #(
-        .p_type       (`VC_QUEUE_NORMAL),
-        .p_msg_nbits  (c_net_msg_nbits),
-        .p_num_msgs   (2)
-      )
-      backw_channel_queue
+      lab4_net_CongestionModule #(f) forw_congestion_module
       (
-        .clk      (clk),
-        .reset    (reset),
+          .clk          (clk),
+          .reset        (reset),
+          .free_one_in  (),
+          .free_two_in  (),
+          .next_one_in  (),
+          .free_one_out (),
+          .free_two_out ()
+      );
 
-        .enq_val  (backw_out_val[`VC_PORT_PICK_FIELD(1,i)]),
-        .enq_rdy  (backw_out_rdy[`VC_PORT_PICK_FIELD(1,i)]),
-        .enq_msg  (backw_out_msg[`VC_PORT_PICK_FIELD(m,i)]),
-
-        .deq_val  (backw_in_val[`VC_PORT_PICK_FIELD(1,i)]),
-        .deq_rdy  (backw_in_rdy[`VC_PORT_PICK_FIELD(1,i)]),
-        .deq_msg  (backw_in_msg[`VC_PORT_PICK_FIELD(m,i)]),
-
-        .num_free_entries (backw_free_output[`VC_PORT_PICK_FIELD(f,i)])
+      lab4_net_CongestionModule #(f) backw_congestion_module
+      (
+          .clk          (clk),
+          .reset        (reset),
+          .free_one_in  (),
+          .free_two_in  (),
+          .next_one_in  (),
+          .free_one_out (),
+          .free_two_out ()
       );
 
     end
