@@ -28,23 +28,6 @@ module lab4_net_AdaptiveRouteCompute
   assign cur = p_router_id;
 
 
-  // Simple logic: We know what east and west are. we know what dest is.
-  always @(*) begin
-  	if (dest > cur) begin
-      if (dest - cur > 4)
-  			reqs = 3'b001; 
-  		else
-  			reqs = 3'b100;  //East: assume east is direction of increasing router numbers
-  	end
-    else if (cur > dest) begin
-      if (cur - dest > 4)
-        reqs = 3'b100;  //East: assume east is direction of increasing router numbers
-      else
-        reqs = 3'b001;
-    end
-    else // (dest == cur)
-      reqs = 3'b010;
-  end
 
 endmodule
 

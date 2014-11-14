@@ -11,6 +11,7 @@
 `include "vc-trace.v"
 
 `include "lab4-net-RouterAlt.v"
+`include "lab4-net-CongestionModule.v"
 
 // macros to calculate previous and next router ids
 
@@ -240,13 +241,13 @@ module lab4_net_RingNetAlt
       (
           .clk                (clk),
           .reset              (reset),
-          .free_one_in        (forw_one_congest[`VC_PORT_PICK_FIELD(f,`NEXT(i))]),
-          .free_two_in        (forw_two_congest[`VC_PORT_PICK_FIELD(f,`NEXT(i))]),
-          .next_one_channel   (forw_one_channel[`VC_PORT_PICK_FIELD(f,`PREV(i))]),
-          .free_one_router    (forw_one_router[`VC_PORT_PICK_FIELD(f,i)]),
-          .free_two_router    (forw_two_router[`VC_PORT_PICK_FIELD(f,i)]),
-          .free_one_out       (forw_one_congest[`VC_PORT_PICK_FIELD(f,`PREV(i))]),
-          .free_two_out       (forw_two_congest[`VC_PORT_PICK_FIELD(f,`PREV(i))])
+          .free_one_in        (backw_one_congest[`VC_PORT_PICK_FIELD(f,`NEXT(i))]),
+          .free_two_in        (backw_two_congest[`VC_PORT_PICK_FIELD(f,`NEXT(i))]),
+          .next_one_channel   (backw_one_channel[`VC_PORT_PICK_FIELD(f,`PREV(i))]),
+          .free_one_router    (backw_one_router[`VC_PORT_PICK_FIELD(f,i)]),
+          .free_two_router    (backw_two_router[`VC_PORT_PICK_FIELD(f,i)]),
+          .free_one_out       (backw_one_congest[`VC_PORT_PICK_FIELD(f,`PREV(i))]),
+          .free_two_out       (backw_two_congest[`VC_PORT_PICK_FIELD(f,`PREV(i))])
       );
 
     end

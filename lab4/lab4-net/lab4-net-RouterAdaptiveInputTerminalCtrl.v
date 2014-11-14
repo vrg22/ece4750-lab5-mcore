@@ -45,15 +45,9 @@ module lab4_net_RouterAdaptiveInputTerminalCtrl
     .reqs           (reqs_temp)
   );
 
-  // Check for bubbles
-  logic wb;             // west bubble     
-  logic eb;             // east bubble
-  assign eb = num_free_east >= 3'h1;
-  assign wb = num_free_west >= 3'h1;
-
 
   always @(*) begin
-    if (((reqs_temp == 3'b001) && eb) || ((reqs_temp == 3'b100) && wb) || (reqs_temp == 3'b010))  
+    if ((reqs_temp == 3'b001) || (reqs_temp == 3'b100) || (reqs_temp == 3'b010))  
       reqs = (in_val) ? reqs_temp : 3'b000;   
     else 
       reqs = 3'b000;

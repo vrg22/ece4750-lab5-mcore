@@ -28,7 +28,7 @@ module lab4_net_CongestionModule
 logic [f-1:0] free_one_out_temp;
 logic [f-1:0] free_two_out_temp;
 
-module vc_ResetReg#(f, 0) one_hop_reg
+vc_ResetReg #(f, 0) one_hop_reg
 (
   .clk      (clk),                    // Clock input
   .reset    (reset),                  // Sync reset input
@@ -36,7 +36,7 @@ module vc_ResetReg#(f, 0) one_hop_reg
   .d        (free_one_in)             // Data input
 );
 
-module vc_ResetReg#(f, 0) two_hop_reg
+vc_ResetReg #(f, 0) two_hop_reg
 (
   .clk      (clk),                    // Clock input
   .reset    (reset),                  // Sync reset input
