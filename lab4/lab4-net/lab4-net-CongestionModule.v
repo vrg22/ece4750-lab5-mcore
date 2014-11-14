@@ -15,11 +15,13 @@ module lab4_net_CongestionModule
 (
   input   logic                       clk,
   input   logic                       reset,
-  input   logic [f-1:0]               free_one_in,
-  input   logic [f-1:0]               free_two_in,
-  input   logic [f-1:0]               next_one_out,
-  output  logic [f-1:0]               free_one_out,
-  output  logic [f-1:0]               free_two_out
+  input   logic [f-1:0]               free_one_in,          // prev one hop congestion info from previous congestion module
+  input   logic [f-1:0]               free_two_in,          // prev two hop congestion info from previous congestion module
+  input   logic [f-1:0]               next_one_channel,     // next one hop congestion info from next channel queue
+  output  logic [f-1:0]               free_one_router,      // prev one hop congestion info to router
+  output  logic [f-1:0]               free_two_router,      // prev two hop congestion info to router
+  output  logic [f-1:0]               free_one_out,         // next one hop congestion info to next congestion module
+  output  logic [f-1:0]               free_two_out          // next two hop congestion info to next congestion module
 );
 
 
@@ -42,9 +44,10 @@ module vc_ResetReg#(f, 0) two_hop_reg
   .d        (free_two_in)             // Data input
 );
 
-
-assign free_one_out = next_one_out;           // msg from next channel queue -> one hop msg
-assign free_two_out = free_one_out_temp;      // one hop msg -> two hop msg
+assign free_one_router = free_one_out_temp;   // one hop msg -> router
+assign free_two_router = free_two_out_temp;   // two hop msg -> router
+assign free_one_out    = next_one_channel;    // msg from next channel queue -> one hop msg
+assign free_two_out    = free_one_out_temp;   // one hop msg -> two hop msg
 
 
 
