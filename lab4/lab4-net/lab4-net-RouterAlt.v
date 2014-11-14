@@ -29,6 +29,8 @@ module lab4_net_RouterAlt
   parameter s = p_srcdest_nbits,
 
   parameter c_net_msg_nbits = `VC_NET_MSG_NBITS(p,o,s)
+
+  parameter f = 2                  // bits to represent 3 possible values of channel free entries
 )
 (
   input  logic                       clk,
@@ -56,8 +58,12 @@ module lab4_net_RouterAlt
 
   output logic                       out2_val,
   input  logic                       out2_rdy,
-  output logic [c_net_msg_nbits-1:0] out2_msg
+  output logic [c_net_msg_nbits-1:0] out2_msg,
 
+  input  logic [f-1:0]               forw_free_one,
+  input  logic [f-1:0]               forw_free_two,
+  input  logic [f-1:0]               backw_free_one,
+  input  logic [f-1:0]               backw_free_two
 );
 
   //----------------------------------------------------------------------
