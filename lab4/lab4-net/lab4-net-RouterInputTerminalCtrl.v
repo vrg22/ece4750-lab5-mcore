@@ -55,25 +55,12 @@ module lab4_net_RouterInputTerminalCtrl
     else 
       reqs = 3'b000;
   end
-
   
-  //assign reqs = (in_val) ? reqs_temp : 3'b000;    
 
   //If what we are requesting is what is being granted, ready to dequeue
   // assign in_rdy = (grants == reqs);
   assign in_rdy = (grants != 3'b000) ? ((grants & reqs) == reqs) : 0;
 
-
-  /*always @(*) begin
-    if ((grants & reqs) == reqs) begin
-      if(reqs == 3'b001)         // packet going west
-        in_rdy = eb ? 1 : 0;
-      else if (reqs == 3'b100)   // packet going east
-        in_rdy = wb ? 1 : 0;
-      else 
-        in_rdy = 1;
-    end   
-  end*/
 
 endmodule
 

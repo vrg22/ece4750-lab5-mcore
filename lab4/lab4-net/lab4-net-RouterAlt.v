@@ -11,7 +11,7 @@
 `include "vc-trace.v"
 
 `include "lab4-net-RouterInputCtrl.v"
-`include "lab4-net-RouterInputTerminalCtrl.v"
+`include "lab4-net-RouterAdaptiveInputTerminalCtrl.v"
 `include "lab4-net-RouterOutputCtrl.v"
 
 module lab4_net_RouterAlt
@@ -22,13 +22,14 @@ module lab4_net_RouterAlt
 
   parameter p_router_id      = 0,
   parameter p_num_routers    = 8,
+  parameter f                = 2,  // bits to represent 3 possible values of channel free entries
 
   // Shorter names, not to be set from outside the module
   parameter p = p_payload_nbits,
   parameter o = p_opaque_nbits,
   parameter s = p_srcdest_nbits,
 
-  parameter c_net_msg_nbits = `VC_NET_MSG_NBITS(p,o,s)
+  parameter c_net_msg_nbits = `VC_NET_MSG_NBITS(p,o,s)                  
 )
 (
   input  logic                       clk,
@@ -56,8 +57,12 @@ module lab4_net_RouterAlt
 
   output logic                       out2_val,
   input  logic                       out2_rdy,
-  output logic [c_net_msg_nbits-1:0] out2_msg
+  output logic [c_net_msg_nbits-1:0] out2_msg,
 
+  input  logic [f-1:0]               forw_free_one,
+  input  logic [f-1:0]               forw_free_two,
+  input  logic [f-1:0]               backw_free_one,
+  input  logic [f-1:0]               backw_free_two
 );
 
   //----------------------------------------------------------------------
@@ -78,19 +83,229 @@ module lab4_net_RouterAlt
 
   // instantiate input queues, crossbar and control modules here
 
-  // the following is a placeholder, delete
+  //----------------------------------------------------------------------
+  // Datapath
+  //----------------------------------------------------------------------
 
-  assign in0_rdy = 0;
-  assign in1_rdy = 0;
-  assign in2_rdy = 0;
+  // instantiate input queues, crossbar and control modules here
 
-  assign out0_val = 0;
-  assign out1_val = 0;
-  assign out2_val = 0;
+  //Input Queues
+  vc_Queue#(`VC_QUEUE_NORMAL,c_net_msg_nbits,4) in0_queue
+  (
+    .clk      (clk),
+    .reset    (reset),
 
-  assign out0_msg = 0;
-  assign out1_msg = 0;
-  assign out2_msg = 0;
+    .enq_val  (in0_val),
+    .enq_rdy  (in0_rdy),
+    .enq_msg  (in0_msg),
+
+    .deq_val  (in0_deq_val),
+    .deq_rdy  (in0_deq_rdy),
+    .deq_msg  (in0_deq_msg),
+
+    .num_free_entries ()
+  );
+
+  vc_Queue#(`VC_QUEUE_NORMAL,c_net_msg_nbits,4) in1_queue
+  (
+    .clk      (clk),
+    .reset    (reset),
+
+    .enq_val  (in1_val),
+    .enq_rdy  (in1_rdy),
+    .enq_msg  (in1_msg),
+
+    .deq_val  (in1_deq_val),
+    .deq_rdy  (in1_deq_rdy),
+    .deq_msg  (in1_deq_msg),
+
+    .num_free_entries ()
+  );
+
+  vc_Queue#(`VC_QUEUE_NORMAL,c_net_msg_nbits,4) in2_queue
+  (
+    .clk      (clk),
+    .reset    (reset),
+
+    .enq_val  (in2_val),
+    .enq_rdy  (in2_rdy),
+    .enq_msg  (in2_msg),
+
+    .deq_val  (in2_deq_val),
+    .deq_rdy  (in2_deq_rdy),
+    .deq_msg  (in2_deq_msg),
+
+    .num_free_entries ()
+  );
+
+
+  //Crossbar
+  logic [1:0]                 xbar_sel0;
+  logic [1:0]                 xbar_sel1;
+  logic [1:0]                 xbar_sel2;
+
+  vc_Crossbar3#(c_net_msg_nbits) xbar
+  (
+    .in0      (in0_deq_msg),
+    .in1      (in1_deq_msg),
+    .in2      (in2_deq_msg),
+
+    .sel0     (xbar_sel0),
+    .sel1     (xbar_sel1),
+    .sel2     (xbar_sel2),
+
+    .out0     (out0_msg),
+    .out1     (out1_msg),
+    .out2     (out2_msg)
+  );
+
+  //----------------------------------------------------------------------
+  // Control
+  //----------------------------------------------------------------------
+
+  //Wires
+  logic [s-1:0]               dest0;
+  logic [s-1:0]               dest1;
+  logic [s-1:0]               dest2;
+
+  //Grant & Request wires
+  logic [2:0]                 in_reqs0;
+  logic [2:0]                 in_reqs1;
+  logic [2:0]                 in_reqs2;
+
+  logic [2:0]                 out_reqs0;
+  logic [2:0]                 out_reqs1;
+  logic [2:0]                 out_reqs2;
+
+  logic [2:0]                 in_grants0;
+  logic [2:0]                 in_grants1;
+  logic [2:0]                 in_grants2;
+
+  logic [2:0]                 out_grants0;
+  logic [2:0]                 out_grants1;
+  logic [2:0]                 out_grants2;
+
+  //Assignment
+  assign out_reqs0 = {in_reqs2[0], in_reqs1[0], in_reqs0[0]};
+  assign out_reqs1 = {in_reqs2[1], in_reqs1[1], in_reqs0[1]};
+  assign out_reqs2 = {in_reqs2[2], in_reqs1[2], in_reqs0[2]};
+
+  assign in_grants0 = {out_grants2[0], out_grants1[0], out_grants0[0]};
+  assign in_grants1 = {out_grants2[1], out_grants1[1], out_grants0[1]};
+  assign in_grants2 = {out_grants2[2], out_grants1[2], out_grants0[2]};
+
+
+  //Unpack Network Msgs -> OR do we want to manually bitslice here?
+  vc_NetMsgUnpack#(p,o,s) in0_deq_unpack
+  (
+    .msg      (in0_deq_msg),
+
+    .dest     (dest0)
+    // .src      (),
+    // .opaque   (),
+    // .payload  ()   
+  );
+
+  vc_NetMsgUnpack#(p,o,s) in1_deq_unpack
+  (
+    .msg      (in1_deq_msg),
+
+    .dest     (dest1)
+    // .src      (),
+    // .opaque   (),
+    // .payload  ()   
+  );
+
+  vc_NetMsgUnpack#(p,o,s) in2_deq_unpack
+  (
+    .msg      (in2_deq_msg),
+
+    .dest     (dest2)
+    // .src      (),
+    // .opaque   (),
+    // .payload  ()   
+  );
+
+
+  //Input Control Units (2 InputCtrl, 1 InputTerminalCtrl)
+  lab4_net_RouterInputCtrl#(p_router_id, p_num_routers) in0_ctrl //West_Input_Port (GOING west)
+  (
+    .dest     (dest0),
+
+    .in_val   (in0_deq_val),
+    .in_rdy   (in0_deq_rdy),
+
+    .reqs     (in_reqs0),
+    .grants   (in_grants0)
+  );
+
+  lab4_net_RouterInputCtrl#(p_router_id, p_num_routers) in2_ctrl //East_Input_Port (GOING east)
+  (
+    .dest     (dest2),
+
+    .in_val   (in2_deq_val),
+    .in_rdy   (in2_deq_rdy),
+
+    .reqs     (in_reqs2),
+    .grants   (in_grants2)
+  );
+
+  lab4_net_RouterAdaptiveInputTerminalCtrl#(p_router_id, p_num_routers, f) in1_ctrl //Input/Output Terminal Port
+  (
+    .dest               (dest1),
+
+    .in_val             (in1_deq_val),
+    .in_rdy             (in1_deq_rdy),
+
+    .forw_free_one      (forw_free_one),
+    .forw_free_two      (forw_free_two),
+    .backw_free_one     (backw_free_one),
+    .backw_free_two     (backw_free_two),
+
+    .reqs               (in_reqs1),
+    .grants             (in_grants1)
+  );
+
+  //Output Control Units (3 identical units)
+  lab4_net_RouterOutputCtrl out0_ctrl
+  (
+    .clk          (clk),
+    .reset        (reset),
+
+    .reqs         (out_reqs0),
+    .grants       (out_grants0),
+
+    .out_val      (out0_val),
+    .out_rdy      (out0_rdy),
+    .xbar_sel     (xbar_sel0)
+  );
+
+  lab4_net_RouterOutputCtrl out1_ctrl
+  (
+    .clk          (clk),
+    .reset        (reset),
+
+    .reqs         (out_reqs1),
+    .grants       (out_grants1),
+
+    .out_val      (out1_val),
+    .out_rdy      (out1_rdy),
+    .xbar_sel     (xbar_sel1)
+  );
+
+  lab4_net_RouterOutputCtrl out2_ctrl
+  (
+    .clk          (clk),
+    .reset        (reset),
+
+    .reqs         (out_reqs2),
+    .grants       (out_grants2),
+
+    .out_val      (out2_val),
+    .out_rdy      (out2_rdy),
+    .xbar_sel     (xbar_sel2)
+  );
+
 
   //----------------------------------------------------------------------
   // Line tracing

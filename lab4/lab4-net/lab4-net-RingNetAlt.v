@@ -11,6 +11,7 @@
 `include "vc-trace.v"
 
 `include "lab4-net-RouterAlt.v"
+`include "lab4-net-CongestionModule.v"
 
 // macros to calculate previous and next router ids
 
@@ -31,7 +32,8 @@ module lab4_net_RingNetAlt
   parameter c_num_ports = 8,
   parameter c_net_msg_nbits = `VC_NET_MSG_NBITS(p,o,s),
 
-  parameter m = c_net_msg_nbits
+  parameter m = c_net_msg_nbits,
+  parameter f = 2                                             // bits to represent 3 possible values of channel free entries
 )
 (
   input  logic clk,
@@ -45,6 +47,39 @@ module lab4_net_RingNetAlt
   input  logic [`VC_PORT_PICK_NBITS(1,c_num_ports)-1:0] out_rdy,
   output logic [`VC_PORT_PICK_NBITS(m,c_num_ports)-1:0] out_msg
 );
+
+
+  //----------------------------------------------------------------------
+  // Congestion Module-Congestion Module connection wires
+  //----------------------------------------------------------------------
+
+  // forward (increasing router id) wires
+
+  logic [`VC_PORT_PICK_NBITS(f,c_num_ports)-1:0] forw_one_congest;            // one hop congestion info
+  logic [`VC_PORT_PICK_NBITS(f,c_num_ports)-1:0] forw_two_congest;            // two hop congestion info
+
+  // backward (decreasing router id) wire
+
+  logic [`VC_PORT_PICK_NBITS(f,c_num_ports)-1:0] backw_one_congest;           // one hop congestion info
+  logic [`VC_PORT_PICK_NBITS(f,c_num_ports)-1:0] backw_two_congest;           // two hop congestion info 
+
+
+  //----------------------------------------------------------------------
+  // Router/Channel-Congestion Pipeline connection wires
+  //----------------------------------------------------------------------
+
+  // forward (increasing router id) wires
+
+  logic [`VC_PORT_PICK_NBITS(f,c_num_ports)-1:0] forw_one_router;             // prev one hop congestion info from congestion pipe to router
+  logic [`VC_PORT_PICK_NBITS(f,c_num_ports)-1:0] forw_two_router;             // prev two hop congestion info from congestion pipe to router
+  logic [`VC_PORT_PICK_NBITS(f,c_num_ports)-1:0] forw_one_channel;            // next one hop congestion info from channel to congestion pipe
+
+  // backward (decreasing router id) wires
+
+  logic [`VC_PORT_PICK_NBITS(f,c_num_ports)-1:0] backw_one_router;            // prev one hop congestion info from congestion pipe to router
+  logic [`VC_PORT_PICK_NBITS(f,c_num_ports)-1:0] backw_two_router;            // prev two hop congestion info from congestion pipe to router
+  logic [`VC_PORT_PICK_NBITS(f,c_num_ports)-1:0] backw_one_channel;           // next one hop congestion info from channel to congestion pipe
+
 
   //----------------------------------------------------------------------
   // Router-router connection wires
@@ -115,7 +150,12 @@ module lab4_net_RingNetAlt
 
         .out2_val (forw_out_val[`VC_PORT_PICK_FIELD(1,`NEXT(i))]),
         .out2_rdy (forw_out_rdy[`VC_PORT_PICK_FIELD(1,`NEXT(i))]),
-        .out2_msg (forw_out_msg[`VC_PORT_PICK_FIELD(m,`NEXT(i))])
+        .out2_msg (forw_out_msg[`VC_PORT_PICK_FIELD(m,`NEXT(i))]),
+
+        .forw_free_one  (forw_one_router[`VC_PORT_PICK_FIELD(f,i)]),            
+        .forw_free_two  (forw_two_router[`VC_PORT_PICK_FIELD(f,i)]),
+        .backw_free_one (backw_one_router[`VC_PORT_PICK_FIELD(f,i)]),
+        .backw_free_two (backw_two_router[`VC_PORT_PICK_FIELD(f,i)])
       );
 
 
@@ -146,7 +186,9 @@ module lab4_net_RingNetAlt
 
         .deq_val  (forw_in_val[`VC_PORT_PICK_FIELD(1,i)]),
         .deq_rdy  (forw_in_rdy[`VC_PORT_PICK_FIELD(1,i)]),
-        .deq_msg  (forw_in_msg[`VC_PORT_PICK_FIELD(m,i)])
+        .deq_msg  (forw_in_msg[`VC_PORT_PICK_FIELD(m,i)]),
+
+        .num_free_entries (forw_one_channel[`VC_PORT_PICK_FIELD(f,i)])
       );
 
       vc_Queue
@@ -166,11 +208,52 @@ module lab4_net_RingNetAlt
 
         .deq_val  (backw_in_val[`VC_PORT_PICK_FIELD(1,i)]),
         .deq_rdy  (backw_in_rdy[`VC_PORT_PICK_FIELD(1,i)]),
-        .deq_msg  (backw_in_msg[`VC_PORT_PICK_FIELD(m,i)])
+        .deq_msg  (backw_in_msg[`VC_PORT_PICK_FIELD(m,i)]),
+
+        .num_free_entries (backw_one_channel[`VC_PORT_PICK_FIELD(f,i)])
       );
 
     end
   endgenerate
+
+
+  //----------------------------------------------------------------------
+  // Congestion Module generation
+  //----------------------------------------------------------------------
+
+  generate
+    for ( i = 0; i < c_num_ports; i = i + 1 ) begin
+
+      lab4_net_CongestionModule #(f) forw_congestion_module
+      (
+          .clk                (clk),
+          .reset              (reset),
+          .free_one_in        (forw_one_congest[`VC_PORT_PICK_FIELD(f,`PREV(i))]),
+          .free_two_in        (forw_two_congest[`VC_PORT_PICK_FIELD(f,`PREV(i))]),
+          .next_one_channel   (forw_one_channel[`VC_PORT_PICK_FIELD(f,`NEXT(i))]),
+          .free_one_router    (forw_one_router[`VC_PORT_PICK_FIELD(f,i)]),
+          .free_two_router    (forw_two_router[`VC_PORT_PICK_FIELD(f,i)]),
+          .free_one_out       (forw_one_congest[`VC_PORT_PICK_FIELD(f,`NEXT(i))]),
+          .free_two_out       (forw_two_congest[`VC_PORT_PICK_FIELD(f,`NEXT(i))])
+      );
+
+      lab4_net_CongestionModule #(f) backw_congestion_module
+      (
+          .clk                (clk),
+          .reset              (reset),
+          .free_one_in        (backw_one_congest[`VC_PORT_PICK_FIELD(f,`NEXT(i))]),
+          .free_two_in        (backw_two_congest[`VC_PORT_PICK_FIELD(f,`NEXT(i))]),
+          .next_one_channel   (backw_one_channel[`VC_PORT_PICK_FIELD(f,`PREV(i))]),
+          .free_one_router    (backw_one_router[`VC_PORT_PICK_FIELD(f,i)]),
+          .free_two_router    (backw_two_router[`VC_PORT_PICK_FIELD(f,i)]),
+          .free_one_out       (backw_one_congest[`VC_PORT_PICK_FIELD(f,`PREV(i))]),
+          .free_two_out       (backw_two_congest[`VC_PORT_PICK_FIELD(f,`PREV(i))])
+      );
+
+    end
+  endgenerate
+
+
 
 
   //----------------------------------------------------------------------

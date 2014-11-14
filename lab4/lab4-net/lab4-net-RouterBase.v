@@ -227,7 +227,7 @@ module lab4_net_RouterBase
 
 
   //Input Control Units (2 InputCtrl, 1 InputTerminalCtrl)
-  lab4_net_RouterInputCtrl#(p_router_id, p_num_routers) in0_ctrl //West_Input_Port (GOING west) //CHECK!
+  lab4_net_RouterInputCtrl#(p_router_id, p_num_routers) in0_ctrl //West_Input_Port (GOING west) 
   (
     .dest     (dest0),
 
@@ -238,7 +238,7 @@ module lab4_net_RouterBase
     .grants   (in_grants0)
   );
 
-  lab4_net_RouterInputCtrl#(p_router_id, p_num_routers) in2_ctrl //East_Input_Port (GOING east) //CHECK!
+  lab4_net_RouterInputCtrl#(p_router_id, p_num_routers) in2_ctrl //East_Input_Port (GOING east) 
   (
     .dest     (dest2),
 
@@ -249,7 +249,7 @@ module lab4_net_RouterBase
     .grants   (in_grants2)
   );
 
-  lab4_net_RouterInputTerminalCtrl#(p_router_id, p_num_routers, 3 /*Free bits = 2 or 3?*/) in1_ctrl //Input/Output Terminal Port
+  lab4_net_RouterInputTerminalCtrl#(p_router_id, p_num_routers, 3) in1_ctrl //Input/Output Terminal Port
   (
     .dest               (dest1),
 
