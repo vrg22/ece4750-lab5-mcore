@@ -270,12 +270,31 @@ once they were implemented. This process was repeated for the alternative
 design; we re-used all the baseline tests but added some more tests to target the 
 new adaptive routing algorithm. 
 
-We tried to ensure that we were testing all possible use-case scenarios of the modules
-we implemented. The Router Input Control module required simple testing since its
+We tried to ensure that we were testing all possible use-case scenarios of the baseline
+modules we implemented. The Router Input Control module required simple testing since its
 functionality is simple. The module only directs packet flow along the same 
 direction in the network so we tested the three different possible scenarios: west-bound packet
 continuing west, east-bound packet continuing east, packet bound to current router is 
-directed to current router. For the Router Input Terminal Control, we tested 
+directed to current router. For the Router Input Terminal Control, we incorporated 
+additional tests that checked if packets entering the current router (through its 
+terminal) were being directed along the shortest path. For the Router Output Control, 
+we ensured that the \textt{xbar\_sel*} signals were being sent correctly based on the 
+requests and grants signals. Testing for the top-level router module was slightly different
+in that we could consider the current router as being the source of a packet or as an
+intermediary that directs a packet along its current path. We used this opportunity to vary
+the source and destination router IDs to test both these cases. We also tested the greedy
+algorithm in this module to ensure that packets were being sent along the shorter path. \par
+
+We tested the alternative implementation on all the baseline tests first to ensure it was
+functional before adding additional tests to target the adaptive routing algorithm. We
+added extra tests to test the Router Adaptive Input Terminal Control module that ``houses''
+the Adaptive Route Compute module. Here, we check for whether packets are routed along the
+path with the lowest ``load factor'' - a metric determined by our adaptive algorithm. We 
+tested this by modifying the test harness to accept channel congestion information inputs and 
+then simulating high congestion along one pathway and low congestion along the other (with 
+both pathways having the same hop count to eliminate that factor). For cases of little to no 
+channel congestion, the baseline tests suffice in verifying the correct functionality of the 
+adaptive algorithm and the alternative top-level ring network as a whole.
 
 
 \section{Evaluation}
