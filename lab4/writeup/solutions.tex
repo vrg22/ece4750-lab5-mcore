@@ -8,6 +8,7 @@
 \usepackage{caption}
 \usepackage{listings}
 \usepackage{enumitem}
+\usepackage{subfigure}
 
 
 \begin{document}
@@ -296,8 +297,62 @@ both pathways having the same hop count to eliminate that factor). For cases of 
 channel congestion, the baseline tests suffice in verifying the correct functionality of the 
 adaptive algorithm and the alternative top-level ring network as a whole.
 
-
 \section{Evaluation}
+
+Figure~\ref{fig:patterns} below is quite indicative of the performance of
+our baseline and alternate implementations of a ring network.
+There are multiple traffic patterns under consideration, such as uniform 
+random, tornado, and rotation. 
+In every single traffic pattern, the baseline implementation is pareto-optimal
+to the alternative implementation. \par
+
+In some cases, the throughput of the traffic patter almost drops by half.
+This is in reference to Partition2 traffic, 
+and to a lesser extent, Uniform Random. 
+Such a big dropoff was not initially expected. 
+Weren't we in fact increasing ideal throughput by distributing congestion in 
+the network, allowing more packets to be in flight? 
+
+Additionally, the zero-load latency drop off should not have been that drastic.
+We were expecting results along the lines of tornado; maybe a very slight
+increase in latency, but not on the order of multiples of cycles. 
+\textbf{This means that our adaptive routing algorithm is under-calculating 
+the cost of rerouting to the non greedy path.
+This is also affecting our ideal throughput.}
+The cost needs to be higher in our non-greedy path to make sure that the path 
+is taken only when it will reduce latency. \par
+
+The problem also is that we do not have global information about our network.
+Compounding that problem is the staleness of the global information we have.
+We are possibly delayed by four cycles in getting network state at some time
+$t$. 
+Now, this should not matter in our test programs because the network streams
+are constant and elephant in nature. 
+However, on any real workload, this strategy will surely falter as nodes 
+are taking longer paths for no benefit.
+For example, in a MapReduce Job, there are two waves of network traffic.
+The first wave is when data is spread out to the workers to run the map
+operation, and the second wave is when data is collected by the controller
+to complete the job. 
+Unless we broke our abstraction and promised low latency delivery of data
+given an application, it would be hard to give the same performance of 
+uniform random traffic without investing considerable resources. \par
+
+Looking at the special traffic case, the neighbor, we see that both 
+patterns are equally low-latency and high throughput. 
+However, this pattern is exactly the special case where we always 
+route greedy. Thus, we expect to see that pattern.
+The only thing that is confusing is that there is no bottleneck on the ideal
+throughput.
+Either we are out of scale or the throughput is really close to the theoretical
+limit. \par
+
+Given the data shown in Figure~\ref{fig:patterns}, a designer would
+emphatically choose to support the baseline greedy routing algorithm.
+The relative costs of implementing one route scheme over another amount to 
+some extra global wires and a little bit more combinational logic. 
+In all practical effects, they have the same cost. 
+
 
 \newpage
 \section {Tables and Diagrams}
@@ -352,6 +407,38 @@ adaptive algorithm and the alternative top-level ring network as a whole.
 	\caption{The Control Store for the Adaptive algorithm. 
 			 Notice that the inputs now contain channel information as well.}
 	\label{fig:altctrl}
+\end{figure}
+
+\begin{figure}[h]
+\subfigure[Uniform Random]{
+	\includegraphics[width=0.33\textwidth]{lab4-net-urandom-plot}
+}
+\subfigure[Partition2]{
+	\includegraphics[width=0.33\textwidth]{lab4-net-partition2-plot}
+}
+\subfigure[Partition4]{
+	\includegraphics[width=0.33\textwidth]{lab4-net-partition4-plot}
+}
+
+\subfigure[Tornado]{
+	\includegraphics[width=0.33\textwidth]{lab4-net-tornado-plot}
+}
+\subfigure[Neighbor]{
+	\includegraphics[width=0.33\textwidth]{lab4-net-neighbor-plot}
+}
+\subfigure[Complement]{
+	\includegraphics[width=0.33\textwidth]{lab4-net-complement-plot}
+}
+
+\subfigure[Reverse]{
+	\includegraphics[width=0.33\textwidth]{lab4-net-reverse-plot}
+}
+\subfigure[Rotation]{
+	\includegraphics[width=0.33\textwidth]{lab4-net-rotation-plot}
+}
+\caption{A summary of the behavior of our network under different traffic
+		 patterns.}
+\label{fig:patterns}
 \end{figure}
 
 \end{document}
