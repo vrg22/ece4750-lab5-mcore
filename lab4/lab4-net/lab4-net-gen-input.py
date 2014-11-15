@@ -71,7 +71,24 @@ if sys.argv[1] == "urandom":
 
 # Add code for other patterns here (e.g., tornado)
 
+#-------------------------------------------------------------------------
+# tornado dataset
+#-------------------------------------------------------------------------
+
+if sys.argv[1] == "tornado":
+  for i in xrange(size):
+    src_gen = random.randint(0, num_ports-1)
+    dest_gen = (src_gen + 3) % 8
+
+    src.append( src_gen )
+    dest.append( dest_gen )
+    opaque.append(  random.randint( 0, ( 1 << opaque_nbits ) - 1 ) )
+    payload.append( random.randint( 0, ( 1 << payload_nbits ) - 1 ) )
 
 
 print_dataset( src, dest, opaque, payload )
+
+
+
+
 
