@@ -95,7 +95,7 @@ for its topology.
 Each node contains a message producer/consumer (also known as Input/Output 
 terminals), a router that the terminal connects to,
 and two outgoing channels from the router to other routers in the ring.
-This topology is logicaly shown in Figure 2. 
+This topology is logicaly shown in Figure~\ref{fig:topo}. 
 Each router connects to two other routers; the west channel of router $n$ 
 is the channel connecting to router $n-1$ and 
 the east channel of router $n$ connecting to router $n+1$.
@@ -124,7 +124,8 @@ the source and destination addresses are the same.
 Depending on the routing algorithm, either port 0 or 2 is chosen for other
 cases of source and destination addresses. \par
 
-The physical datapath on which the messages travel on is shown in Figure 3.
+The physical datapath on which the messages travel on is shown in 
+Figure~\ref{fig:topo}.
 Each router port is buffered by an input queue of size four which carries
 network messages. 
 Under some control logic soon to be discussed, an encoding of the 
@@ -134,8 +135,8 @@ This allows up to three discrete messages to traverse the router on any
 given cycle.
 A val/rdy interface mediates transfer of the packet out of the router. 
 This process repeats as long as there are packets in the input queues.
-The box show in Figure 3 around our router datapath is the interface for our 
-Router Base module. 
+The box show in Figure~\ref{fig:topo} around our router datapath is the 
+interface for our Router Base module. 
 We repeat this modular design in our control logic.
 The control logic is stored separately in another module so as to follow the
 design principle of the control-datapath split. 
@@ -196,7 +197,8 @@ This size is their congestion at their ports.
 Of course, this arithmetic for router names is done under modulo 8. 
 Given this congestion factor, we determine whether we want to route packets 
 through the path with the longer hop count. 
-A representation of the new control signal is shown in Figure 5.\par
+A representation of the new control signal is shown in 
+Figure~\ref{fig:altctrl}.\par
 
 There are, however, special cases to consider. \\
 As stated before, if the source and destination address are the same, then the
@@ -247,13 +249,15 @@ new routing algorithm with minimum
 
 \section{Evaluation}
 
-The figure below is quite indicative of the performance of our baseline and
-alternate implementations of a ring network.
+Figure~\ref{fig:patterns} below is quite indicative of the performance of
+our baseline and alternate implementations of a ring network.
 There are multiple traffic patterns under consideration, such as uniform 
 random, tornado, and rotation. 
 In every single traffic pattern, the baseline implementation is pareto-optimal
-to the alternative implementation. 
+to the alternative implementation. \par
 
+In some cases, the throughput of the traffic patter almost drops by half.
+This is in reference to Uniform Random and Partition2 traffic. 
 \begin{figure}[h]
 \subfigure[Uniform Random]{
 	\includegraphics[width=0.33\textwidth]{lab4-net-urandom-plot}
@@ -281,7 +285,9 @@ to the alternative implementation.
 \subfigure[Rotation]{
 	\includegraphics[width=0.33\textwidth]{lab4-net-rotation-plot}
 }
-
+\caption{A summary of the behavior of our network under different traffic
+		 patterns.}
+\label{fig:patterns}
 \end{figure}
 
 \newpage
@@ -299,26 +305,25 @@ to the alternative implementation.
 \begin{figure}[h]
 	\centering
 	\includegraphics[scale=0.5]{topology}
-	\label{fig:topo}
 	\caption{Network Topology of our Ring}
+	\label{fig:topo}
 \end{figure}
 
 \begin{figure}[h]
 	\centering
 	\includegraphics[scale=0.7]{dpath}
-	\label{fig:dpath}
 	\caption
 	{
 		The Datapath for our Router.
 		Each channel mediates transmission via val/rdy interfaces.
 		An arbiter allows messages to go in and out in a round robin fashion.
 	}
+	\label{fig:dpath}
 \end{figure}
 
 \begin{figure}[h]
 	\centering
 	\includegraphics[scale=0.7]{baselinectrl}
-	\label{fig:ctrl}
 	\caption
 	{
 		The Control Unit for our Router.
@@ -329,6 +334,7 @@ to the alternative implementation.
 		The Router Output module allows packets to exit on a port by performing
 		some arbitration. 
 	}
+	\label{fig:ctrl}
 \end{figure}
 
 \begin{figure}[h]
