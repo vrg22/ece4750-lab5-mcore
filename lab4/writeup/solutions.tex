@@ -8,6 +8,7 @@
 \usepackage{caption}
 \usepackage{listings}
 \usepackage{enumitem}
+\usepackage{subfigure}
 
 
 \begin{document}
@@ -266,38 +267,28 @@ In every single traffic pattern, the baseline implementation is pareto-optimal
 to the alternative implementation. \par
 
 In some cases, the throughput of the traffic patter almost drops by half.
-This is in reference to Uniform Random and Partition2 traffic. 
-\begin{figure}[h]
-\subfigure[Uniform Random]{
-	\includegraphics[width=0.33\textwidth]{lab4-net-urandom-plot}
-}
-\subfigure[Partition2]{
-	\includegraphics[width=0.33\textwidth]{lab4-net-partition2-plot}
-}
-\subfigure[Partition4]{
-	\includegraphics[width=0.33\textwidth]{lab4-net-partition4-plot}
-}
+This is in reference to Partition2 traffic, 
+and to a lesser extent, Uniform Random. 
+Such a big dropoff was not initially expected. 
+Weren't we in fact increasing ideal throughput by distributing congestion in 
+the network, allowing more packets to be in flight? 
 
-\subfigure[Tornado]{
-	\includegraphics[width=0.33\textwidth]{lab4-net-tornado-plot}
-}
-\subfigure[Neighbor]{
-	\includegraphics[width=0.33\textwidth]{lab4-net-neighbor-plot}
-}
-\subfigure[Complement]{
-	\includegraphics[width=0.33\textwidth]{lab4-net-complement-plot}
-}
+Additionally, the zero-load latency drop off should not have been that drastic.
+We were expecting results along the lines of tornado; maybe a very slight
+increase in latency, but not on the order of multiples of cycles. 
+This means that our adaptive routing algorithm is miscalculating the cost
+of rerouting to the non greedy path. 
+The cost needs to be higher in our non-greedy path to make sure that the path 
+is taken only when it will reduce latency. \par
 
-\subfigure[Reverse]{
-	\includegraphics[width=0.33\textwidth]{lab4-net-reverse-plot}
-}
-\subfigure[Rotation]{
-	\includegraphics[width=0.33\textwidth]{lab4-net-rotation-plot}
-}
-\caption{A summary of the behavior of our network under different traffic
-		 patterns.}
-\label{fig:patterns}
-\end{figure}
+The problem is that we do not have global informatino about our network.
+Compounding the problem is the staleness of the global information we have.
+We are possibly delayed by four cycles in getting network state at some time
+$t$. 
+Now, this should not matter in our test programs because the network streams
+are constant and elephant in nature. 
+However, on any real workload, this strategy will surely falter as nodes 
+are taking longer paths for no benefit. 
 
 \newpage
 \section {Tables and Diagrams}
@@ -352,6 +343,38 @@ This is in reference to Uniform Random and Partition2 traffic.
 	\caption{The Control Store for the Adaptive algorithm. 
 			 Notice that the inputs now contain channel information as well.}
 	\label{fig:altctrl}
+\end{figure}
+
+\begin{figure}[h]
+\subfigure[Uniform Random]{
+	\includegraphics[width=0.33\textwidth]{lab4-net-urandom-plot}
+}
+\subfigure[Partition2]{
+	\includegraphics[width=0.33\textwidth]{lab4-net-partition2-plot}
+}
+\subfigure[Partition4]{
+	\includegraphics[width=0.33\textwidth]{lab4-net-partition4-plot}
+}
+
+\subfigure[Tornado]{
+	\includegraphics[width=0.33\textwidth]{lab4-net-tornado-plot}
+}
+\subfigure[Neighbor]{
+	\includegraphics[width=0.33\textwidth]{lab4-net-neighbor-plot}
+}
+\subfigure[Complement]{
+	\includegraphics[width=0.33\textwidth]{lab4-net-complement-plot}
+}
+
+\subfigure[Reverse]{
+	\includegraphics[width=0.33\textwidth]{lab4-net-reverse-plot}
+}
+\subfigure[Rotation]{
+	\includegraphics[width=0.33\textwidth]{lab4-net-rotation-plot}
+}
+\caption{A summary of the behavior of our network under different traffic
+		 patterns.}
+\label{fig:patterns}
 \end{figure}
 
 \end{document}
