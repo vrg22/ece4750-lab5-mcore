@@ -8,7 +8,6 @@
 \usepackage{caption}
 \usepackage{listings}
 \usepackage{enumitem}
-\usepackage{subfigure}
 
 
 \begin{document}
@@ -225,7 +224,7 @@ packets attempting to enter a given terminal.
 However, if the source was one channel away from the destination router and the
 rest of the network was empty, it would still take 10 cycles to route the 
 opposite direction. 
-There would be 7 cycles of empty traffic and three cycle of pure waiting time.
+There would be 7 cycles of empty traffic and three cycles of pure waiting time.
 Therefore, either way leads to 10 cycles of waiting.
 It makes no sense to route the other way, \textit{ever}.
 So, we will simply route greedily in that case. \par
@@ -239,14 +238,17 @@ of $ 0 + 4 =4 $.
 Therefore, we route west. 
 We route on whichever route has a lower cost. \par
 
-We simulate wire delay in queue size length by pipeline the signal of each 
-router through a module that contains registers to relay our control unit. 
+We simulate wire delay in queue size/length by pipelining the channel congestion
+information from one and two hops over through a module that contains registers 
+to relay our control unit. Two such ``congestion pipelines'' had to be implemented
+in the alternative top-level ring module to accommodate for CW and CCW packet flow
+directions.
 This was a modification done in the datapath that was encapuslated in a 
 module, 
 This is fairly simple, however, as we are simply inducing wire delay. \par
-This does lead to imperfect information though.
+This does lead to imperfect information though. We are not considering 
 However, we assume the network is close to steady state and that general 
-congestion eariler implies general congestion later.
+congestion earlier implies general congestion later.
 This is some type of temporal prediction of network state. \par
 
 As far as the design of the alternative network, we were able to plug in our
