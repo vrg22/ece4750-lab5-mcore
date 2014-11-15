@@ -39,6 +39,9 @@ module TestHarness
   localparam o = p_opaque_nbits;
   localparam s = p_srcdest_nbits;
 
+  localparam p_num_free_nbits = 3;       // 3 bits to represent 5 possible values in a 4-element queue (0,1,2,3,4)
+  localparam f                = 2;       // bits to represent 3 possible values of channel free entries
+
 
   //----------------------------------------------------------------------
   // Test sources
@@ -109,44 +112,57 @@ module TestHarness
   logic                       sink2_rdy;
   logic [c_net_msg_nbits-1:0] sink2_msg;
 
+  logic [f-1:0]               forw_free_one;
+  logic [f-1:0]               forw_free_two;
+  logic [f-1:0]               backw_free_one;
+  logic [f-1:0]               backw_free_two;
+
 
   lab4_net_RouterAlt
   #(
-    .p_payload_nbits (p_payload_nbits),
-    .p_opaque_nbits  (p_opaque_nbits),
-    .p_srcdest_nbits (p_srcdest_nbits),
+    .p_payload_nbits  (p_payload_nbits),
+    .p_opaque_nbits   (p_opaque_nbits),
+    .p_srcdest_nbits  (p_srcdest_nbits),
 
-    .p_router_id     (c_router_id),
-    .p_num_routers   (c_num_routers)
+    .p_router_id      (c_router_id),
+    .p_num_routers    (c_num_routers),
+
+    .p_num_free_nbits (p_num_free_nbits),
+    .f                (f)
   )
   router
   (
-    .clk      (clk),
-    .reset    (reset),
+    .clk              (clk),
+    .reset            (reset),
 
-    .in0_val  (src0_val),
-    .in0_rdy  (src0_rdy),
-    .in0_msg  (src0_msg),
+    .in0_val          (src0_val),
+    .in0_rdy          (src0_rdy),
+    .in0_msg          (src0_msg),
 
-    .in1_val  (src1_val),
-    .in1_rdy  (src1_rdy),
-    .in1_msg  (src1_msg),
+    .in1_val          (src1_val),
+    .in1_rdy          (src1_rdy),
+    .in1_msg          (src1_msg),
 
-    .in2_val  (src2_val),
-    .in2_rdy  (src2_rdy),
-    .in2_msg  (src2_msg),
+    .in2_val          (src2_val),
+    .in2_rdy          (src2_rdy),
+    .in2_msg          (src2_msg),
 
-    .out0_val (sink0_val),
-    .out0_rdy (sink0_rdy),
-    .out0_msg (sink0_msg),
+    .out0_val         (sink0_val),
+    .out0_rdy         (sink0_rdy),
+    .out0_msg         (sink0_msg),
 
-    .out1_val (sink1_val),
-    .out1_rdy (sink1_rdy),
-    .out1_msg (sink1_msg),
+    .out1_val         (sink1_val),
+    .out1_rdy         (sink1_rdy),
+    .out1_msg         (sink1_msg),
 
-    .out2_val (sink2_val),
-    .out2_rdy (sink2_rdy),
-    .out2_msg (sink2_msg)
+    .out2_val         (sink2_val),
+    .out2_rdy         (sink2_rdy),
+    .out2_msg         (sink2_msg),
+
+    .forw_free_one    (forw_free_one),
+    .forw_free_two    (forw_free_two),
+    .backw_free_one   (backw_free_one),
+    .backw_free_two   (backw_free_two)
   );
 
   //----------------------------------------------------------------------
@@ -472,10 +488,10 @@ module top;
   endtask
 
   //----------------------------------------------------------------------
-  // basic test
+  // basic test 1: send a message to self
   //----------------------------------------------------------------------
 
-  `VC_TEST_CASE_BEGIN( 1, "basic test" )
+  `VC_TEST_CASE_BEGIN( 1, "basic test 1: send a message to self" )
   begin
     init_rand_delays( 0, 0 );
 
@@ -489,6 +505,77 @@ module top;
 
   end
   `VC_TEST_CASE_END
+
+
+  // add more test cases
+
+  //----------------------------------------------------------------------
+  // basic test 2: send a message east, dest-src less than 4
+  //----------------------------------------------------------------------
+
+  `VC_TEST_CASE_BEGIN( 2, "basic test 2: send a message east, dest-src less than 4" )
+  begin
+    init_rand_delays( 0, 0 );
+
+    //            port  port
+    //            in    out   src   dest  opq    payload
+    init_net_msg( 2'h2, 2'h2, 3'h0, 3'h4, 8'h00, 8'hff );      // tests "extreme case" of sending from 7 to 0 CCW 
+
+    run_test;
+
+  end
+  `VC_TEST_CASE_END
+
+  //----------------------------------------------------------------------
+  // basic test 3: send a message west, dest-src less than 4
+  //----------------------------------------------------------------------
+
+  `VC_TEST_CASE_BEGIN( 3, "basic test 3: send a message west, dest-src less than 4" )
+  begin
+    init_rand_delays( 0, 0 );
+
+    //            port  port
+    //            in    out   src   dest  opq    payload
+    init_net_msg( 2'h0, 2'h0, 3'h4, 3'h1, 8'h00, 8'hab );     // tests "extreme case" of sending from 0 to 7 CW 
+
+    run_test;
+
+  end
+  `VC_TEST_CASE_END
+
+  /* //----------------------------------------------------------------------
+  // basic test 4: send a message east, dest-src greater than 4
+  //----------------------------------------------------------------------
+
+  `VC_TEST_CASE_BEGIN( 4, "basic test 4: send a message east, dest-src greater than than 4" )                   // CHANGE ROUTER ID TO 0 FOR BASIC TEST 4
+  begin
+    init_rand_delays( 0, 0 );
+
+    //            port  port
+    //            in    out   src   dest  opq    payload
+    init_net_msg( 2'h0, 2'h1, 3'h7, 3'h0, 8'h00, 8'hab );     // tests "extreme case" of sending from 7 to 0 CW 
+
+    run_test;
+
+  end
+  `VC_TEST_CASE_END */
+
+  /* //----------------------------------------------------------------------
+  // basic test 5: send a message west, dest-src greater than 4
+  //----------------------------------------------------------------------
+
+  `VC_TEST_CASE_BEGIN( 5, "basic test 5: send a message west, dest-src greater than than 4" )                   // CHANGE ROUTER ID TO 7 FOR BASIC TEST 5
+  begin
+    init_rand_delays( 0, 0 );
+
+    //            port  port
+    //            in    out   src   dest  opq    payload
+    init_net_msg( 2'h2, 2'h1, 3'h0, 3'h7, 8'h00, 8'hab );     // tests "extreme case" of sending from 0 to 7 CW 
+
+    run_test;
+
+  end
+  `VC_TEST_CASE_END */
 
 
   // add more test cases

@@ -33,7 +33,8 @@ module lab4_net_RingNetAlt
   parameter c_net_msg_nbits = `VC_NET_MSG_NBITS(p,o,s),
 
   parameter m = c_net_msg_nbits,
-  parameter f = 2                                             // bits to represent 3 possible values of channel free entries
+  parameter p_num_free_nbits = 3,       // 3 bits to represent 5 possible values in a 4-element queue (0,1,2,3,4)
+  parameter f = 2                       // bits to represent 3 possible values of channel free entries
 )
 (
   input  logic clk,
@@ -121,7 +122,9 @@ module lab4_net_RingNetAlt
         .p_srcdest_nbits  (p_srcdest_nbits),
 
         .p_router_id      (i),
-        .p_num_routers    (c_num_ports)
+        .p_num_routers    (c_num_ports),
+        .p_num_free_nbits (p_num_free_nbits),
+        .f                (f)
       )
       router
       (

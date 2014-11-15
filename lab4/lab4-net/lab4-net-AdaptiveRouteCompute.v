@@ -1,5 +1,5 @@
 //========================================================================
-// Greedy Route Computation
+// Adaptive Route Computation
 //========================================================================
 
 `ifndef LAB4_NET_ADAPTIVE_ROUTE_COMPUTE_V
@@ -24,9 +24,67 @@ module lab4_net_AdaptiveRouteCompute
   output logic [2:0]                  reqs
 );
 
-  logic [c_dest_nbits-1:0] 			  cur;
+  logic [c_dest_nbits-1:0] 			      cur;
   assign cur = p_router_id;
 
+  logic [p_num_routers-1:0]           east_hops;
+  logic [p_num_routers-1:0]           west_hops;
+  logic [8:0]                         east_factor;
+  logic [8:0]                         west_factor;
+
+
+  // Compute hops and load factors in either direction. Route along path with minimal load factor
+  
+  always @(*) begin
+    // destination = current router
+    if (dest == cur) begin
+      reqs = 3'b010;
+    end
+    // destination > current router
+    else if (dest > cur) begin
+      east_hops = dest-cur;
+      west_hops = p_num_routers-(dest-cur);
+      // destination is only one hop away so don't need to check two hops away
+      if (dest-cur == 1) begin
+        east_factor = (f-forw_free_one) + east_hops;
+        west_factor = (f-backw_free_one) + west_hops;
+      end
+      // destination is more than one hop away
+      else begin
+        east_factor = (f-forw_free_one) + (f-forw_free_two) + east_hops;
+        west_factor = (f-backw_free_one) + (f-backw_free_two) + west_hops;
+      end
+      // route along path with minimal load factor. east if factors are equal
+      if(west_factor < east_factor) begin
+        reqs = 3'b001;
+      end
+      else begin
+        reqs = 3'b100;
+      end
+    end
+    // destination < current router
+    else begin
+      west_hops = dest-cur;
+      east_hops = p_num_routers-(dest-cur);
+      // destination is only one hop away so don't need to check two hops away
+      if (dest-cur == 1) begin
+        east_factor = (f-forw_free_one) + east_hops;
+        west_factor = (f-backw_free_one) + west_hops;
+      end
+      // destination is more than one hop away
+      else begin
+        east_factor = (f-forw_free_one) + (f-forw_free_two) + east_hops;
+        west_factor = (f-backw_free_one) + (f-backw_free_two) + west_hops;  
+      end
+      // route along path with minimal load factor. east if factors are equal
+      if(west_factor < east_factor) begin
+        reqs = 3'b001;
+      end
+      else begin
+        reqs = 3'b100;
+      end 
+    end
+  end
 
 
 endmodule
