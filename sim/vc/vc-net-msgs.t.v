@@ -23,11 +23,11 @@ module top;
   localparam t1_o = c_t1_opaque_nbits;
   localparam t1_s = c_t1_srcdest_nbits;
 
-  reg  [`VC_NET_MSG_PAYLOAD_NBITS(t1_p,t1_o,t1_s)-1:0]  t1_pack_payload;
-  reg  [`VC_NET_MSG_OPAQUE_NBITS(t1_p,t1_o,t1_s)-1:0]   t1_pack_opaque;
-  reg  [`VC_NET_MSG_SRC_NBITS(t1_p,t1_o,t1_s)-1:0]      t1_pack_src;
-  reg  [`VC_NET_MSG_DEST_NBITS(t1_p,t1_o,t1_s)-1:0]     t1_pack_dest;
-  wire [`VC_NET_MSG_NBITS(t1_p,t1_o,t1_s)-1:0]          t1_pack_msg;
+  logic [`VC_NET_MSG_PAYLOAD_NBITS(t1_p,t1_o,t1_s)-1:0]  t1_pack_payload;
+  logic [`VC_NET_MSG_OPAQUE_NBITS(t1_p,t1_o,t1_s)-1:0]   t1_pack_opaque;
+  logic [`VC_NET_MSG_SRC_NBITS(t1_p,t1_o,t1_s)-1:0]      t1_pack_src;
+  logic [`VC_NET_MSG_DEST_NBITS(t1_p,t1_o,t1_s)-1:0]     t1_pack_dest;
+  logic [`VC_NET_MSG_NBITS(t1_p,t1_o,t1_s)-1:0]          t1_pack_msg;
 
   vc_NetMsgPack#(t1_p,t1_o,t1_s) t1_pack
   (
@@ -38,10 +38,10 @@ module top;
     .msg        (t1_pack_msg)
   );
 
-  wire [`VC_NET_MSG_PAYLOAD_NBITS(t1_p,t1_o,t1_s)-1:0]  t1_unpack_payload;
-  wire [`VC_NET_MSG_OPAQUE_NBITS(t1_p,t1_o,t1_s)-1:0]   t1_unpack_opaque;
-  wire [`VC_NET_MSG_SRC_NBITS(t1_p,t1_o,t1_s)-1:0]      t1_unpack_src;
-  wire [`VC_NET_MSG_DEST_NBITS(t1_p,t1_o,t1_s)-1:0]     t1_unpack_dest;
+  logic [`VC_NET_MSG_PAYLOAD_NBITS(t1_p,t1_o,t1_s)-1:0]  t1_unpack_payload;
+  logic [`VC_NET_MSG_OPAQUE_NBITS(t1_p,t1_o,t1_s)-1:0]   t1_unpack_opaque;
+  logic [`VC_NET_MSG_SRC_NBITS(t1_p,t1_o,t1_s)-1:0]      t1_unpack_src;
+  logic [`VC_NET_MSG_DEST_NBITS(t1_p,t1_o,t1_s)-1:0]     t1_unpack_dest;
 
   vc_NetMsgUnpack#(t1_p,t1_o,t1_s) t1_unpack
   (
@@ -52,8 +52,8 @@ module top;
     .dest       (t1_unpack_dest)
   );
 
-  reg t1_reset = 1'b1;
-  reg t1_val;
+  logic t1_reset = 1'b1;
+  logic t1_val;
 
   vc_NetMsgTrace#(t1_p,t1_o,t1_s) t1_trace
   (
@@ -68,11 +68,11 @@ module top;
 
   task t1
   (
-    input                                                 val,
-    input [`VC_NET_MSG_DEST_NBITS(t1_p,t1_o,t1_s)-1:0]    dest,
-    input [`VC_NET_MSG_SRC_NBITS(t1_p,t1_o,t1_s)-1:0]     src,
-    input [`VC_NET_MSG_OPAQUE_NBITS(t1_p,t1_o,t1_s)-1:0]  opaque,
-    input [`VC_NET_MSG_PAYLOAD_NBITS(t1_p,t1_o,t1_s)-1:0] payload
+    input logic                                                 val,
+    input logic [`VC_NET_MSG_DEST_NBITS(t1_p,t1_o,t1_s)-1:0]    dest,
+    input logic [`VC_NET_MSG_SRC_NBITS(t1_p,t1_o,t1_s)-1:0]     src,
+    input logic [`VC_NET_MSG_OPAQUE_NBITS(t1_p,t1_o,t1_s)-1:0]  opaque,
+    input logic [`VC_NET_MSG_PAYLOAD_NBITS(t1_p,t1_o,t1_s)-1:0] payload
   );
   begin
     t1_val          = val;
@@ -120,11 +120,11 @@ module top;
   localparam t2_o = c_t2_opaque_nbits;
   localparam t2_s = c_t2_srcdest_nbits;
 
-  reg  [`VC_NET_MSG_PAYLOAD_NBITS(t2_p,t2_o,t2_s)-1:0]  t2_pack_payload;
-  reg  [`VC_NET_MSG_OPAQUE_NBITS(t2_p,t2_o,t2_s)-1:0]   t2_pack_opaque;
-  reg  [`VC_NET_MSG_SRC_NBITS(t2_p,t2_o,t2_s)-1:0]      t2_pack_src;
-  reg  [`VC_NET_MSG_DEST_NBITS(t2_p,t2_o,t2_s)-1:0]     t2_pack_dest;
-  wire [`VC_NET_MSG_NBITS(t2_p,t2_o,t2_s)-1:0]          t2_pack_msg;
+  logic [`VC_NET_MSG_PAYLOAD_NBITS(t2_p,t2_o,t2_s)-1:0]  t2_pack_payload;
+  logic [`VC_NET_MSG_OPAQUE_NBITS(t2_p,t2_o,t2_s)-1:0]   t2_pack_opaque;
+  logic [`VC_NET_MSG_SRC_NBITS(t2_p,t2_o,t2_s)-1:0]      t2_pack_src;
+  logic [`VC_NET_MSG_DEST_NBITS(t2_p,t2_o,t2_s)-1:0]     t2_pack_dest;
+  logic [`VC_NET_MSG_NBITS(t2_p,t2_o,t2_s)-1:0]          t2_pack_msg;
 
   vc_NetMsgPack#(t2_p,t2_o,t2_s) t2_pack
   (
@@ -135,10 +135,10 @@ module top;
     .msg        (t2_pack_msg)
   );
 
-  wire [`VC_NET_MSG_PAYLOAD_NBITS(t2_p,t2_o,t2_s)-1:0]  t2_unpack_payload;
-  wire [`VC_NET_MSG_OPAQUE_NBITS(t2_p,t2_o,t2_s)-1:0]   t2_unpack_opaque;
-  wire [`VC_NET_MSG_SRC_NBITS(t2_p,t2_o,t2_s)-1:0]      t2_unpack_src;
-  wire [`VC_NET_MSG_DEST_NBITS(t2_p,t2_o,t2_s)-1:0]     t2_unpack_dest;
+  logic [`VC_NET_MSG_PAYLOAD_NBITS(t2_p,t2_o,t2_s)-1:0]  t2_unpack_payload;
+  logic [`VC_NET_MSG_OPAQUE_NBITS(t2_p,t2_o,t2_s)-1:0]   t2_unpack_opaque;
+  logic [`VC_NET_MSG_SRC_NBITS(t2_p,t2_o,t2_s)-1:0]      t2_unpack_src;
+  logic [`VC_NET_MSG_DEST_NBITS(t2_p,t2_o,t2_s)-1:0]     t2_unpack_dest;
 
   vc_NetMsgUnpack#(t2_p,t2_o,t2_s) t2_unpack
   (
@@ -149,8 +149,8 @@ module top;
     .dest       (t2_unpack_dest)
   );
 
-  reg t2_reset = 1'b1;
-  reg t2_val;
+  logic t2_reset = 1'b1;
+  logic t2_val;
 
   vc_NetMsgTrace#(t2_p,t2_o,t2_s) t2_trace
   (
@@ -165,11 +165,11 @@ module top;
 
   task t2
   (
-    input                                                 val,
-    input [`VC_NET_MSG_DEST_NBITS(t2_p,t2_o,t2_s)-1:0]    dest,
-    input [`VC_NET_MSG_SRC_NBITS(t2_p,t2_o,t2_s)-1:0]     src,
-    input [`VC_NET_MSG_OPAQUE_NBITS(t2_p,t2_o,t2_s)-1:0]  opaque,
-    input [`VC_NET_MSG_PAYLOAD_NBITS(t2_p,t2_o,t2_s)-1:0] payload
+    input logic                                                 val,
+    input logic [`VC_NET_MSG_DEST_NBITS(t2_p,t2_o,t2_s)-1:0]    dest,
+    input logic [`VC_NET_MSG_SRC_NBITS(t2_p,t2_o,t2_s)-1:0]     src,
+    input logic [`VC_NET_MSG_OPAQUE_NBITS(t2_p,t2_o,t2_s)-1:0]  opaque,
+    input logic [`VC_NET_MSG_PAYLOAD_NBITS(t2_p,t2_o,t2_s)-1:0] payload
   );
   begin
     t2_val          = val;

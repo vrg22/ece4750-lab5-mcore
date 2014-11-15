@@ -9,15 +9,15 @@
 //
 // module tester;
 //
-//  reg clk = 1;
+//  logic clk = 1'b1;
 //  always #5 clk = ~clk;
 //
 //  `VC_TEST_SUITE_BEGIN( "vc_Muxes" );
 //
-//  reg  [31:0] mux2_in0;
-//  reg  [31:0] mux2_in0;
-//  reg         mux2_sel;
-//  wire [31:0] mux2_out;
+//  logic [31:0] mux2_in0;
+//  logic [31:0] mux2_in0;
+//  logic        mux2_sel;
+//  logic [31:0] mux2_out;
 //
 //  vc_Mux2#(32) mux2( mux2_in0, mux2_in1, mux2_sel, mux2_out );
 //
@@ -75,7 +75,7 @@ endmodule
 `define VC_TEST_SUITE_BEGIN( name_ )                                    \
   vc_Test    vc_test();                                                 \
                                                                         \
-  reg        clk = 1;                                                   \
+  logic        clk = 1'b1;                                              \
                                                                         \
   initial begin                                                         \
     if ( !$value$plusargs( "test-case=%d", vc_test.case_num_only ) ) begin \

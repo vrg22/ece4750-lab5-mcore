@@ -13,14 +13,14 @@ module top;
   // Test vc_Crossbar2_w32
   //----------------------------------------------------------------------
 
-  reg  [31:0] t1_in0 = 32'hdeadbeef;
-  reg  [31:0] t1_in1 = 32'hbeeff00d;
+  logic [31:0] t1_in0 = 32'hdeadbeef;
+  logic [31:0] t1_in1 = 32'hbeeff00d;
 
-  reg         t1_sel0;
-  reg         t1_sel1;
+  logic        t1_sel0;
+  logic        t1_sel1;
 
-  wire [31:0] t1_out0;
-  wire [31:0] t1_out1;
+  logic [31:0] t1_out0;
+  logic [31:0] t1_out1;
 
   vc_Crossbar2#(32) t1_xbar2_w32
   (
@@ -38,11 +38,11 @@ module top;
 
   task t1
   (
-    input        sel0,
-    input        sel1,
+    input logic        sel0,
+    input logic        sel1,
 
-    input [31:0] out0,
-    input [31:0] out1
+    input logic [31:0] out0,
+    input logic [31:0] out1
   );
   begin
     t1_sel0 = sel0;
@@ -71,17 +71,17 @@ module top;
   // Test vc_Crossbar3_w32
   //----------------------------------------------------------------------
 
-  reg  [31:0] t2_in0 = 32'hdeadbeef;
-  reg  [31:0] t2_in1 = 32'hbeeff00d;
-  reg  [31:0] t2_in2 = 32'hcafebabe;
+  logic [31:0] t2_in0 = 32'hdeadbeef;
+  logic [31:0] t2_in1 = 32'hbeeff00d;
+  logic [31:0] t2_in2 = 32'hcafebabe;
 
-  reg  [1:0]  t2_sel0;
-  reg  [1:0]  t2_sel1;
-  reg  [1:0]  t2_sel2;
+  logic [1:0]  t2_sel0;
+  logic [1:0]  t2_sel1;
+  logic [1:0]  t2_sel2;
 
-  wire [31:0] t2_out0;
-  wire [31:0] t2_out1;
-  wire [31:0] t2_out2;
+  logic [31:0] t2_out0;
+  logic [31:0] t2_out1;
+  logic [31:0] t2_out2;
 
   vc_Crossbar3#(32) t2_xbar3_w32
   (
@@ -102,13 +102,13 @@ module top;
 
   task t2
   (
-    input [1:0]  sel0,
-    input [1:0]  sel1,
-    input [1:0]  sel2,
+    input logic [1:0]  sel0,
+    input logic [1:0]  sel1,
+    input logic [1:0]  sel2,
 
-    input [31:0] out0,
-    input [31:0] out1,
-    input [31:0] out2
+    input logic [31:0] out0,
+    input logic [31:0] out1,
+    input logic [31:0] out2
   );
   begin
     t2_sel0 = sel0;
@@ -145,20 +145,20 @@ module top;
   // Test vc_Crossbar4_w32
   //----------------------------------------------------------------------
 
-  reg  [31:0] t3_in0 = 32'hdeadbeef;
-  reg  [31:0] t3_in1 = 32'hbeeff00d;
-  reg  [31:0] t3_in2 = 32'hcafebabe;
-  reg  [31:0] t3_in3 = 32'hff00ff00;
+  logic [31:0] t3_in0 = 32'hdeadbeef;
+  logic [31:0] t3_in1 = 32'hbeeff00d;
+  logic [31:0] t3_in2 = 32'hcafebabe;
+  logic [31:0] t3_in3 = 32'hff00ff00;
 
-  reg  [1:0]  t3_sel0;
-  reg  [1:0]  t3_sel1;
-  reg  [1:0]  t3_sel2;
-  reg  [1:0]  t3_sel3;
+  logic [1:0]  t3_sel0;
+  logic [1:0]  t3_sel1;
+  logic [1:0]  t3_sel2;
+  logic [1:0]  t3_sel3;
 
-  wire [31:0] t3_out0;
-  wire [31:0] t3_out1;
-  wire [31:0] t3_out2;
-  wire [31:0] t3_out3;
+  logic [31:0] t3_out0;
+  logic [31:0] t3_out1;
+  logic [31:0] t3_out2;
+  logic [31:0] t3_out3;
 
   vc_Crossbar4#(32) t3_xbar4_w32
   (
@@ -182,15 +182,15 @@ module top;
 
   task t3
   (
-    input [1:0]  sel0,
-    input [1:0]  sel1,
-    input [1:0]  sel2,
-    input [1:0]  sel3,
+    input logic [1:0]  sel0,
+    input logic [1:0]  sel1,
+    input logic [1:0]  sel2,
+    input logic [1:0]  sel3,
 
-    input [31:0] out0,
-    input [31:0] out1,
-    input [31:0] out2,
-    input [31:0] out3
+    input logic [31:0] out0,
+    input logic [31:0] out1,
+    input logic [31:0] out2,
+    input logic [31:0] out3
   );
   begin
     t3_sel0 = sel0;

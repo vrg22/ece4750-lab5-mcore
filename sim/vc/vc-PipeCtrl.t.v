@@ -24,25 +24,25 @@ module TestStage
   parameter p_msg_nbits = 32,
   parameter p_shamt     = 4
 )(
-  input                    clk,
-  input                    reset,
+  input  logic                   clk,
+  input  logic                   reset,
 
-  input  [p_msg_nbits-1:0] prev_msg,
-  input                    prev_val,
-  output                   prev_stall,
-  output                   prev_squash,
+  input  logic [p_msg_nbits-1:0] prev_msg,
+  input  logic                   prev_val,
+  output logic                   prev_stall,
+  output logic                   prev_squash,
 
-  output [p_msg_nbits-1:0] next_msg,
-  output                   next_val,
-  input                    next_stall,
-  input                    next_squash
+  output logic [p_msg_nbits-1:0] next_msg,
+  output logic                   next_val,
+  input  logic                   next_stall,
+  input  logic                   next_squash
 );
 
-  wire curr_stall;
-  wire curr_squash;
-  wire curr_reg_en;
-  wire curr_val;
-  wire [p_msg_nbits-1:0] reg_out;
+  logic curr_stall;
+  logic curr_squash;
+  logic curr_reg_en;
+  logic curr_val;
+  logic [p_msg_nbits-1:0] reg_out;
 
   // the pipeline stage is a register
 
@@ -91,7 +91,7 @@ module TestStage
 
   assign curr_squash = curr_val & ( ctr == {p_shamt{1'b1}} );
 
-  reg [p_shamt-1:0] ctr;
+  logic [p_shamt-1:0] ctr;
 
   // sequential stall/squash logic
 
@@ -114,7 +114,8 @@ module TestStage
   // Line Tracing
   //----------------------------------------------------------------------
 
-  reg [`VC_TRACE_NBITS_TO_NCHARS(p_msg_nbits)*8-1:0] msg_str;
+  logic [`VC_TRACE_NBITS_TO_NCHARS(p_msg_nbits)*8-1:0] msg_str;
+
   `VC_TRACE_BEGIN
   begin
     $sformat( msg_str, "%x", next_msg );
@@ -136,22 +137,22 @@ module TestHarness
   parameter p_num_msgs   = 1024,
   parameter p_num_stages = 1
 )(
-  input         clk,
-  input         reset,
-  input  [31:0] src_max_delay,
-  input  [31:0] sink_max_delay,
-  output        done
+  input  logic        clk,
+  input  logic        reset,
+  input  logic [31:0] src_max_delay,
+  input  logic [31:0] sink_max_delay,
+  output logic        done
 );
 
-  wire [p_msg_nbits-1:0] src_msg;
-  wire                   src_val;
-  wire                   src_rdy;
-  wire                   src_done;
+  logic [p_msg_nbits-1:0] src_msg;
+  logic                   src_val;
+  logic                   src_rdy;
+  logic                   src_done;
 
-  wire [p_msg_nbits-1:0] sink_msg;
-  wire                   sink_val;
-  wire                   sink_rdy;
-  wire                   sink_done;
+  logic [p_msg_nbits-1:0] sink_msg;
+  logic                   sink_val;
+  logic                   sink_rdy;
+  logic                   sink_done;
 
   vc_TestRandDelaySource#(p_msg_nbits,p_num_msgs) src
   (
@@ -170,10 +171,10 @@ module TestHarness
   // declare the wires between pipeline stages, note there are
   // p_num_stages+1 wires to account for the connections to the sink
 
-  wire [p_msg_nbits-1:0] msg    [p_num_stages:0];
-  wire                   val    [p_num_stages:0];
-  wire                   stall  [p_num_stages:0];
-  wire                   squash [p_num_stages:0];
+  logic [p_msg_nbits-1:0] msg    [p_num_stages:0];
+  logic                   val    [p_num_stages:0];
+  logic                   stall  [p_num_stages:0];
+  logic                   squash [p_num_stages:0];
 
   // the pipeline protocol logic <-> val/rdy interfacing
 
@@ -296,10 +297,10 @@ module top;
   // Test Setup
   //----------------------------------------------------------------------
 
-  reg         th_reset = 1'b1;
-  reg  [31:0] th_src_max_delay;
-  reg  [31:0] th_sink_max_delay;
-  wire        th_done;
+  logic        th_reset = 1'b1;
+  logic [31:0] th_src_max_delay;
+  logic [31:0] th_sink_max_delay;
+  logic        th_done;
 
   TestHarness
   #(
@@ -319,8 +320,8 @@ module top;
 
   task init_in
   (
-    input [ 9:0] i,
-    input [32:0] in
+    input logic [ 9:0] i,
+    input logic [32:0] in
   );
   begin
     th.src.src.m[i]   = in;
@@ -329,8 +330,8 @@ module top;
 
   task init_out
   (
-    input [ 9:0] i,
-    input [32:0] out
+    input logic [ 9:0] i,
+    input logic [32:0] out
   );
   begin
     th.sink.sink.m[i] = out;

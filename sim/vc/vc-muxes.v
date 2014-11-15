@@ -13,9 +13,9 @@ module vc_Mux2
 #(
   parameter p_nbits = 1
 )(
-  input      [p_nbits-1:0] in0, in1,
-  input                    sel,
-  output reg [p_nbits-1:0] out
+  input  logic [p_nbits-1:0] in0, in1,
+  input  logic               sel,
+  output logic [p_nbits-1:0] out
 );
 
   always @(*)
@@ -37,9 +37,9 @@ module vc_Mux3
 #(
   parameter p_nbits = 1
 )(
-  input      [p_nbits-1:0] in0, in1, in2,
-  input              [1:0] sel,
-  output reg [p_nbits-1:0] out
+  input  logic [p_nbits-1:0] in0, in1, in2,
+  input  logic         [1:0] sel,
+  output logic [p_nbits-1:0] out
 );
 
   always @(*)
@@ -62,9 +62,9 @@ module vc_Mux4
 #(
   parameter p_nbits = 1
 )(
-  input      [p_nbits-1:0] in0, in1, in2, in3,
-  input              [1:0] sel,
-  output reg [p_nbits-1:0] out
+  input  logic [p_nbits-1:0] in0, in1, in2, in3,
+  input  logic         [1:0] sel,
+  output logic [p_nbits-1:0] out
 );
 
   always @(*)
@@ -88,9 +88,9 @@ module vc_Mux5
 #(
  parameter p_nbits = 1
 )(
-  input      [p_nbits-1:0] in0, in1, in2, in3, in4,
-  input              [2:0] sel,
-  output reg [p_nbits-1:0] out
+  input  logic [p_nbits-1:0] in0, in1, in2, in3, in4,
+  input  logic         [2:0] sel,
+  output logic [p_nbits-1:0] out
 );
 
   always @(*)
@@ -115,9 +115,9 @@ module vc_Mux6
 #(
   parameter p_nbits = 1
 )(
-  input      [p_nbits-1:0] in0, in1, in2, in3, in4, in5,
-  input              [2:0] sel,
-  output reg [p_nbits-1:0] out
+  input  logic [p_nbits-1:0] in0, in1, in2, in3, in4, in5,
+  input  logic         [2:0] sel,
+  output logic [p_nbits-1:0] out
 );
 
   always @(*)
@@ -143,9 +143,9 @@ module vc_Mux7
 #(
   parameter p_nbits = 1
 )(
-  input      [p_nbits-1:0] in0, in1, in2, in3, in4, in5, in6,
-  input              [2:0] sel,
-  output reg [p_nbits-1:0] out
+  input  logic [p_nbits-1:0] in0, in1, in2, in3, in4, in5, in6,
+  input  logic         [2:0] sel,
+  output logic [p_nbits-1:0] out
 );
 
   always @(*)
@@ -172,9 +172,9 @@ module vc_Mux8
 #(
   parameter p_nbits = 1
 )(
-  input      [p_nbits-1:0] in0, in1, in2, in3, in4, in5, in6, in7,
-  input              [2:0] sel,
-  output reg [p_nbits-1:0] out
+  input  logic [p_nbits-1:0] in0, in1, in2, in3, in4, in5, in6, in7,
+  input  logic         [2:0] sel,
+  output logic [p_nbits-1:0] out
 );
 
   always @(*)

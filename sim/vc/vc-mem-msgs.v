@@ -154,15 +154,15 @@ module vc_MemReqMsgPack
 )(
   // Input message
 
-  input  [`VC_MEM_REQ_MSG_TYPE_NBITS(o,a,d)-1:0]   type_,
-  input  [`VC_MEM_REQ_MSG_OPAQUE_NBITS(o,a,d)-1:0] opaque,
-  input  [`VC_MEM_REQ_MSG_ADDR_NBITS(o,a,d)-1:0]   addr,
-  input  [`VC_MEM_REQ_MSG_LEN_NBITS(o,a,d)-1:0]    len,
-  input  [`VC_MEM_REQ_MSG_DATA_NBITS(o,a,d)-1:0]   data,
+  input  logic [`VC_MEM_REQ_MSG_TYPE_NBITS(o,a,d)-1:0]   type_,
+  input  logic [`VC_MEM_REQ_MSG_OPAQUE_NBITS(o,a,d)-1:0] opaque,
+  input  logic [`VC_MEM_REQ_MSG_ADDR_NBITS(o,a,d)-1:0]   addr,
+  input  logic [`VC_MEM_REQ_MSG_LEN_NBITS(o,a,d)-1:0]    len,
+  input  logic [`VC_MEM_REQ_MSG_DATA_NBITS(o,a,d)-1:0]   data,
 
   // Output bits
 
-  output [`VC_MEM_REQ_MSG_NBITS(o,a,d)-1:0]        msg
+  output logic [`VC_MEM_REQ_MSG_NBITS(o,a,d)-1:0]        msg
 );
 
   assign msg[`VC_MEM_REQ_MSG_TYPE_FIELD(o,a,d)]   = type_;
@@ -191,15 +191,15 @@ module vc_MemReqMsgUnpack
 
   // Input bits
 
-  input [`VC_MEM_REQ_MSG_NBITS(o,a,d)-1:0]         msg,
+  input  logic [`VC_MEM_REQ_MSG_NBITS(o,a,d)-1:0]        msg,
 
   // Output message
 
-  output [`VC_MEM_REQ_MSG_TYPE_NBITS(o,a,d)-1:0]   type_,
-  output [`VC_MEM_REQ_MSG_OPAQUE_NBITS(o,a,d)-1:0] opaque,
-  output [`VC_MEM_REQ_MSG_ADDR_NBITS(o,a,d)-1:0]   addr,
-  output [`VC_MEM_REQ_MSG_LEN_NBITS(o,a,d)-1:0]    len,
-  output [`VC_MEM_REQ_MSG_DATA_NBITS(o,a,d)-1:0]   data
+  output logic [`VC_MEM_REQ_MSG_TYPE_NBITS(o,a,d)-1:0]   type_,
+  output logic [`VC_MEM_REQ_MSG_OPAQUE_NBITS(o,a,d)-1:0] opaque,
+  output logic [`VC_MEM_REQ_MSG_ADDR_NBITS(o,a,d)-1:0]   addr,
+  output logic [`VC_MEM_REQ_MSG_LEN_NBITS(o,a,d)-1:0]    len,
+  output logic [`VC_MEM_REQ_MSG_DATA_NBITS(o,a,d)-1:0]   data
 );
 
   assign type_  = msg[`VC_MEM_REQ_MSG_TYPE_FIELD(o,a,d)];
@@ -225,20 +225,20 @@ module vc_MemReqMsgTrace
   parameter a = p_addr_nbits,
   parameter d = p_data_nbits
 )(
-  input                                    clk,
-  input                                    reset,
-  input                                    val,
-  input                                    rdy,
-  input [`VC_MEM_REQ_MSG_NBITS(o,a,d)-1:0] msg
+  input logic                                    clk,
+  input logic                                    reset,
+  input logic                                    val,
+  input logic                                    rdy,
+  input logic [`VC_MEM_REQ_MSG_NBITS(o,a,d)-1:0] msg
 );
 
   // Extract fields
 
-  wire [`VC_MEM_REQ_MSG_TYPE_NBITS(o,a,d)-1:0]   type_;
-  wire [`VC_MEM_REQ_MSG_OPAQUE_NBITS(o,a,d)-1:0] opaque;
-  wire [`VC_MEM_REQ_MSG_ADDR_NBITS(o,a,d)-1:0]   addr;
-  wire [`VC_MEM_REQ_MSG_LEN_NBITS(o,a,d)-1:0]    len;
-  wire [`VC_MEM_REQ_MSG_DATA_NBITS(o,a,d)-1:0]   data;
+  logic [`VC_MEM_REQ_MSG_TYPE_NBITS(o,a,d)-1:0]   type_;
+  logic [`VC_MEM_REQ_MSG_OPAQUE_NBITS(o,a,d)-1:0] opaque;
+  logic [`VC_MEM_REQ_MSG_ADDR_NBITS(o,a,d)-1:0]   addr;
+  logic [`VC_MEM_REQ_MSG_LEN_NBITS(o,a,d)-1:0]    len;
+  logic [`VC_MEM_REQ_MSG_DATA_NBITS(o,a,d)-1:0]   data;
 
   vc_MemReqMsgUnpack#(o,a,d) mem_req_msg_unpack
   (
@@ -259,8 +259,9 @@ module vc_MemReqMsgTrace
 
   // Line tracing
 
-  reg [8*2-1:0] type_str;
-  reg [`VC_TRACE_NBITS-1:0] str;
+  logic [8*2-1:0] type_str;
+  logic [`VC_TRACE_NBITS-1:0] str;
+
   `VC_TRACE_BEGIN
   begin
 
@@ -430,14 +431,14 @@ module vc_MemRespMsgPack
 )(
   // Input message
 
-  input  [`VC_MEM_RESP_MSG_TYPE_NBITS(o,d)-1:0]   type_,
-  input  [`VC_MEM_RESP_MSG_OPAQUE_NBITS(o,d)-1:0] opaque,
-  input  [`VC_MEM_RESP_MSG_LEN_NBITS(o,d)-1:0]    len,
-  input  [`VC_MEM_RESP_MSG_DATA_NBITS(o,d)-1:0]   data,
+  input  logic [`VC_MEM_RESP_MSG_TYPE_NBITS(o,d)-1:0]   type_,
+  input  logic [`VC_MEM_RESP_MSG_OPAQUE_NBITS(o,d)-1:0] opaque,
+  input  logic [`VC_MEM_RESP_MSG_LEN_NBITS(o,d)-1:0]    len,
+  input  logic [`VC_MEM_RESP_MSG_DATA_NBITS(o,d)-1:0]   data,
 
   // Output bits
 
-  output [`VC_MEM_RESP_MSG_NBITS(o,d)-1:0]        msg
+  output logic [`VC_MEM_RESP_MSG_NBITS(o,d)-1:0]        msg
 );
 
   assign msg[`VC_MEM_RESP_MSG_TYPE_FIELD(o,d)]   = type_;
@@ -463,14 +464,14 @@ module vc_MemRespMsgUnpack
 
   // Input bits
 
-  input [`VC_MEM_RESP_MSG_NBITS(o,d)-1:0]         msg,
+  input  logic [`VC_MEM_RESP_MSG_NBITS(o,d)-1:0]        msg,
 
   // Output message
 
-  output [`VC_MEM_RESP_MSG_TYPE_NBITS(o,d)-1:0]   type_,
-  output [`VC_MEM_RESP_MSG_OPAQUE_NBITS(o,d)-1:0] opaque,
-  output [`VC_MEM_RESP_MSG_LEN_NBITS(o,d)-1:0]    len,
-  output [`VC_MEM_RESP_MSG_DATA_NBITS(o,d)-1:0]   data
+  output logic [`VC_MEM_RESP_MSG_TYPE_NBITS(o,d)-1:0]   type_,
+  output logic [`VC_MEM_RESP_MSG_OPAQUE_NBITS(o,d)-1:0] opaque,
+  output logic [`VC_MEM_RESP_MSG_LEN_NBITS(o,d)-1:0]    len,
+  output logic [`VC_MEM_RESP_MSG_DATA_NBITS(o,d)-1:0]   data
 );
 
   assign type_   = msg[`VC_MEM_RESP_MSG_TYPE_FIELD(o,d)];
@@ -493,19 +494,19 @@ module vc_MemRespMsgTrace
   parameter o = p_opaque_nbits,
   parameter d = p_data_nbits
 )(
-  input                                     clk,
-  input                                     reset,
-  input                                     val,
-  input                                     rdy,
-  input [`VC_MEM_RESP_MSG_NBITS(o,d)-1:0] msg
+  input logic                                     clk,
+  input logic                                     reset,
+  input logic                                     val,
+  input logic                                     rdy,
+  input logic [`VC_MEM_RESP_MSG_NBITS(o,d)-1:0] msg
 );
 
   // Extract fields
 
-  wire [`VC_MEM_RESP_MSG_TYPE_NBITS(o,d)-1:0]   type_;
-  wire [`VC_MEM_RESP_MSG_OPAQUE_NBITS(o,d)-1:0] opaque;
-  wire [`VC_MEM_RESP_MSG_LEN_NBITS(o,d)-1:0]    len;
-  wire [`VC_MEM_RESP_MSG_DATA_NBITS(o,d)-1:0]   data;
+  logic [`VC_MEM_RESP_MSG_TYPE_NBITS(o,d)-1:0]   type_;
+  logic [`VC_MEM_RESP_MSG_OPAQUE_NBITS(o,d)-1:0] opaque;
+  logic [`VC_MEM_RESP_MSG_LEN_NBITS(o,d)-1:0]    len;
+  logic [`VC_MEM_RESP_MSG_DATA_NBITS(o,d)-1:0]   data;
 
   vc_MemRespMsgUnpack#(o,d) mem_req_msg_unpack
   (
@@ -525,8 +526,9 @@ module vc_MemRespMsgTrace
 
   // Line tracing
 
-  reg [8*2-1:0] type_str;
-  reg [`VC_TRACE_NBITS-1:0] str;
+  logic [8*2-1:0] type_str;
+  logic [`VC_TRACE_NBITS-1:0] str;
+
   `VC_TRACE_BEGIN
   begin
 

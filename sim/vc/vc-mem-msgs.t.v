@@ -12,12 +12,12 @@ module top;
   // Test MemReqMsg with opaque = 8b, addr = 32b, data = 32b
   //----------------------------------------------------------------------
 
-  reg  [`VC_MEM_REQ_MSG_TYPE_NBITS(8,32,32)-1:0]   t1_pack_type;
-  reg  [`VC_MEM_REQ_MSG_OPAQUE_NBITS(8,32,32)-1:0] t1_pack_opaque;
-  reg  [`VC_MEM_REQ_MSG_ADDR_NBITS(8,32,32)-1:0]   t1_pack_addr;
-  reg  [`VC_MEM_REQ_MSG_LEN_NBITS(8,32,32)-1:0]    t1_pack_len;
-  reg  [`VC_MEM_REQ_MSG_DATA_NBITS(8,32,32)-1:0]   t1_pack_data;
-  wire [`VC_MEM_REQ_MSG_NBITS(8,32,32)-1:0]        t1_pack_msg;
+  logic [`VC_MEM_REQ_MSG_TYPE_NBITS(8,32,32)-1:0]   t1_pack_type;
+  logic [`VC_MEM_REQ_MSG_OPAQUE_NBITS(8,32,32)-1:0] t1_pack_opaque;
+  logic [`VC_MEM_REQ_MSG_ADDR_NBITS(8,32,32)-1:0]   t1_pack_addr;
+  logic [`VC_MEM_REQ_MSG_LEN_NBITS(8,32,32)-1:0]    t1_pack_len;
+  logic [`VC_MEM_REQ_MSG_DATA_NBITS(8,32,32)-1:0]   t1_pack_data;
+  logic [`VC_MEM_REQ_MSG_NBITS(8,32,32)-1:0]        t1_pack_msg;
 
   vc_MemReqMsgPack#(8,32,32) t1_pack
   (
@@ -29,11 +29,11 @@ module top;
     .msg    (t1_pack_msg)
   );
 
-  wire [`VC_MEM_REQ_MSG_TYPE_NBITS(8,32,32)-1:0]   t1_unpack_type;
-  wire [`VC_MEM_REQ_MSG_OPAQUE_NBITS(8,32,32)-1:0] t1_unpack_opaque;
-  wire [`VC_MEM_REQ_MSG_ADDR_NBITS(8,32,32)-1:0]   t1_unpack_addr;
-  wire [`VC_MEM_REQ_MSG_LEN_NBITS(8,32,32)-1:0]    t1_unpack_len;
-  wire [`VC_MEM_REQ_MSG_DATA_NBITS(8,32,32)-1:0]   t1_unpack_data;
+  logic [`VC_MEM_REQ_MSG_TYPE_NBITS(8,32,32)-1:0]   t1_unpack_type;
+  logic [`VC_MEM_REQ_MSG_OPAQUE_NBITS(8,32,32)-1:0] t1_unpack_opaque;
+  logic [`VC_MEM_REQ_MSG_ADDR_NBITS(8,32,32)-1:0]   t1_unpack_addr;
+  logic [`VC_MEM_REQ_MSG_LEN_NBITS(8,32,32)-1:0]    t1_unpack_len;
+  logic [`VC_MEM_REQ_MSG_DATA_NBITS(8,32,32)-1:0]   t1_unpack_data;
 
   vc_MemReqMsgUnpack#(8,32,32) t1_unpack
   (
@@ -45,8 +45,8 @@ module top;
     .data   (t1_unpack_data)
   );
 
-  reg t1_reset = 1'b1;
-  reg t1_val;
+  logic t1_reset = 1'b1;
+  logic t1_val;
 
   vc_MemReqMsgTrace#(8,32,32) t1_trace
   (
@@ -61,12 +61,12 @@ module top;
 
   task t1
   (
-    input                                             val,
-    input [`VC_MEM_REQ_MSG_TYPE_NBITS(8,32,32)-1:0]   type_,
-    input [`VC_MEM_REQ_MSG_OPAQUE_NBITS(8,32,32)-1:0] opaque,
-    input [`VC_MEM_REQ_MSG_ADDR_NBITS(8,32,32)-1:0]   addr,
-    input [`VC_MEM_REQ_MSG_LEN_NBITS(8,32,32)-1:0]    len,
-    input [`VC_MEM_REQ_MSG_DATA_NBITS(8,32,32)-1:0]   data
+    input logic                                             val,
+    input logic [`VC_MEM_REQ_MSG_TYPE_NBITS(8,32,32)-1:0]   type_,
+    input logic [`VC_MEM_REQ_MSG_OPAQUE_NBITS(8,32,32)-1:0] opaque,
+    input logic [`VC_MEM_REQ_MSG_ADDR_NBITS(8,32,32)-1:0]   addr,
+    input logic [`VC_MEM_REQ_MSG_LEN_NBITS(8,32,32)-1:0]    len,
+    input logic [`VC_MEM_REQ_MSG_DATA_NBITS(8,32,32)-1:0]   data
   );
   begin
     t1_val         = val;
@@ -126,12 +126,12 @@ module top;
   // Test MemReqMsg with opaque = 4b, addr = 16b, data = 48b
   //----------------------------------------------------------------------
 
-  reg  [`VC_MEM_REQ_MSG_TYPE_NBITS(4,16,48)-1:0]   t2_pack_type;
-  reg  [`VC_MEM_REQ_MSG_OPAQUE_NBITS(4,16,48)-1:0] t2_pack_opaque;
-  reg  [`VC_MEM_REQ_MSG_ADDR_NBITS(4,16,48)-1:0]   t2_pack_addr;
-  reg  [`VC_MEM_REQ_MSG_LEN_NBITS(4,16,48)-1:0]    t2_pack_len;
-  reg  [`VC_MEM_REQ_MSG_DATA_NBITS(4,16,48)-1:0]   t2_pack_data;
-  wire [`VC_MEM_REQ_MSG_NBITS(4,16,48)-1:0]        t2_pack_msg;
+  logic [`VC_MEM_REQ_MSG_TYPE_NBITS(4,16,48)-1:0]   t2_pack_type;
+  logic [`VC_MEM_REQ_MSG_OPAQUE_NBITS(4,16,48)-1:0] t2_pack_opaque;
+  logic [`VC_MEM_REQ_MSG_ADDR_NBITS(4,16,48)-1:0]   t2_pack_addr;
+  logic [`VC_MEM_REQ_MSG_LEN_NBITS(4,16,48)-1:0]    t2_pack_len;
+  logic [`VC_MEM_REQ_MSG_DATA_NBITS(4,16,48)-1:0]   t2_pack_data;
+  logic [`VC_MEM_REQ_MSG_NBITS(4,16,48)-1:0]        t2_pack_msg;
 
   vc_MemReqMsgPack#(4,16,48) t2_pack
   (
@@ -143,11 +143,11 @@ module top;
     .msg    (t2_pack_msg)
   );
 
-  wire [`VC_MEM_REQ_MSG_TYPE_NBITS(4,16,48)-1:0]   t2_unpack_type;
-  wire [`VC_MEM_REQ_MSG_OPAQUE_NBITS(4,16,48)-1:0] t2_unpack_opaque;
-  wire [`VC_MEM_REQ_MSG_ADDR_NBITS(4,16,48)-1:0]   t2_unpack_addr;
-  wire [`VC_MEM_REQ_MSG_LEN_NBITS(4,16,48)-1:0]    t2_unpack_len;
-  wire [`VC_MEM_REQ_MSG_DATA_NBITS(4,16,48)-1:0]   t2_unpack_data;
+  logic [`VC_MEM_REQ_MSG_TYPE_NBITS(4,16,48)-1:0]   t2_unpack_type;
+  logic [`VC_MEM_REQ_MSG_OPAQUE_NBITS(4,16,48)-1:0] t2_unpack_opaque;
+  logic [`VC_MEM_REQ_MSG_ADDR_NBITS(4,16,48)-1:0]   t2_unpack_addr;
+  logic [`VC_MEM_REQ_MSG_LEN_NBITS(4,16,48)-1:0]    t2_unpack_len;
+  logic [`VC_MEM_REQ_MSG_DATA_NBITS(4,16,48)-1:0]   t2_unpack_data;
 
   vc_MemReqMsgUnpack#(4,16,48) t2_unpack
   (
@@ -159,8 +159,8 @@ module top;
     .data   (t2_unpack_data)
   );
 
-  reg t2_reset = 1'b1;
-  reg t2_val;
+  logic t2_reset = 1'b1;
+  logic t2_val;
 
   vc_MemReqMsgTrace#(4,16,48) t2_trace
   (
@@ -175,12 +175,12 @@ module top;
 
   task t2
   (
-    input                                             val,
-    input [`VC_MEM_REQ_MSG_TYPE_NBITS(4,16,48)-1:0]   type_,
-    input [`VC_MEM_REQ_MSG_OPAQUE_NBITS(4,16,48)-1:0] opaque,
-    input [`VC_MEM_REQ_MSG_ADDR_NBITS(4,16,48)-1:0]   addr,
-    input [`VC_MEM_REQ_MSG_LEN_NBITS(4,16,48)-1:0]    len,
-    input [`VC_MEM_REQ_MSG_DATA_NBITS(4,16,48)-1:0]   data
+    input logic                                             val,
+    input logic [`VC_MEM_REQ_MSG_TYPE_NBITS(4,16,48)-1:0]   type_,
+    input logic [`VC_MEM_REQ_MSG_OPAQUE_NBITS(4,16,48)-1:0] opaque,
+    input logic [`VC_MEM_REQ_MSG_ADDR_NBITS(4,16,48)-1:0]   addr,
+    input logic [`VC_MEM_REQ_MSG_LEN_NBITS(4,16,48)-1:0]    len,
+    input logic [`VC_MEM_REQ_MSG_DATA_NBITS(4,16,48)-1:0]   data
   );
   begin
     t2_val         = val;
@@ -238,11 +238,11 @@ module top;
   // Test MemRespMsg with opaque = 8b, data = 32b
   //----------------------------------------------------------------------
 
-  reg  [`VC_MEM_RESP_MSG_TYPE_NBITS(8,32)-1:0]   t3_pack_type;
-  reg  [`VC_MEM_RESP_MSG_OPAQUE_NBITS(8,32)-1:0] t3_pack_opaque;
-  reg  [`VC_MEM_RESP_MSG_LEN_NBITS(8,32)-1:0]    t3_pack_len;
-  reg  [`VC_MEM_RESP_MSG_DATA_NBITS(8,32)-1:0]   t3_pack_data;
-  wire [`VC_MEM_RESP_MSG_NBITS(8,32)-1:0]        t3_pack_msg;
+  logic [`VC_MEM_RESP_MSG_TYPE_NBITS(8,32)-1:0]   t3_pack_type;
+  logic [`VC_MEM_RESP_MSG_OPAQUE_NBITS(8,32)-1:0] t3_pack_opaque;
+  logic [`VC_MEM_RESP_MSG_LEN_NBITS(8,32)-1:0]    t3_pack_len;
+  logic [`VC_MEM_RESP_MSG_DATA_NBITS(8,32)-1:0]   t3_pack_data;
+  logic [`VC_MEM_RESP_MSG_NBITS(8,32)-1:0]        t3_pack_msg;
 
   vc_MemRespMsgPack#(8,32) t3_pack
   (
@@ -253,10 +253,10 @@ module top;
     .msg    (t3_pack_msg)
   );
 
-  wire [`VC_MEM_RESP_MSG_TYPE_NBITS(8,32)-1:0]   t3_unpack_type;
-  wire [`VC_MEM_RESP_MSG_OPAQUE_NBITS(8,32)-1:0] t3_unpack_opaque;
-  wire [`VC_MEM_RESP_MSG_LEN_NBITS(8,32)-1:0]    t3_unpack_len;
-  wire [`VC_MEM_RESP_MSG_DATA_NBITS(8,32)-1:0]   t3_unpack_data;
+  logic [`VC_MEM_RESP_MSG_TYPE_NBITS(8,32)-1:0]   t3_unpack_type;
+  logic [`VC_MEM_RESP_MSG_OPAQUE_NBITS(8,32)-1:0] t3_unpack_opaque;
+  logic [`VC_MEM_RESP_MSG_LEN_NBITS(8,32)-1:0]    t3_unpack_len;
+  logic [`VC_MEM_RESP_MSG_DATA_NBITS(8,32)-1:0]   t3_unpack_data;
 
   vc_MemRespMsgUnpack#(8,32) t3_unpack
   (
@@ -267,8 +267,8 @@ module top;
     .data   (t3_unpack_data)
   );
 
-  reg t3_reset = 1'b1;
-  reg t3_val;
+  logic t3_reset = 1'b1;
+  logic t3_val;
 
   vc_MemRespMsgTrace#(8,32) t3_trace
   (
@@ -283,11 +283,11 @@ module top;
 
   task t3
   (
-    input                                           val,
-    input [`VC_MEM_RESP_MSG_TYPE_NBITS(8,32)-1:0]   type_,
-    input [`VC_MEM_RESP_MSG_OPAQUE_NBITS(8,32)-1:0] opaque,
-    input [`VC_MEM_RESP_MSG_LEN_NBITS(8,32)-1:0]    len,
-    input [`VC_MEM_RESP_MSG_DATA_NBITS(8,32)-1:0]   data
+    input logic                                           val,
+    input logic [`VC_MEM_RESP_MSG_TYPE_NBITS(8,32)-1:0]   type_,
+    input logic [`VC_MEM_RESP_MSG_OPAQUE_NBITS(8,32)-1:0] opaque,
+    input logic [`VC_MEM_RESP_MSG_LEN_NBITS(8,32)-1:0]    len,
+    input logic [`VC_MEM_RESP_MSG_DATA_NBITS(8,32)-1:0]   data
   );
   begin
     t3_val         = val;
@@ -339,11 +339,11 @@ module top;
   // Test MemRespMsg with opaque = 4b, data = 48b
   //----------------------------------------------------------------------
 
-  reg  [`VC_MEM_RESP_MSG_TYPE_NBITS(4,48)-1:0]   t4_pack_type;
-  reg  [`VC_MEM_RESP_MSG_OPAQUE_NBITS(4,48)-1:0] t4_pack_opaque;
-  reg  [`VC_MEM_RESP_MSG_LEN_NBITS(4,48)-1:0]    t4_pack_len;
-  reg  [`VC_MEM_RESP_MSG_DATA_NBITS(4,48)-1:0]   t4_pack_data;
-  wire [`VC_MEM_RESP_MSG_NBITS(4,48)-1:0]        t4_pack_msg;
+  logic [`VC_MEM_RESP_MSG_TYPE_NBITS(4,48)-1:0]   t4_pack_type;
+  logic [`VC_MEM_RESP_MSG_OPAQUE_NBITS(4,48)-1:0] t4_pack_opaque;
+  logic [`VC_MEM_RESP_MSG_LEN_NBITS(4,48)-1:0]    t4_pack_len;
+  logic [`VC_MEM_RESP_MSG_DATA_NBITS(4,48)-1:0]   t4_pack_data;
+  logic [`VC_MEM_RESP_MSG_NBITS(4,48)-1:0]        t4_pack_msg;
 
   vc_MemRespMsgPack#(4,48) t4_pack
   (
@@ -354,10 +354,10 @@ module top;
     .msg    (t4_pack_msg)
   );
 
-  wire [`VC_MEM_RESP_MSG_TYPE_NBITS(4,48)-1:0]   t4_unpack_type;
-  wire [`VC_MEM_RESP_MSG_OPAQUE_NBITS(4,48)-1:0] t4_unpack_opaque;
-  wire [`VC_MEM_RESP_MSG_LEN_NBITS(4,48)-1:0]    t4_unpack_len;
-  wire [`VC_MEM_RESP_MSG_DATA_NBITS(4,48)-1:0]   t4_unpack_data;
+  logic [`VC_MEM_RESP_MSG_TYPE_NBITS(4,48)-1:0]   t4_unpack_type;
+  logic [`VC_MEM_RESP_MSG_OPAQUE_NBITS(4,48)-1:0] t4_unpack_opaque;
+  logic [`VC_MEM_RESP_MSG_LEN_NBITS(4,48)-1:0]    t4_unpack_len;
+  logic [`VC_MEM_RESP_MSG_DATA_NBITS(4,48)-1:0]   t4_unpack_data;
 
   vc_MemRespMsgUnpack#(4,48) t4_unpack
   (
@@ -368,8 +368,8 @@ module top;
     .data   (t4_unpack_data)
   );
 
-  reg t4_reset = 1'b1;
-  reg t4_val;
+  logic t4_reset = 1'b1;
+  logic t4_val;
 
   vc_MemRespMsgTrace#(4,48) t4_trace
   (
@@ -384,11 +384,11 @@ module top;
 
   task t4
   (
-    input                                           val,
-    input [`VC_MEM_RESP_MSG_TYPE_NBITS(4,48)-1:0]   type_,
-    input [`VC_MEM_RESP_MSG_OPAQUE_NBITS(4,48)-1:0] opaque,
-    input [`VC_MEM_RESP_MSG_LEN_NBITS(4,48)-1:0]    len,
-    input [`VC_MEM_RESP_MSG_DATA_NBITS(4,48)-1:0]   data
+    input logic                                           val,
+    input logic [`VC_MEM_RESP_MSG_TYPE_NBITS(4,48)-1:0]   type_,
+    input logic [`VC_MEM_RESP_MSG_OPAQUE_NBITS(4,48)-1:0] opaque,
+    input logic [`VC_MEM_RESP_MSG_LEN_NBITS(4,48)-1:0]    len,
+    input logic [`VC_MEM_RESP_MSG_DATA_NBITS(4,48)-1:0]   data
   );
   begin
     t4_val         = val;

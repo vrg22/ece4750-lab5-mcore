@@ -14,31 +14,31 @@ module vc_TestRandDelayUnorderedSink
   parameter p_msg_nbits = 1,
   parameter p_num_msgs  = 1024
 )(
-  input                   clk,
-  input                   reset,
+  input  logic                   clk,
+  input  logic                   reset,
 
   // Max delay input
 
-  input [31:0]            max_delay,
+  input  logic [31:0]            max_delay,
 
   // Sink message interface
 
-  input                   val,
-  output                  rdy,
-  input [p_msg_nbits-1:0] msg,
+  input  logic                   val,
+  output logic                   rdy,
+  input  logic [p_msg_nbits-1:0] msg,
 
   // Goes high once all sink data has been received
 
-  output                  done
+  output logic                   done
 );
 
   //----------------------------------------------------------------------
   // Test random delay
   //----------------------------------------------------------------------
 
-  wire                   sink_val;
-  wire                   sink_rdy;
-  wire [p_msg_nbits-1:0] sink_msg;
+  logic                   sink_val;
+  logic                   sink_rdy;
+  logic [p_msg_nbits-1:0] sink_msg;
 
   vc_TestRandDelay#(p_msg_nbits) rand_delay
   (
@@ -76,7 +76,8 @@ module vc_TestRandDelayUnorderedSink
   // Line Tracing
   //----------------------------------------------------------------------
 
-  reg [`VC_TRACE_NBITS_TO_NCHARS(p_msg_nbits)*8-1:0] msg_str;
+  logic [`VC_TRACE_NBITS_TO_NCHARS(p_msg_nbits)*8-1:0] msg_str;
+
   `VC_TRACE_BEGIN
   begin
     $sformat( msg_str, "%x", msg );

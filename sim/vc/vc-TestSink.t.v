@@ -16,17 +16,17 @@ module TestHarness
   parameter p_msg_nbits = 1,
   parameter p_num_msgs  = 1024
 )(
-  input  clk,
-  input  reset,
-  output done
+  input  logic clk,
+  input  logic reset,
+  output logic done
 );
 
-  wire                   val;
-  wire                   rdy;
-  wire [p_msg_nbits-1:0] msg;
+  logic                   val;
+  logic                   rdy;
+  logic [p_msg_nbits-1:0] msg;
 
-  wire                   src_done;
-  wire                   sink_done;
+  logic                   src_done;
+  logic                   sink_done;
 
   vc_TestSource#(p_msg_nbits,p_num_msgs) src
   (
@@ -71,8 +71,8 @@ module top;
   // Test Case: 8b messages
   //----------------------------------------------------------------------
 
-  wire        t1_done;
-  reg         t1_reset = 1;
+  logic        t1_done;
+  logic        t1_reset = 1;
 
   TestHarness#(8) t1
   (
@@ -107,8 +107,8 @@ module top;
   // Test Case: 12b messages
   //----------------------------------------------------------------------
 
-  wire        t2_done;
-  reg         t2_reset = 1;
+  logic        t2_done;
+  logic        t2_reset = 1;
 
   TestHarness#(13) t2
   (

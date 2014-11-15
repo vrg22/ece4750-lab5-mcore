@@ -21,18 +21,18 @@ module vc_TestUnorderedSink
   parameter p_num_msgs  = 1024,
   parameter p_sim_mode  = 0
 )(
-  input                    clk,
-  input                    reset,
+  input  logic                   clk,
+  input  logic                   reset,
 
   // Sink message interface
 
-  input                    val,
-  output                   rdy,
-  input  [p_msg_nbits-1:0] msg,
+  input  logic                   val,
+  output logic                   rdy,
+  input  logic [p_msg_nbits-1:0] msg,
 
   // Goes high once all sink data has been received
 
-  output                   done
+  output logic                   done
 );
 
   //----------------------------------------------------------------------
@@ -49,15 +49,15 @@ module vc_TestUnorderedSink
 
   // Memory which stores messages to verify against those received
 
-  reg [p_msg_nbits-1:0] m[p_num_msgs-1:0];
+  logic [p_msg_nbits-1:0] m[p_num_msgs-1:0];
 
   // Bitmask that indicates seen messages
 
-  reg [p_num_msgs-1:0] seen;
+  logic [p_num_msgs-1:0] seen;
 
   // Register reset
 
-  reg reset_reg;
+  logic reset_reg;
   always @( posedge clk )
     reset_reg <= reset;
 
@@ -67,8 +67,8 @@ module vc_TestUnorderedSink
 
   // Counters for number of messages expected and received
 
-  reg [31:0] num_expected;
-  reg [31:0] num_seen;
+  logic [31:0] num_expected;
+  logic [31:0] num_seen;
 
   // We check number of expected and seen, and when they are the same, we
   // are done
@@ -81,7 +81,8 @@ module vc_TestUnorderedSink
 
   // The go signal is high when a message is transferred
 
-  wire go = val && rdy;
+  logic go;
+  assign go = val && rdy;
 
   //----------------------------------------------------------------------
   // Verification logic
@@ -89,10 +90,10 @@ module vc_TestUnorderedSink
 
   // Index register that we use to check m
 
-  reg [31:0] index;
+  logic [31:0] index;
 
-  reg        failed;
-  reg  [3:0] verbose;
+  logic        failed;
+  logic  [3:0] verbose;
 
   initial begin
     if ( !$value$plusargs( "verbose=%d", verbose ) )
@@ -205,7 +206,8 @@ module vc_TestUnorderedSink
   // Line Tracing
   //----------------------------------------------------------------------
 
-  reg [`VC_TRACE_NBITS_TO_NCHARS(p_msg_nbits)*8-1:0] msg_str;
+  logic [`VC_TRACE_NBITS_TO_NCHARS(p_msg_nbits)*8-1:0] msg_str;
+
   `VC_TRACE_BEGIN
   begin
     $sformat( msg_str, "%x", msg );

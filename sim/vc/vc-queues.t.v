@@ -12,13 +12,13 @@ module top;
   // Test Case: simple queue w/ 1 entry
   //----------------------------------------------------------------------
 
-  reg        t1_reset = 1;
-  reg        t1_enq_val;
-  wire       t1_enq_rdy;
-  reg  [7:0] t1_enq_msg;
-  wire       t1_deq_val;
-  reg        t1_deq_rdy;
-  wire [7:0] t1_deq_msg;
+  logic       t1_reset = 1;
+  logic       t1_enq_val;
+  logic       t1_enq_rdy;
+  logic [7:0] t1_enq_msg;
+  logic       t1_deq_val;
+  logic       t1_deq_rdy;
+  logic [7:0] t1_deq_msg;
 
   vc_Queue#(`VC_QUEUE_NORMAL,8,1) t1_queue
   (
@@ -36,8 +36,8 @@ module top;
 
   task t1
   (
-    input [7:0] enq_msg, input enq_val, input enq_rdy,
-    input [7:0] deq_msg, input deq_val, input deq_rdy
+    input logic [7:0] enq_msg, input enq_val, input enq_rdy,
+    input logic [7:0] deq_msg, input deq_val, input deq_rdy
   );
   begin
     t1_enq_val = enq_val;
@@ -86,13 +86,13 @@ module top;
   // Test Case: pipe queue w/ 1 entry
   //----------------------------------------------------------------------
 
-  reg        t2_reset = 1;
-  reg  [7:0] t2_enq_msg;
-  reg        t2_enq_val;
-  wire       t2_enq_rdy;
-  wire [7:0] t2_deq_msg;
-  wire       t2_deq_val;
-  reg        t2_deq_rdy;
+  logic       t2_reset = 1;
+  logic [7:0] t2_enq_msg;
+  logic       t2_enq_val;
+  logic       t2_enq_rdy;
+  logic [7:0] t2_deq_msg;
+  logic       t2_deq_val;
+  logic       t2_deq_rdy;
 
   vc_Queue#(`VC_QUEUE_PIPE,8,1) t2_queue
   (
@@ -110,8 +110,8 @@ module top;
 
   task t2
   (
-    input [7:0] enq_msg, input enq_val, input enq_rdy,
-    input [7:0] deq_msg, input deq_val, input deq_rdy
+    input logic [7:0] enq_msg, input enq_val, input enq_rdy,
+    input logic [7:0] deq_msg, input deq_val, input deq_rdy
   );
   begin
     t2_enq_msg = enq_msg;
@@ -158,13 +158,13 @@ module top;
   // Test Case: bypass queue w/ 1 entry
   //----------------------------------------------------------------------
 
-  reg        t3_reset = 1;
-  reg  [7:0] t3_enq_msg;
-  reg        t3_enq_val;
-  wire       t3_enq_rdy;
-  wire [7:0] t3_deq_msg;
-  wire       t3_deq_val;
-  reg        t3_deq_rdy;
+  logic       t3_reset = 1;
+  logic [7:0] t3_enq_msg;
+  logic       t3_enq_val;
+  logic       t3_enq_rdy;
+  logic [7:0] t3_deq_msg;
+  logic       t3_deq_val;
+  logic       t3_deq_rdy;
 
   vc_Queue#(`VC_QUEUE_BYPASS,8,1) t3_queue
   (
@@ -182,8 +182,8 @@ module top;
 
   task t3
   (
-    input [7:0] enq_msg, input enq_val, input enq_rdy,
-    input [7:0] deq_msg, input deq_val, input deq_rdy
+    input logic [7:0] enq_msg, input enq_val, input enq_rdy,
+    input logic [7:0] deq_msg, input deq_val, input deq_rdy
   );
   begin
     t3_enq_msg = enq_msg;
@@ -229,13 +229,13 @@ module top;
   // Test Case: simple queue w/ 3 entries
   //----------------------------------------------------------------------
 
-  reg        t4_reset = 1;
-  reg  [7:0] t4_enq_msg;
-  reg        t4_enq_val;
-  wire       t4_enq_rdy;
-  wire [7:0] t4_deq_msg;
-  wire       t4_deq_val;
-  reg        t4_deq_rdy;
+  logic       t4_reset = 1;
+  logic [7:0] t4_enq_msg;
+  logic       t4_enq_val;
+  logic       t4_enq_rdy;
+  logic [7:0] t4_deq_msg;
+  logic       t4_deq_val;
+  logic       t4_deq_rdy;
 
   vc_Queue#(`VC_QUEUE_NORMAL,8,3) t4_queue
   (
@@ -253,8 +253,8 @@ module top;
 
   task t4
   (
-    input [7:0] enq_msg, input enq_val, input enq_rdy,
-    input [7:0] deq_msg, input deq_val, input deq_rdy
+    input logic [7:0] enq_msg, input enq_val, input enq_rdy,
+    input logic [7:0] deq_msg, input deq_val, input deq_rdy
   );
   begin
     t4_enq_msg = enq_msg;
@@ -306,13 +306,13 @@ module top;
   // Test Case: pipe queue w/ 3 entries
   //----------------------------------------------------------------------
 
-  reg        t5_reset = 1;
-  reg  [7:0] t5_enq_msg;
-  reg        t5_enq_val;
-  wire       t5_enq_rdy;
-  wire [7:0] t5_deq_msg;
-  wire       t5_deq_val;
-  reg        t5_deq_rdy;
+  logic       t5_reset = 1;
+  logic [7:0] t5_enq_msg;
+  logic       t5_enq_val;
+  logic       t5_enq_rdy;
+  logic [7:0] t5_deq_msg;
+  logic       t5_deq_val;
+  logic       t5_deq_rdy;
 
   vc_Queue#(`VC_QUEUE_PIPE,8,3) t5_queue
   (
@@ -330,8 +330,8 @@ module top;
 
   task t5
   (
-    input [7:0] enq_msg, input enq_val, input enq_rdy,
-    input [7:0] deq_msg, input deq_val, input deq_rdy
+    input logic [7:0] enq_msg, input enq_val, input enq_rdy,
+    input logic [7:0] deq_msg, input deq_val, input deq_rdy
   );
   begin
     t5_enq_msg = enq_msg;
@@ -383,13 +383,13 @@ module top;
   // Test Case: bypass queue w/ 3 entries
   //----------------------------------------------------------------------
 
-  reg        t6_reset = 1;
-  reg  [7:0] t6_enq_msg;
-  reg        t6_enq_val;
-  wire       t6_enq_rdy;
-  wire [7:0] t6_deq_msg;
-  wire       t6_deq_val;
-  reg        t6_deq_rdy;
+  logic       t6_reset = 1;
+  logic [7:0] t6_enq_msg;
+  logic       t6_enq_val;
+  logic       t6_enq_rdy;
+  logic [7:0] t6_deq_msg;
+  logic       t6_deq_val;
+  logic       t6_deq_rdy;
 
   vc_Queue#(`VC_QUEUE_BYPASS,8,3) t6_queue
   (
@@ -407,8 +407,8 @@ module top;
 
   task t6
   (
-    input [7:0] enq_msg, input enq_val, input enq_rdy,
-    input [7:0] deq_msg, input deq_val, input deq_rdy
+    input logic [7:0] enq_msg, input enq_val, input enq_rdy,
+    input logic [7:0] deq_msg, input deq_val, input deq_rdy
   );
   begin
     t6_enq_msg = enq_msg;

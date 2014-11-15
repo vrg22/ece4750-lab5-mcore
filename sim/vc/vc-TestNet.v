@@ -27,31 +27,31 @@ module vc_TestNet
   parameter c_net_msg_nbits = `VC_NET_MSG_NBITS(p,o,s)
 )
 (
-  input clk,
-  input reset,
+  input  logic clk,
+  input  logic reset,
 
-  input  [`VC_PORT_PICK_NBITS(1,p_num_ports)-1:0]               in_val,
-  output [`VC_PORT_PICK_NBITS(1,p_num_ports)-1:0]               in_rdy,
-  input  [`VC_PORT_PICK_NBITS(c_net_msg_nbits,p_num_ports)-1:0] in_msg,
+  input  logic [`VC_PORT_PICK_NBITS(1,p_num_ports)-1:0]               in_val,
+  output logic [`VC_PORT_PICK_NBITS(1,p_num_ports)-1:0]               in_rdy,
+  input  logic [`VC_PORT_PICK_NBITS(c_net_msg_nbits,p_num_ports)-1:0] in_msg,
 
 
-  output [`VC_PORT_PICK_NBITS(1,p_num_ports)-1:0]               out_val,
-  input  [`VC_PORT_PICK_NBITS(1,p_num_ports)-1:0]               out_rdy,
-  output [`VC_PORT_PICK_NBITS(c_net_msg_nbits,p_num_ports)-1:0] out_msg
+  output logic [`VC_PORT_PICK_NBITS(1,p_num_ports)-1:0]               out_val,
+  input  logic [`VC_PORT_PICK_NBITS(1,p_num_ports)-1:0]               out_rdy,
+  output logic [`VC_PORT_PICK_NBITS(c_net_msg_nbits,p_num_ports)-1:0] out_msg
 );
 
   // deq wires are the wires out of the input queues
 
-  wire  [`VC_PORT_PICK_NBITS(1,p_num_ports)-1:0]               deq_val;
-  reg   [`VC_PORT_PICK_NBITS(1,p_num_ports)-1:0]               deq_rdy;
-  wire  [`VC_PORT_PICK_NBITS(c_net_msg_nbits,p_num_ports)-1:0] deq_msg;
+  logic  [`VC_PORT_PICK_NBITS(1,p_num_ports)-1:0]               deq_val;
+  logic  [`VC_PORT_PICK_NBITS(1,p_num_ports)-1:0]               deq_rdy;
+  logic  [`VC_PORT_PICK_NBITS(c_net_msg_nbits,p_num_ports)-1:0] deq_msg;
 
-  wire [`VC_PORT_PICK_NBITS(s,p_num_ports)-1:0] dests;
-  reg  [p_num_ports*p_num_ports-1:0] in_rdy_arr;
+  logic [`VC_PORT_PICK_NBITS(s,p_num_ports)-1:0] dests;
+  logic [p_num_ports*p_num_ports-1:0] in_rdy_arr;
 
   // net string which is used to print the line tracing
 
-  wire [(p_num_ports*6*8)-1:0] net_str;
+  logic [(p_num_ports*6*8)-1:0] net_str;
 
   genvar in;
   genvar out;
@@ -79,16 +79,16 @@ module vc_TestNet
       .deq_msg (deq_msg[`VC_PORT_PICK_FIELD(c_net_msg_nbits,in)])
     );
 
-    wire                        in_queue_deq_val;
-    wire                        in_queue_deq_rdy;
-    wire [c_net_msg_nbits-1:0]  in_queue_deq_msg;
+    logic                        in_queue_deq_val;
+    logic                        in_queue_deq_rdy;
+    logic [c_net_msg_nbits-1:0]  in_queue_deq_msg;
 
     assign in_queue_deq_val = deq_val[`VC_PORT_PICK_FIELD(1,in)];
     assign in_queue_deq_rdy = deq_rdy[`VC_PORT_PICK_FIELD(1,in)];
     assign in_queue_deq_msg = deq_msg[`VC_PORT_PICK_FIELD(c_net_msg_nbits,in)];
 
     // line tracing-related arb and net str
-    reg [6*8-1:0] in_queue_str;
+    logic [6*8-1:0] in_queue_str;
     assign net_str[`VC_PORT_PICK_FIELD(6*8,p_num_ports-in-1)] =
                                                         in_queue_str;
 
@@ -123,8 +123,8 @@ module vc_TestNet
   generate
   for ( out = 0; out < p_num_ports; out = out + 1 ) begin: ARB_OUT
 
-    wire [p_num_ports-1:0] reqs;
-    wire [p_num_ports-1:0] grants;
+    logic [p_num_ports-1:0] reqs;
+    logic [p_num_ports-1:0] grants;
 
     vc_RoundRobinArb #(p_num_ports) arb
     (
@@ -147,20 +147,20 @@ module vc_TestNet
     end
 
     // we circuit-connect the out msg to the granted in msg
-    reg [31:0] i;
+    logic [31:0] i;
 
     // binary encoded grants signal
-    reg [3:0] grants_bin;
-    reg [c_net_msg_nbits-1:0] arb_out_msg;
+    logic [3:0] grants_bin;
+    logic [c_net_msg_nbits-1:0] arb_out_msg;
     assign out_msg[`VC_PORT_PICK_FIELD(c_net_msg_nbits,out)] = arb_out_msg;
-    wire [c_net_msg_nbits-1:0] arb_in_msg0;
-    wire [c_net_msg_nbits-1:0] arb_in_msg1;
+    logic [c_net_msg_nbits-1:0] arb_in_msg0;
+    logic [c_net_msg_nbits-1:0] arb_in_msg1;
 
     assign arb_in_msg0 = deq_msg[`VC_PORT_PICK_FIELD(c_net_msg_nbits,0)];
     assign arb_in_msg1 = deq_msg[`VC_PORT_PICK_FIELD(c_net_msg_nbits,1)];
 
     //// line tracing-related arb and net str
-    //reg [5*8-1:0] arb_str;
+    //logic [5*8-1:0] arb_str;
     //assign net_str[`VC_PORT_PICK_FIELD(5*8,p_num_ports-out-1)] = arb_str;
 
     always @(*) begin
@@ -185,7 +185,7 @@ module vc_TestNet
   end
   endgenerate
 
-  reg [31:0] i;
+  logic [31:0] i;
   always @(*) begin
     for ( i = 0; i < p_num_ports; i = i + 1 ) begin
       deq_rdy[i] = | in_rdy_arr[`VC_PORT_PICK_FIELD(p_num_ports,i)];

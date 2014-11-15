@@ -12,10 +12,10 @@ module top;
   // Test vc_FixedArbChain
   //----------------------------------------------------------------------
 
-  reg        t1_kin;
-  reg  [3:0] t1_reqs;
-  wire [3:0] t1_grants;
-  wire       t1_kout;
+  logic       t1_kin;
+  logic [3:0] t1_reqs;
+  logic [3:0] t1_grants;
+  logic       t1_kout;
 
   vc_FixedArbChain#(4) t1_fixed_arb_chain
   (
@@ -29,10 +29,10 @@ module top;
 
   task t1
   (
-    input       kin,
-    input [3:0] reqs,
-    input [3:0] grants,
-    input       kout
+    input logic       kin,
+    input logic [3:0] reqs,
+    input logic [3:0] grants,
+    input logic       kout
   );
   begin
     t1_kin  = kin;
@@ -81,11 +81,11 @@ module top;
   // Test vc_VariableArbChain
   //----------------------------------------------------------------------
 
-  reg        t2_kin;
-  reg  [3:0] t2_priority;
-  reg  [3:0] t2_reqs;
-  wire [3:0] t2_grants;
-  wire       t2_kout;
+  logic       t2_kin;
+  logic [3:0] t2_priority;
+  logic [3:0] t2_reqs;
+  logic [3:0] t2_grants;
+  logic       t2_kout;
 
   vc_VariableArbChain#(4) t2_arb
   (
@@ -100,11 +100,11 @@ module top;
 
   task t2
   (
-    input       kin,
-    input [3:0] priority_,
-    input [3:0] reqs,
-    input [3:0] grants,
-    input       kout
+    input logic       kin,
+    input logic [3:0] priority_,
+    input logic [3:0] reqs,
+    input logic [3:0] grants,
+    input logic       kout
   );
   begin
     t2_kin      = kin;
@@ -233,11 +233,11 @@ module top;
   // Test vc_RoundRobinArbChain
   //----------------------------------------------------------------------
 
-  reg        t3_reset = 1;
-  reg        t3_kin;
-  reg  [3:0] t3_reqs;
-  wire [3:0] t3_grants;
-  wire       t3_kout;
+  logic       t3_reset = 1'b1;
+  logic       t3_kin;
+  logic [3:0] t3_reqs;
+  logic [3:0] t3_grants;
+  logic       t3_kout;
 
   vc_RoundRobinArbChain#(4) t3_arb
   (
@@ -253,10 +253,10 @@ module top;
 
   task t3
   (
-    input       kin,
-    input [3:0] reqs,
-    input [3:0] grants,
-    input       kout
+    input logic       kin,
+    input logic [3:0] reqs,
+    input logic [3:0] grants,
+    input logic       kout
   );
   begin
     t3_kin  = kin;

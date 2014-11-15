@@ -89,14 +89,14 @@ module vc_NetMsgPack
 (
   // Input message
 
-  input [`VC_NET_MSG_DEST_NBITS(p,o,s)-1:0]    dest,
-  input [`VC_NET_MSG_SRC_NBITS(p,o,s)-1:0]     src,
-  input [`VC_NET_MSG_OPAQUE_NBITS(p,o,s)-1:0]  opaque,
-  input [`VC_NET_MSG_PAYLOAD_NBITS(p,o,s)-1:0] payload,
+  input  logic [`VC_NET_MSG_DEST_NBITS(p,o,s)-1:0]    dest,
+  input  logic [`VC_NET_MSG_SRC_NBITS(p,o,s)-1:0]     src,
+  input  logic [`VC_NET_MSG_OPAQUE_NBITS(p,o,s)-1:0]  opaque,
+  input  logic [`VC_NET_MSG_PAYLOAD_NBITS(p,o,s)-1:0] payload,
 
   // Output msg
 
-  output [`VC_NET_MSG_NBITS(p,o,s)-1:0]        msg
+  output logic [`VC_NET_MSG_NBITS(p,o,s)-1:0]         msg
 );
 
   assign msg[`VC_NET_MSG_DEST_FIELD(p,o,s)]    = dest;
@@ -124,14 +124,14 @@ module vc_NetMsgUnpack
 (
   // Input message
 
-  input  [`VC_NET_MSG_NBITS(p,o,s)-1:0] msg,
+  input  logic [`VC_NET_MSG_NBITS(p,o,s)-1:0]         msg,
 
   // Output message
 
-  output [`VC_NET_MSG_DEST_NBITS(p,o,s)-1:0]    dest,
-  output [`VC_NET_MSG_SRC_NBITS(p,o,s)-1:0]     src,
-  output [`VC_NET_MSG_OPAQUE_NBITS(p,o,s)-1:0]  opaque,
-  output [`VC_NET_MSG_PAYLOAD_NBITS(p,o,s)-1:0] payload
+  output logic [`VC_NET_MSG_DEST_NBITS(p,o,s)-1:0]    dest,
+  output logic [`VC_NET_MSG_SRC_NBITS(p,o,s)-1:0]     src,
+  output logic [`VC_NET_MSG_OPAQUE_NBITS(p,o,s)-1:0]  opaque,
+  output logic [`VC_NET_MSG_PAYLOAD_NBITS(p,o,s)-1:0] payload
 );
 
   assign dest    = msg[`VC_NET_MSG_DEST_FIELD(p,o,s)];
@@ -157,19 +157,19 @@ module vc_NetMsgTrace
   parameter s = p_srcdest_nbits
 )
 (
-  input                                 clk,
-  input                                 reset,
-  input                                 val,
-  input                                 rdy,
-  input  [`VC_NET_MSG_NBITS(p,o,s)-1:0] msg
+  input  logic                                clk,
+  input  logic                                reset,
+  input  logic                                val,
+  input  logic                                rdy,
+  input  logic [`VC_NET_MSG_NBITS(p,o,s)-1:0] msg
 );
 
   // Extract fields
 
-  wire [`VC_NET_MSG_DEST_FIELD(p,o,s)]    dest;
-  wire [`VC_NET_MSG_SRC_FIELD(p,o,s)]     src;
-  wire [`VC_NET_MSG_OPAQUE_FIELD(p,o,s)]  opaque;
-  wire [`VC_NET_MSG_PAYLOAD_FIELD(p,o,s)] payload;
+  logic [`VC_NET_MSG_DEST_FIELD(p,o,s)]    dest;
+  logic [`VC_NET_MSG_SRC_FIELD(p,o,s)]     src;
+  logic [`VC_NET_MSG_OPAQUE_FIELD(p,o,s)]  opaque;
+  logic [`VC_NET_MSG_PAYLOAD_FIELD(p,o,s)] payload;
 
   vc_NetMsgUnpack#(p,o,s) net_msg_unpack
   (
@@ -182,7 +182,8 @@ module vc_NetMsgTrace
 
   // Line tracing
 
-  reg [`VC_TRACE_NBITS-1:0] str;
+  logic [`VC_TRACE_NBITS-1:0] str;
+
   `VC_TRACE_BEGIN
   begin
 

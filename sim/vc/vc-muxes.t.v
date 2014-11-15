@@ -12,10 +12,10 @@ module top;
   // Test vc_Mux2_w32
   //----------------------------------------------------------------------
 
-  reg  [31:0] t1_in0 = 32'h0a0a0a0a;
-  reg  [31:0] t1_in1 = 32'hb0b0b0b0;
-  reg         t1_sel;
-  wire [31:0] t1_out;
+  logic [31:0] t1_in0 = 32'h0a0a0a0a;
+  logic [31:0] t1_in1 = 32'hb0b0b0b0;
+  logic        t1_sel;
+  logic [31:0] t1_out;
 
   vc_Mux2#(32) t1_mux2_w32
   (
@@ -29,8 +29,8 @@ module top;
 
   task t1
   (
-    input           sel,
-    input [31:0]    out
+    input logic           sel,
+    input logic [31:0]    out
   );
   begin
     t1_sel = sel;
@@ -53,11 +53,11 @@ module top;
   // Test vc_Mux3_w32
   //----------------------------------------------------------------------
 
-  reg  [31:0] t2_in0 = 32'h0a0a0a0a;
-  reg  [31:0] t2_in1 = 32'hb0b0b0b0;
-  reg  [31:0] t2_in2 = 32'h0c0c0c0c;
-  reg  [ 1:0] t2_sel;
-  wire [31:0] t2_out;
+  logic [31:0] t2_in0 = 32'h0a0a0a0a;
+  logic [31:0] t2_in1 = 32'hb0b0b0b0;
+  logic [31:0] t2_in2 = 32'h0c0c0c0c;
+  logic [ 1:0] t2_sel;
+  logic [31:0] t2_out;
 
   vc_Mux3#(32) t2_mux3_w32
   (
@@ -72,8 +72,8 @@ module top;
 
   task t2
   (
-    input [1:0]     sel,
-    input [31:0]    out
+    input logic [1:0]     sel,
+    input logic [31:0]    out
   );
   begin
     t2_sel = sel;
@@ -97,12 +97,12 @@ module top;
   // Test vc_Mux4_w32
   //----------------------------------------------------------------------
 
-  reg  [31:0] t3_in0 = 32'h0a0a0a0a;
-  reg  [31:0] t3_in1 = 32'hb0b0b0b0;
-  reg  [31:0] t3_in2 = 32'h0c0c0c0c;
-  reg  [31:0] t3_in3 = 32'hd0d0d0d0;
-  reg  [ 1:0] t3_sel;
-  wire [31:0] t3_out;
+  logic [31:0] t3_in0 = 32'h0a0a0a0a;
+  logic [31:0] t3_in1 = 32'hb0b0b0b0;
+  logic [31:0] t3_in2 = 32'h0c0c0c0c;
+  logic [31:0] t3_in3 = 32'hd0d0d0d0;
+  logic [ 1:0] t3_sel;
+  logic [31:0] t3_out;
 
   vc_Mux4#(32) t3_mux4_w32
   (
@@ -118,8 +118,8 @@ module top;
 
   task t3
   (
-    input [1:0]     sel,
-    input [31:0]    out
+    input logic [1:0]     sel,
+    input logic [31:0]    out
   );
   begin
     t3_sel = sel;
@@ -144,13 +144,13 @@ module top;
   // Test vc_Mux5_w32
   //----------------------------------------------------------------------
 
-  reg  [31:0] t4_in0 = 32'h0a0a0a0a;
-  reg  [31:0] t4_in1 = 32'hb0b0b0b0;
-  reg  [31:0] t4_in2 = 32'h0c0c0c0c;
-  reg  [31:0] t4_in3 = 32'hd0d0d0d0;
-  reg  [31:0] t4_in4 = 32'h0e0e0e0e;
-  reg  [ 2:0] t4_sel;
-  wire [31:0] t4_out;
+  logic [31:0] t4_in0 = 32'h0a0a0a0a;
+  logic [31:0] t4_in1 = 32'hb0b0b0b0;
+  logic [31:0] t4_in2 = 32'h0c0c0c0c;
+  logic [31:0] t4_in3 = 32'hd0d0d0d0;
+  logic [31:0] t4_in4 = 32'h0e0e0e0e;
+  logic [ 2:0] t4_sel;
+  logic [31:0] t4_out;
 
   vc_Mux5#(32) t4_mux5_w32
   (
@@ -167,8 +167,8 @@ module top;
 
   task t4
   (
-    input [2:0]     sel,
-    input [31:0]    out
+    input logic [2:0]     sel,
+    input logic [31:0]    out
   );
   begin
     t4_sel = sel;
@@ -194,14 +194,14 @@ module top;
   // Test vc_Mux6_w32
   //----------------------------------------------------------------------
 
-  reg  [31:0] t5_in0 = 32'h0a0a0a0a;
-  reg  [31:0] t5_in1 = 32'hb0b0b0b0;
-  reg  [31:0] t5_in2 = 32'h0c0c0c0c;
-  reg  [31:0] t5_in3 = 32'hd0d0d0d0;
-  reg  [31:0] t5_in4 = 32'h0e0e0e0e;
-  reg  [31:0] t5_in5 = 32'hf0f0f0f0;
-  reg  [ 2:0] t5_sel;
-  wire [31:0] t5_out;
+  logic [31:0] t5_in0 = 32'h0a0a0a0a;
+  logic [31:0] t5_in1 = 32'hb0b0b0b0;
+  logic [31:0] t5_in2 = 32'h0c0c0c0c;
+  logic [31:0] t5_in3 = 32'hd0d0d0d0;
+  logic [31:0] t5_in4 = 32'h0e0e0e0e;
+  logic [31:0] t5_in5 = 32'hf0f0f0f0;
+  logic [ 2:0] t5_sel;
+  logic [31:0] t5_out;
 
   vc_Mux6#(32) t5_mux6_w32
   (
@@ -219,8 +219,8 @@ module top;
 
   task t5
   (
-    input [2:0]     sel,
-    input [31:0]    out
+    input logic [2:0]     sel,
+    input logic [31:0]    out
   );
   begin
     t5_sel = sel;
@@ -247,15 +247,15 @@ module top;
   // Test vc_Mux7_w32
   //----------------------------------------------------------------------
 
-  reg  [31:0] t6_in0 = 32'h0a0a0a0a;
-  reg  [31:0] t6_in1 = 32'hb0b0b0b0;
-  reg  [31:0] t6_in2 = 32'h0c0c0c0c;
-  reg  [31:0] t6_in3 = 32'hd0d0d0d0;
-  reg  [31:0] t6_in4 = 32'h0e0e0e0e;
-  reg  [31:0] t6_in5 = 32'hf0f0f0f0;
-  reg  [31:0] t6_in6 = 32'h01010101;
-  reg  [ 2:0] t6_sel;
-  wire [31:0] t6_out;
+  logic [31:0] t6_in0 = 32'h0a0a0a0a;
+  logic [31:0] t6_in1 = 32'hb0b0b0b0;
+  logic [31:0] t6_in2 = 32'h0c0c0c0c;
+  logic [31:0] t6_in3 = 32'hd0d0d0d0;
+  logic [31:0] t6_in4 = 32'h0e0e0e0e;
+  logic [31:0] t6_in5 = 32'hf0f0f0f0;
+  logic [31:0] t6_in6 = 32'h01010101;
+  logic [ 2:0] t6_sel;
+  logic [31:0] t6_out;
 
   vc_Mux7#(32) t6_mux7_w32
   (
@@ -274,8 +274,8 @@ module top;
 
   task t6
   (
-    input [2:0]     sel,
-    input [31:0]    out
+    input logic [2:0]     sel,
+    input logic [31:0]    out
   );
   begin
     t6_sel = sel;
@@ -303,16 +303,16 @@ module top;
   // Test vc_Mux8_w32
   //----------------------------------------------------------------------
 
-  reg  [31:0] t7_in0 = 32'h0a0a0a0a;
-  reg  [31:0] t7_in1 = 32'hb0b0b0b0;
-  reg  [31:0] t7_in2 = 32'h0c0c0c0c;
-  reg  [31:0] t7_in3 = 32'hd0d0d0d0;
-  reg  [31:0] t7_in4 = 32'h0e0e0e0e;
-  reg  [31:0] t7_in5 = 32'hf0f0f0f0;
-  reg  [31:0] t7_in6 = 32'h01010101;
-  reg  [31:0] t7_in7 = 32'h20202020;
-  reg  [ 2:0] t7_sel;
-  wire [31:0] t7_out;
+  logic [31:0] t7_in0 = 32'h0a0a0a0a;
+  logic [31:0] t7_in1 = 32'hb0b0b0b0;
+  logic [31:0] t7_in2 = 32'h0c0c0c0c;
+  logic [31:0] t7_in3 = 32'hd0d0d0d0;
+  logic [31:0] t7_in4 = 32'h0e0e0e0e;
+  logic [31:0] t7_in5 = 32'hf0f0f0f0;
+  logic [31:0] t7_in6 = 32'h01010101;
+  logic [31:0] t7_in7 = 32'h20202020;
+  logic [ 2:0] t7_sel;
+  logic [31:0] t7_out;
 
   vc_Mux8#(32) t7_mux8_w32
   (
@@ -332,8 +332,8 @@ module top;
 
   task t7
   (
-    input [2:0]     sel,
-    input [31:0]    out
+    input logic [2:0]     sel,
+    input logic [31:0]    out
   );
   begin
     t7_sel = sel;

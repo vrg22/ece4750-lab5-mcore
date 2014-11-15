@@ -14,12 +14,12 @@
 
 module TestHarness
 (
-  input         clk,
-  input         reset,
-  input         mem_clear,
-  input  [31:0] src_max_delay,
-  input  [31:0] sink_max_delay,
-  output        done
+  input  logic        clk,
+  input  logic        reset,
+  input  logic        mem_clear,
+  input  logic [31:0] src_max_delay,
+  input  logic [31:0] sink_max_delay,
+  output logic        done
 );
 
   // Local parameters
@@ -34,10 +34,10 @@ module TestHarness
 
   // Test source for port 0
 
-  wire                   src0_val;
-  wire                   src0_rdy;
-  wire [c_req_nbits-1:0] src0_msg;
-  wire                   src0_done;
+  logic                   src0_val;
+  logic                   src0_rdy;
+  logic [c_req_nbits-1:0] src0_msg;
+  logic                   src0_done;
 
   vc_TestRandDelaySource#(c_req_nbits) src0
   (
@@ -52,10 +52,10 @@ module TestHarness
 
   // Test source for port 1
 
-  wire                   src1_val;
-  wire                   src1_rdy;
-  wire [c_req_nbits-1:0] src1_msg;
-  wire                   src1_done;
+  logic                   src1_val;
+  logic                   src1_rdy;
+  logic [c_req_nbits-1:0] src1_msg;
+  logic                   src1_done;
 
   vc_TestRandDelaySource#(c_req_nbits) src1
   (
@@ -70,13 +70,13 @@ module TestHarness
 
   // Test memory
 
-  wire                     sink0_val;
-  wire                     sink0_rdy;
-  wire [c_resp_nbits-1:0]  sink0_msg;
+  logic                     sink0_val;
+  logic                     sink0_rdy;
+  logic [c_resp_nbits-1:0]  sink0_msg;
 
-  wire                     sink1_val;
-  wire                     sink1_rdy;
-  wire [c_resp_nbits-1:0]  sink1_msg;
+  logic                     sink1_val;
+  logic                     sink1_rdy;
+  logic [c_resp_nbits-1:0]  sink1_msg;
 
   vc_TestMem_2ports
   #(
@@ -110,7 +110,7 @@ module TestHarness
 
   // Test sink for port 0
 
-  wire        sink0_done;
+  logic        sink0_done;
 
   vc_TestRandDelaySink#(c_resp_nbits) sink0
   (
@@ -125,7 +125,7 @@ module TestHarness
 
   // Test sink for port 1
 
-  wire        sink1_done;
+  logic        sink1_done;
 
   vc_TestRandDelaySink#(c_resp_nbits) sink1
   (
@@ -177,11 +177,11 @@ module top;
   // Test setup
   //----------------------------------------------------------------------
 
-  reg         th_reset = 1;
-  reg         th_mem_clear;
-  reg  [31:0] th_src_max_delay;
-  reg  [31:0] th_sink_max_delay;
-  wire        th_done;
+  logic        th_reset = 1;
+  logic        th_mem_clear;
+  logic [31:0] th_src_max_delay;
+  logic [31:0] th_sink_max_delay;
+  logic        th_done;
 
   TestHarness th
   (
@@ -197,8 +197,8 @@ module top;
 
   task init_rand_delays
   (
-    input [31:0] src_max_delay,
-    input [31:0] sink_max_delay
+    input logic [31:0] src_max_delay,
+    input logic [31:0] sink_max_delay
   );
   begin
     th_src_max_delay  = src_max_delay;
@@ -208,23 +208,23 @@ module top;
 
   // Helper task to initalize port 0 source/sink
 
-  reg [`VC_MEM_REQ_MSG_NBITS(8,16,32)-1:0] th_port0_memreq;
-  reg [`VC_MEM_RESP_MSG_NBITS(8,32)-1:0]   th_port0_memresp;
+  logic [`VC_MEM_REQ_MSG_NBITS(8,16,32)-1:0] th_port0_memreq;
+  logic [`VC_MEM_RESP_MSG_NBITS(8,32)-1:0]   th_port0_memresp;
 
   task init_port0
   (
-    input [1023:0] index,
+    input logic [1023:0] index,
 
-    input [`VC_MEM_REQ_MSG_TYPE_NBITS(8,16,32)-1:0]   memreq_type,
-    input [`VC_MEM_REQ_MSG_OPAQUE_NBITS(8,16,32)-1:0] memreq_opaque,
-    input [`VC_MEM_REQ_MSG_ADDR_NBITS(8,16,32)-1:0]   memreq_addr,
-    input [`VC_MEM_REQ_MSG_LEN_NBITS(8,16,32)-1:0]    memreq_len,
-    input [`VC_MEM_REQ_MSG_DATA_NBITS(8,16,32)-1:0]   memreq_data,
+    input logic [`VC_MEM_REQ_MSG_TYPE_NBITS(8,16,32)-1:0]   memreq_type,
+    input logic [`VC_MEM_REQ_MSG_OPAQUE_NBITS(8,16,32)-1:0] memreq_opaque,
+    input logic [`VC_MEM_REQ_MSG_ADDR_NBITS(8,16,32)-1:0]   memreq_addr,
+    input logic [`VC_MEM_REQ_MSG_LEN_NBITS(8,16,32)-1:0]    memreq_len,
+    input logic [`VC_MEM_REQ_MSG_DATA_NBITS(8,16,32)-1:0]   memreq_data,
 
-    input [`VC_MEM_RESP_MSG_TYPE_NBITS(8,32)-1:0]     memresp_type,
-    input [`VC_MEM_RESP_MSG_OPAQUE_NBITS(8,32)-1:0]   memresp_opaque,
-    input [`VC_MEM_RESP_MSG_LEN_NBITS(8,32)-1:0]      memresp_len,
-    input [`VC_MEM_RESP_MSG_DATA_NBITS(8,32)-1:0]     memresp_data
+    input logic [`VC_MEM_RESP_MSG_TYPE_NBITS(8,32)-1:0]     memresp_type,
+    input logic [`VC_MEM_RESP_MSG_OPAQUE_NBITS(8,32)-1:0]   memresp_opaque,
+    input logic [`VC_MEM_RESP_MSG_LEN_NBITS(8,32)-1:0]      memresp_len,
+    input logic [`VC_MEM_RESP_MSG_DATA_NBITS(8,32)-1:0]     memresp_data
   );
   begin
     th_port0_memreq[`VC_MEM_REQ_MSG_TYPE_FIELD(8,16,32)]   = memreq_type;
@@ -245,23 +245,23 @@ module top;
 
   // Helper task to initalize port 1 source/sink
 
-  reg [`VC_MEM_REQ_MSG_NBITS(8,16,32)-1:0] th_port1_memreq;
-  reg [`VC_MEM_RESP_MSG_NBITS(8,32)-1:0]   th_port1_memresp;
+  logic [`VC_MEM_REQ_MSG_NBITS(8,16,32)-1:0] th_port1_memreq;
+  logic [`VC_MEM_RESP_MSG_NBITS(8,32)-1:0]   th_port1_memresp;
 
   task init_port1
   (
-    input [1023:0] index,
+    input logic [1023:0] index,
 
-    input [`VC_MEM_REQ_MSG_TYPE_NBITS(8,16,32)-1:0]   memreq_type,
-    input [`VC_MEM_REQ_MSG_OPAQUE_NBITS(8,16,32)-1:0] memreq_opaque,
-    input [`VC_MEM_REQ_MSG_ADDR_NBITS(8,16,32)-1:0]   memreq_addr,
-    input [`VC_MEM_REQ_MSG_LEN_NBITS(8,16,32)-1:0]    memreq_len,
-    input [`VC_MEM_REQ_MSG_DATA_NBITS(8,16,32)-1:0]   memreq_data,
+    input logic [`VC_MEM_REQ_MSG_TYPE_NBITS(8,16,32)-1:0]   memreq_type,
+    input logic [`VC_MEM_REQ_MSG_OPAQUE_NBITS(8,16,32)-1:0] memreq_opaque,
+    input logic [`VC_MEM_REQ_MSG_ADDR_NBITS(8,16,32)-1:0]   memreq_addr,
+    input logic [`VC_MEM_REQ_MSG_LEN_NBITS(8,16,32)-1:0]    memreq_len,
+    input logic [`VC_MEM_REQ_MSG_DATA_NBITS(8,16,32)-1:0]   memreq_data,
 
-    input [`VC_MEM_RESP_MSG_TYPE_NBITS(8,32)-1:0]     memresp_type,
-    input [`VC_MEM_RESP_MSG_OPAQUE_NBITS(8,32)-1:0]   memresp_opaque,
-    input [`VC_MEM_RESP_MSG_LEN_NBITS(8,32)-1:0]      memresp_len,
-    input [`VC_MEM_RESP_MSG_DATA_NBITS(8,32)-1:0]     memresp_data
+    input logic [`VC_MEM_RESP_MSG_TYPE_NBITS(8,32)-1:0]     memresp_type,
+    input logic [`VC_MEM_RESP_MSG_OPAQUE_NBITS(8,32)-1:0]   memresp_opaque,
+    input logic [`VC_MEM_RESP_MSG_LEN_NBITS(8,32)-1:0]      memresp_len,
+    input logic [`VC_MEM_RESP_MSG_DATA_NBITS(8,32)-1:0]     memresp_data
   );
   begin
     th_port1_memreq[`VC_MEM_REQ_MSG_TYPE_FIELD(8,16,32)]   = memreq_type;

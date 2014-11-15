@@ -16,17 +16,17 @@ module vc_RandomNumGen
   parameter p_out_nbits = 4,            // Bitwidth of output
   parameter p_seed      = 32'hdeadbeef  // Random seed, should be 32 bits
 )(
-  input                    clk,
-  input                    reset,
-  input                    next,   // Generate next value
-  output [p_out_nbits-1:0] out     // Current random number
+  input  logic                   clk,
+  input  logic                   reset,
+  input  logic                   next,   // Generate next value
+  output logic [p_out_nbits-1:0] out     // Current random number
 );
 
   // State
 
-  wire        rand_num_en;
-  wire [31:0] rand_num_next;
-  wire [31:0] rand_num;
+  logic        rand_num_en;
+  logic [31:0] rand_num_next;
+  logic [31:0] rand_num;
 
   vc_EnResetReg#(32,p_seed) rand_num_reg
   (
@@ -39,13 +39,13 @@ module vc_RandomNumGen
 
   // Logic for a simple random numbers using the Tausworthe algorithm
 
-  wire [31:0] temp = ((rand_num >> 17) ^ rand_num);
+  logic [31:0] temp;
+  assign temp = ((rand_num >> 17) ^ rand_num);
+
   assign rand_num_next = ((temp << 15) ^ temp);
   assign rand_num_en = next;
 
   // We XOR higher order bits to create smaller output numbers
-
-  reg out;
 
   integer i;
   always @(*)

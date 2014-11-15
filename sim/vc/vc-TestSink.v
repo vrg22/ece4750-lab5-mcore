@@ -17,18 +17,18 @@ module vc_TestSink
   parameter p_num_msgs  = 1024,
   parameter p_sim_mode  = 0
 )(
-  input                    clk,
-  input                    reset,
+  input  logic                   clk,
+  input  logic                   reset,
 
   // Sink message interface
 
-  input                    val,
-  output                   rdy,
-  input  [p_msg_nbits-1:0] msg,
+  input  logic                   val,
+  output logic                   rdy,
+  input  logic [p_msg_nbits-1:0] msg,
 
   // Goes high once all sink data has been received
 
-  output                   done
+  output logic                   done
 );
 
   //----------------------------------------------------------------------
@@ -45,13 +45,13 @@ module vc_TestSink
 
   // Memory which stores messages to verify against those received
 
-  reg [p_msg_nbits-1:0] m[p_num_msgs-1:0];
+  logic [p_msg_nbits-1:0] m[p_num_msgs-1:0];
 
   // Index register pointing to next message to verify
 
-  wire                     index_en;
-  wire [c_index_nbits-1:0] index_next;
-  wire [c_index_nbits-1:0] index;
+  logic                     index_en;
+  logic [c_index_nbits-1:0] index_next;
+  logic [c_index_nbits-1:0] index;
 
   vc_EnResetReg#(c_index_nbits,{c_index_nbits{1'b0}}) index_reg
   (
@@ -64,7 +64,7 @@ module vc_TestSink
 
   // Register reset
 
-  reg reset_reg;
+  logic reset_reg;
   always @( posedge clk )
     reset_reg <= reset;
 
@@ -89,14 +89,15 @@ module vc_TestSink
 
   // The go signal is high when a message is transferred
 
-  wire go = val && rdy;
+  logic go;
+  assign go = val && rdy;
 
   //----------------------------------------------------------------------
   // Verification logic
   //----------------------------------------------------------------------
 
-  reg        failed;
-  reg  [3:0] verbose;
+  logic        failed;
+  logic  [3:0] verbose;
 
   initial begin
     if ( !$value$plusargs( "verbose=%d", verbose ) )
@@ -164,7 +165,7 @@ module vc_TestSink
   // Line Tracing
   //----------------------------------------------------------------------
 
-  reg [`VC_TRACE_NBITS_TO_NCHARS(p_msg_nbits)*8-1:0] msg_str;
+  logic [`VC_TRACE_NBITS_TO_NCHARS(p_msg_nbits)*8-1:0] msg_str;
 
   `VC_TRACE_BEGIN
   begin

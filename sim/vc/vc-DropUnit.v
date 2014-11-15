@@ -13,28 +13,28 @@ module vc_DropUnit
   parameter   p_msg_nbits = 1
 )
 (
-  input                    clk,
-  input                    reset,
+  input  logic                   clk,
+  input  logic                   reset,
 
   // the drop signal will drop the next arriving packet
 
-  input                    drop,
+  input  logic                   drop,
 
-  input  [p_msg_nbits-1:0] in_msg,
-  input                    in_val,
-  output reg               in_rdy,
+  input  logic [p_msg_nbits-1:0] in_msg,
+  input  logic                   in_val,
+  output logic                   in_rdy,
 
-  output [p_msg_nbits-1:0] out_msg,
-  output reg               out_val,
-  input                    out_rdy
+  output logic [p_msg_nbits-1:0] out_msg,
+  output logic                   out_val,
+  input  logic                   out_rdy
 );
 
   localparam c_state_pass = 1'b0;
   localparam c_state_drop = 1'b1;
 
-  reg state;
-  reg next_state;
-  wire in_go;
+  logic state;
+  logic next_state;
+  logic in_go;
 
   assign in_go = in_rdy && in_val;
 

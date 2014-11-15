@@ -13,11 +13,11 @@ module vc_Adder
 #(
   parameter p_nbits = 1
 )(
-  input  [p_nbits-1:0] in0,
-  input  [p_nbits-1:0] in1,
-  input                cin,
-  output [p_nbits-1:0] out,
-  output               cout
+  input  logic [p_nbits-1:0] in0,
+  input  logic [p_nbits-1:0] in1,
+  input  logic               cin,
+  output logic [p_nbits-1:0] out,
+  output logic               cout
 );
 
   assign {cout,out} = in0 + in1 + cin;
@@ -28,9 +28,9 @@ module vc_SimpleAdder
 #(
   parameter p_nbits = 1
 )(
-  input  [p_nbits-1:0] in0,
-  input  [p_nbits-1:0] in1,
-  output [p_nbits-1:0] out
+  input  logic [p_nbits-1:0] in0,
+  input  logic [p_nbits-1:0] in1,
+  output logic [p_nbits-1:0] out
 );
 
   assign out = in0 + in1;
@@ -45,9 +45,9 @@ module vc_Subtractor
 #(
   parameter p_nbits = 1
 )(
-  input  [p_nbits-1:0] in0,
-  input  [p_nbits-1:0] in1,
-  output [p_nbits-1:0] out
+  input  logic [p_nbits-1:0] in0,
+  input  logic [p_nbits-1:0] in1,
+  output logic [p_nbits-1:0] out
 );
 
   assign out = in0 - in1;
@@ -63,8 +63,8 @@ module vc_Incrementer
   parameter p_nbits     = 1,
   parameter p_inc_value = 1
 )(
-  input  [p_nbits-1:0] in,
-  output [p_nbits-1:0] out
+  input  logic [p_nbits-1:0] in,
+  output logic [p_nbits-1:0] out
 );
 
   assign out = in + p_inc_value;
@@ -80,8 +80,8 @@ module vc_ZeroExtender
   parameter p_in_nbits  = 1,
   parameter p_out_nbits = 8
 )(
-  input   [p_in_nbits-1:0] in,
-  output [p_out_nbits-1:0] out
+  input  logic [p_in_nbits-1:0]  in,
+  output logic [p_out_nbits-1:0] out
 );
 
   assign out = { {( p_out_nbits - p_in_nbits ){1'b0}}, in };
@@ -98,8 +98,8 @@ module vc_SignExtender
  parameter p_out_nbits = 8
 )
 (
-  input   [p_in_nbits-1:0] in,
-  output [p_out_nbits-1:0] out
+  input  logic [p_in_nbits-1:0]  in,
+  output logic [p_out_nbits-1:0] out
 );
 
   assign out = { {(p_out_nbits-p_in_nbits){in[p_in_nbits-1]}}, in };
@@ -114,8 +114,8 @@ module vc_ZeroComparator
 #(
   parameter p_nbits = 1
 )(
-  input  [p_nbits-1:0] in,
-  output               out
+  input  logic [p_nbits-1:0] in,
+  output logic               out
 );
 
   assign out = ( in == {p_nbits{1'b0}} );
@@ -130,9 +130,9 @@ module vc_EqComparator
 #(
   parameter p_nbits = 1
 )(
-  input  [p_nbits-1:0] in0,
-  input  [p_nbits-1:0] in1,
-  output               out
+  input  logic [p_nbits-1:0] in0,
+  input  logic [p_nbits-1:0] in1,
+  output logic               out
 );
 
   assign out = ( in0 == in1 );
@@ -147,9 +147,9 @@ module vc_LtComparator
 #(
   parameter p_nbits = 1
 )(
-  input  [p_nbits-1:0] in0,
-  input  [p_nbits-1:0] in1,
-  output               out
+  input  logic [p_nbits-1:0] in0,
+  input  logic [p_nbits-1:0] in1,
+  output logic               out
 );
 
   assign out = ( in0 < in1 );
@@ -164,9 +164,9 @@ module vc_GtComparator
 #(
   parameter p_nbits = 1
 )(
-  input  [p_nbits-1:0] in0,
-  input  [p_nbits-1:0] in1,
-  output               out
+  input  logic [p_nbits-1:0] in0,
+  input  logic [p_nbits-1:0] in1,
+  output logic               out
 );
 
   assign out = ( in0 > in1 );
@@ -182,9 +182,9 @@ module vc_LeftLogicalShifter
   parameter p_nbits       = 1,
   parameter p_shamt_nbits = 1 )
 (
-  input        [p_nbits-1:0] in,
-  input  [p_shamt_nbits-1:0] shamt,
-  output       [p_nbits-1:0] out
+  input  logic       [p_nbits-1:0] in,
+  input  logic [p_shamt_nbits-1:0] shamt,
+  output logic       [p_nbits-1:0] out
 );
 
   assign out = ( in << shamt );
@@ -200,9 +200,9 @@ module vc_RightLogicalShifter
   parameter p_nbits       = 1,
   parameter p_shamt_nbits = 1
 )(
-  input        [p_nbits-1:0] in,
-  input  [p_shamt_nbits-1:0] shamt,
-  output       [p_nbits-1:0] out
+  input  logic       [p_nbits-1:0] in,
+  input  logic [p_shamt_nbits-1:0] shamt,
+  output logic       [p_nbits-1:0] out
 );
 
   assign out = ( in >> shamt );

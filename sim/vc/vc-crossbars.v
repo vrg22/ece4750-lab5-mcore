@@ -16,14 +16,14 @@ module vc_Crossbar2
   parameter p_nbits = 32
 )
 (
-  input  [p_nbits-1:0]   in0,
-  input  [p_nbits-1:0]   in1,
+  input  logic [p_nbits-1:0]   in0,
+  input  logic [p_nbits-1:0]   in1,
 
-  input                  sel0,
-  input                  sel1,
+  input  logic                 sel0,
+  input  logic                 sel1,
 
-  output [p_nbits-1:0]   out0,
-  output [p_nbits-1:0]   out1
+  output logic [p_nbits-1:0]   out0,
+  output logic [p_nbits-1:0]   out1
 );
 
   vc_Mux2#(p_nbits) out0_mux
@@ -53,17 +53,17 @@ module vc_Crossbar3
   parameter p_nbits = 32
 )
 (
-  input  [p_nbits-1:0]   in0,
-  input  [p_nbits-1:0]   in1,
-  input  [p_nbits-1:0]   in2,
+  input  logic [p_nbits-1:0]   in0,
+  input  logic [p_nbits-1:0]   in1,
+  input  logic [p_nbits-1:0]   in2,
 
-  input  [1:0]           sel0,
-  input  [1:0]           sel1,
-  input  [1:0]           sel2,
+  input  logic [1:0]           sel0,
+  input  logic [1:0]           sel1,
+  input  logic [1:0]           sel2,
 
-  output [p_nbits-1:0]   out0,
-  output [p_nbits-1:0]   out1,
-  output [p_nbits-1:0]   out2
+  output logic [p_nbits-1:0]   out0,
+  output logic [p_nbits-1:0]   out1,
+  output logic [p_nbits-1:0]   out2
 );
 
   vc_Mux3#(p_nbits) out0_mux
@@ -104,20 +104,20 @@ module vc_Crossbar4
   parameter p_nbits = 32
 )
 (
-  input  [p_nbits-1:0]   in0,
-  input  [p_nbits-1:0]   in1,
-  input  [p_nbits-1:0]   in2,
-  input  [p_nbits-1:0]   in3,
+  input  logic [p_nbits-1:0]   in0,
+  input  logic [p_nbits-1:0]   in1,
+  input  logic [p_nbits-1:0]   in2,
+  input  logic [p_nbits-1:0]   in3,
 
-  input  [1:0]           sel0,
-  input  [1:0]           sel1,
-  input  [1:0]           sel2,
-  input  [1:0]           sel3,
+  input  logic [1:0]           sel0,
+  input  logic [1:0]           sel1,
+  input  logic [1:0]           sel2,
+  input  logic [1:0]           sel3,
 
-  output [p_nbits-1:0]   out0,
-  output [p_nbits-1:0]   out1,
-  output [p_nbits-1:0]   out2,
-  output [p_nbits-1:0]   out3
+  output logic [p_nbits-1:0]   out0,
+  output logic [p_nbits-1:0]   out1,
+  output logic [p_nbits-1:0]   out2,
+  output logic [p_nbits-1:0]   out3
 );
 
   vc_Mux4#(p_nbits) out0_mux

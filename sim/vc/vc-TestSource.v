@@ -13,8 +13,8 @@ module vc_TestSource
   parameter p_msg_nbits = 1,
   parameter p_num_msgs  = 1024
 )(
-  input  clk,
-  input  reset,
+  input  logic                   clk,
+  input  logic                   reset,
 
   // Source message interface
 
@@ -41,13 +41,13 @@ module vc_TestSource
 
   // Memory which stores messages to send
 
-  reg [p_msg_nbits-1:0] m[p_num_msgs-1:0];
+  logic [p_msg_nbits-1:0] m[p_num_msgs-1:0];
 
   // Index register pointing to next message to send
 
-  wire                     index_en;
-  wire [c_index_nbits-1:0] index_next;
-  wire [c_index_nbits-1:0] index;
+  logic                     index_en;
+  logic [c_index_nbits-1:0] index_next;
+  logic [c_index_nbits-1:0] index;
 
   vc_EnResetReg#(c_index_nbits,{c_index_nbits{1'b0}}) index_reg
   (
@@ -60,7 +60,7 @@ module vc_TestSource
 
   // Register reset
 
-  reg reset_reg;
+  logic reset_reg;
   always @( posedge clk )
     reset_reg <= reset;
 
@@ -100,7 +100,8 @@ module vc_TestSource
 
   // The go signal is high when a message is transferred
 
-  wire go = val && rdy;
+  logic go;
+  assign go = val && rdy;
 
   // We bump the index pointer every time we successfully send a message,
   // otherwise the index stays the same.
@@ -123,7 +124,7 @@ module vc_TestSource
   // Line Tracing
   //----------------------------------------------------------------------
 
-  reg [`VC_TRACE_NBITS_TO_NCHARS(p_msg_nbits)*8-1:0] msg_str;
+  logic [`VC_TRACE_NBITS_TO_NCHARS(p_msg_nbits)*8-1:0] msg_str;
 
   `VC_TRACE_BEGIN
   begin

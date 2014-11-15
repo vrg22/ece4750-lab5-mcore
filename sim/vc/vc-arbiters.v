@@ -21,10 +21,10 @@ module vc_FixedArbChain
 #(
   parameter p_num_reqs = 2
 )(
-  input                   kin,    // kill in
-  input  [p_num_reqs-1:0] reqs,   // 1 = making a req, 0 = no req
-  output [p_num_reqs-1:0] grants, // (one-hot) 1 indicates req won grant
-  output                  kout    // kill out
+  input  logic                  kin,    // kill in
+  input  logic [p_num_reqs-1:0] reqs,   // 1 = making a req, 0 = no req
+  output logic [p_num_reqs-1:0] grants, // (one-hot) 1 indicates req won grant
+  output logic                  kout    // kill out
 );
 
   // The internal kills signals essentially form a kill chain from the
@@ -34,13 +34,13 @@ module vc_FixedArbChain
   // kills[i+1]) and then this kill signal is propagated to all lower
   // priority requesters.
 
-  wire [p_num_reqs:0] kills;
+  logic [p_num_reqs:0] kills;
   assign kills[0] = 1'b0;
 
   // The per requester logic first computes the grant signal and then
   // computes the kill signal for the next requester.
 
-  wire [p_num_reqs-1:0] grants_int;
+  logic [p_num_reqs-1:0] grants_int;
 
   genvar i;
   generate
@@ -80,11 +80,11 @@ module vc_FixedArb
 #(
   parameter p_num_reqs = 2
 )(
-  input  [p_num_reqs-1:0] reqs,  // 1 = making a req, 0 = no req
-  output [p_num_reqs-1:0] grants // (one-hot) 1 = which req won grant
+  input  logic [p_num_reqs-1:0] reqs,  // 1 = making a req, 0 = no req
+  output logic [p_num_reqs-1:0] grants // (one-hot) 1 = which req won grant
 );
 
-  wire dummy_kout;
+  logic dummy_kout;
 
   vc_FixedArbChain#(p_num_reqs) fixed_arb_chain
   (
@@ -106,11 +106,11 @@ module vc_VariableArbChain
 #(
   parameter p_num_reqs = 2
 )(
-  input                   kin,       // kill in
-  input  [p_num_reqs-1:0] priority_, // (one-hot) 1 is req w/ highest pri
-  input  [p_num_reqs-1:0] reqs,      // 1 = making a req, 0 = no req
-  output [p_num_reqs-1:0] grants,    // (one-hot) 1 is req won grant
-  output                  kout       // kill out
+  input  logic                  kin,       // kill in
+  input  logic [p_num_reqs-1:0] priority_, // (one-hot) 1 is req w/ highest pri
+  input  logic [p_num_reqs-1:0] reqs,      // 1 = making a req, 0 = no req
+  output logic [p_num_reqs-1:0] grants,    // (one-hot) 1 is req won grant
+  output logic                  kout       // kill out
 );
 
   // The internal kills signals essentially form a kill chain from the
@@ -122,12 +122,16 @@ module vc_VariableArbChain
   // Principles and Practices of Interconnection Networks, Dally +
   // Towles, p354 for more info.
 
-  wire [2*p_num_reqs:0] kills;
+  logic [2*p_num_reqs:0] kills;
   assign kills[0] = 1'b1;
 
-  wire [2*p_num_reqs-1:0] priority_int = { {p_num_reqs{1'b0}}, priority_ };
-  wire [2*p_num_reqs-1:0] reqs_int     = { reqs, reqs };
-  wire [2*p_num_reqs-1:0] grants_int;
+  logic [2*p_num_reqs-1:0] priority_int;
+  assign priority_int = { {p_num_reqs{1'b0}}, priority_ };
+
+  logic [2*p_num_reqs-1:0] reqs_int;
+  assign reqs_int = { reqs, reqs };
+
+  logic [2*p_num_reqs-1:0] grants_int;
 
   // The per requester logic first computes the grant signal and then
   // computes the kill signal for the next requester.
@@ -176,12 +180,12 @@ module vc_VariableArb
 #(
   parameter p_num_reqs = 2
 )(
-  input  [p_num_reqs-1:0] priority_,  // (one-hot) 1 is req w/ highest pri
-  input  [p_num_reqs-1:0] reqs,      // 1 = making a req, 0 = no req
-  output [p_num_reqs-1:0] grants     // (one-hot) 1 is req won grant
+  input  logic [p_num_reqs-1:0] priority_,  // (one-hot) 1 is req w/ highest pri
+  input  logic [p_num_reqs-1:0] reqs,      // 1 = making a req, 0 = no req
+  output logic [p_num_reqs-1:0] grants     // (one-hot) 1 is req won grant
 );
 
-  wire dummy_kout;
+  logic dummy_kout;
 
   vc_VariableArbChain#(p_num_reqs) variable_arb_chain
   (
@@ -205,26 +209,27 @@ module vc_RoundRobinArbChain
   parameter p_num_reqs             = 2,
   parameter p_priority_reset_value = 1  // (one-hot) 1 = high priority req
 )(
-  input                   clk,
-  input                   reset,
-  input                   kin,    // kill in
-  input  [p_num_reqs-1:0] reqs,   // 1 = making a req, 0 = no req
-  output [p_num_reqs-1:0] grants, // (one-hot) 1 is req won grant
-  output                  kout    // kill out
+  input  logic                  clk,
+  input  logic                  reset,
+  input  logic                  kin,    // kill in
+  input  logic [p_num_reqs-1:0] reqs,   // 1 = making a req, 0 = no req
+  output logic [p_num_reqs-1:0] grants, // (one-hot) 1 is req won grant
+  output logic                  kout    // kill out
 );
 
   // We only update the priority if a requester actually received a grant
 
-  wire priority_en = |grants;
+  logic priority_en;
+  assign priority_en = |grants;
 
   // Next priority is just the one-hot grant vector left rotated by one
 
-  wire [p_num_reqs-1:0] priority_next
-    = { grants[p_num_reqs-2:0], grants[p_num_reqs-1] };
+  logic [p_num_reqs-1:0] priority_next;
+  assign priority_next = { grants[p_num_reqs-2:0], grants[p_num_reqs-1] };
 
   // State for the one-hot priority vector
 
-  wire [p_num_reqs-1:0] priority_;
+  logic [p_num_reqs-1:0] priority_;
 
   vc_EnResetReg#(p_num_reqs,p_priority_reset_value) priority_reg
   (
@@ -262,24 +267,25 @@ endmodule
 
 module vc_RoundRobinArb #( parameter p_num_reqs = 2 )
 (
-  input                 clk,
-  input                 reset,
-  input  [p_num_reqs-1:0] reqs,    // 1 = making a req, 0 = no req
-  output [p_num_reqs-1:0] grants   // (one-hot) 1 is req won grant
+  input  logic                clk,
+  input  logic                reset,
+  input  logic [p_num_reqs-1:0] reqs,    // 1 = making a req, 0 = no req
+  output logic [p_num_reqs-1:0] grants   // (one-hot) 1 is req won grant
 );
 
   // We only update the priority if a requester actually received a grant
 
-  wire priority_en = |grants;
+  logic priority_en;
+  assign priority_en = |grants;
 
   // Next priority is just the one-hot grant vector left rotated by one
 
-  wire [p_num_reqs-1:0] priority_next
-    = { grants[p_num_reqs-2:0], grants[p_num_reqs-1] };
+  logic [p_num_reqs-1:0] priority_next;
+  assign priority_next = { grants[p_num_reqs-2:0], grants[p_num_reqs-1] };
 
   // State for the one-hot priority vector
 
-  wire [p_num_reqs-1:0] priority_;
+  logic [p_num_reqs-1:0] priority_;
 
   vc_EnResetReg#(p_num_reqs,1) priority_reg
   (
@@ -292,7 +298,7 @@ module vc_RoundRobinArb #( parameter p_num_reqs = 2 )
 
   // Variable arbiter chain
 
-  wire dummy_kout;
+  logic dummy_kout;
 
   vc_VariableArbChain#(p_num_reqs) variable_arb_chain
   (

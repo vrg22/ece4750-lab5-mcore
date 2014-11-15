@@ -15,8 +15,8 @@
 
 module vc_Trace
 (
-  input clk,
-  input reset
+  input logic clk,
+  input logic reset
 );
 
   integer len0;
@@ -35,7 +35,7 @@ module vc_Trace
 
   // This is the actual trace storage used when displaying a trace
 
-  reg [nbits-1:0] storage;
+  logic [nbits-1:0] storage;
 
   // Meant to be accesible from outside module
 
@@ -44,7 +44,7 @@ module vc_Trace
 
   // Get trace level from command line
 
-  reg [3:0] level;
+  logic [3:0] level;
 
   initial begin
     if ( !$value$plusargs( "trace=%d", level ) ) begin
@@ -65,8 +65,8 @@ module vc_Trace
 
   task append_str
   (
-    inout [nbits-1:0] trace,
-    input [nbits-1:0] str
+    inout logic [nbits-1:0] trace,
+    input logic [nbits-1:0] str
   );
   begin
 
@@ -95,8 +95,8 @@ module vc_Trace
 
   task append_str_ljust
   (
-    inout [nbits-1:0] trace,
-    input [nbits-1:0] str
+    inout logic [nbits-1:0] trace,
+    input logic [nbits-1:0] str
   );
   begin
 
@@ -121,8 +121,8 @@ module vc_Trace
 
   task append_chars
   (
-    inout         [nbits-1:0] trace,
-    input               [7:0] char,
+    inout logic   [nbits-1:0] trace,
+    input logic         [7:0] char,
     input integer             num
   );
   begin
@@ -149,9 +149,9 @@ module vc_Trace
 
   task append_val_str
   (
-    inout [nbits-1:0] trace,
-    input             val,
-    input [nbits-1:0] str
+    inout logic [nbits-1:0] trace,
+    input logic             val,
+    input logic [nbits-1:0] str
   );
   begin
 
@@ -179,10 +179,10 @@ module vc_Trace
 
   task append_val_rdy_str
   (
-    inout [nbits-1:0] trace,
-    input             val,
-    input             rdy,
-    input [nbits-1:0] str
+    inout logic [nbits-1:0] trace,
+    input logic             val,
+    input logic             rdy,
+    input logic [nbits-1:0] str
   );
   begin
 

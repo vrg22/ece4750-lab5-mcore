@@ -14,31 +14,31 @@ module vc_TestRandDelaySource
   parameter p_msg_nbits = 1,
   parameter p_num_msgs  = 1024
 )(
-  input                    clk,
-  input                    reset,
+  input  logic                   clk,
+  input  logic                   reset,
 
   // Max delay input
 
-  input [31:0]             max_delay,
+  input  logic [31:0]            max_delay,
 
   // Source message interface
 
-  output                   val,
-  input                    rdy,
-  output [p_msg_nbits-1:0] msg,
+  output logic                   val,
+  input  logic                   rdy,
+  output logic [p_msg_nbits-1:0] msg,
 
   // Goes high once all source data has been issued
 
-  output                   done
+  output logic                   done
 );
 
   //----------------------------------------------------------------------
   // Test source
   //----------------------------------------------------------------------
 
-  wire                   src_val;
-  wire                   src_rdy;
-  wire [p_msg_nbits-1:0] src_msg;
+  logic                   src_val;
+  logic                   src_rdy;
+  logic [p_msg_nbits-1:0] src_msg;
 
   vc_TestSource#(p_msg_nbits,p_num_msgs) src
   (
@@ -76,7 +76,7 @@ module vc_TestRandDelaySource
   // Line Tracing
   //----------------------------------------------------------------------
 
-  reg [`VC_TRACE_NBITS_TO_NCHARS(p_msg_nbits)*8-1:0] msg_str;
+  logic [`VC_TRACE_NBITS_TO_NCHARS(p_msg_nbits)*8-1:0] msg_str;
 
   `VC_TRACE_BEGIN
   begin

@@ -15,24 +15,24 @@ module vc_TestDelay
 #(
   parameter p_msg_nbits = 1 // size of message in bits
 )(
-  input                    clk,
-  input                    reset,
+  input  logic                   clk,
+  input  logic                   reset,
 
   // Delay input
 
-  input [31:0]             delay_amt,
+  input  logic [31:0]            delay_amt,
 
   // Input interface
 
-  input                    in_val,
-  output                   in_rdy,
-  input [p_msg_nbits-1:0]  in_msg,
+  input  logic                   in_val,
+  output logic                   in_rdy,
+  input  logic [p_msg_nbits-1:0] in_msg,
 
   // Output interface
 
-  output                   out_val,
-  input                    out_rdy,
-  output [p_msg_nbits-1:0] out_msg
+  output logic                   out_val,
+  input  logic                   out_rdy,
+  output logic [p_msg_nbits-1:0] out_msg
 );
 
   //----------------------------------------------------------------------
@@ -41,9 +41,9 @@ module vc_TestDelay
 
   // Delay counter
 
-  reg         delay_en;
-  reg  [31:0] delay_next;
-  wire [31:0] delay;
+  logic        delay_en;
+  logic [31:0] delay_next;
+  logic [31:0] delay;
 
   vc_EnResetReg#(32,32'b0) delay_reg
   (
@@ -63,7 +63,8 @@ module vc_TestDelay
   // state. This only happens when the input is valid, the output is
   // ready, and the delay amount is zero.
 
-  wire zero_cycle_delay = in_val && out_rdy && (delay_amt == 0);
+  logic zero_cycle_delay;
+  assign zero_cycle_delay = in_val && out_rdy && (delay_amt == 0);
 
   //----------------------------------------------------------------------
   // State register
@@ -73,8 +74,8 @@ module vc_TestDelay
   localparam c_state_idle  = 1'b0;
   localparam c_state_delay = 1'b1;
 
-  reg [c_state_sz-1:0] state_next;
-  reg [c_state_sz-1:0] state;
+  logic [c_state_sz-1:0] state_next;
+  logic [c_state_sz-1:0] state;
 
   always @ ( posedge clk ) begin
     if ( reset ) begin
@@ -122,9 +123,6 @@ module vc_TestDelay
   //----------------------------------------------------------------------
   // State output
   //----------------------------------------------------------------------
-
-  reg in_rdy;
-  reg out_val;
 
   always @(*) begin
 
@@ -185,7 +183,8 @@ module vc_TestDelay
   // Line Tracing
   //----------------------------------------------------------------------
 
-  reg [`VC_TRACE_NBITS_TO_NCHARS(p_msg_nbits)*8-1:0] msg_str;
+  logic [`VC_TRACE_NBITS_TO_NCHARS(p_msg_nbits)*8-1:0] msg_str;
+
   `VC_TRACE_BEGIN
   begin
 

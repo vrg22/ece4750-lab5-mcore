@@ -12,9 +12,9 @@ module top;
   // Test vc_Reg
   //----------------------------------------------------------------------
 
-  reg         t1_reset = 1;
-  reg  [31:0] t1_d;
-  wire [31:0] t1_q;
+  logic        t1_reset = 1'b1;
+  logic [31:0] t1_d;
+  logic [31:0] t1_q;
 
   vc_Reg#(32) t1_reg_w32
   (
@@ -27,8 +27,8 @@ module top;
 
   task t1
   (
-    input [31:0]    d,
-    input [31:0]    q
+    input logic [31:0]    d,
+    input logic [31:0]    q
   );
   begin
     t1_d = d;
@@ -57,9 +57,9 @@ module top;
   // Test vc_ResetReg
   //----------------------------------------------------------------------
 
-  reg         t2_reset = 1;
-  reg  [31:0] t2_d;
-  wire [31:0] t2_q;
+  logic        t2_reset = 1'b1;
+  logic [31:0] t2_d;
+  logic [31:0] t2_q;
 
   vc_ResetReg#(32,32'hdeadbeef) t2_reset_reg
   (
@@ -73,8 +73,8 @@ module top;
 
   task t2
   (
-    input [31:0]    d,
-    input [31:0]    q
+    input logic [31:0]    d,
+    input logic [31:0]    q
   );
   begin
     t2_d = d;
@@ -103,10 +103,10 @@ module top;
   // Test vc_EnReg
   //--------------------------------------------------------------------
 
-  reg         t3_reset = 1;
-  reg  [31:0] t3_d;
-  reg         t3_en;
-  wire [31:0] t3_q;
+  logic        t3_reset = 1'b1;
+  logic [31:0] t3_d;
+  logic        t3_en;
+  logic [31:0] t3_q;
 
   vc_EnReg#(32) t3_en_reg
   (
@@ -121,9 +121,9 @@ module top;
 
   task t3
   (
-    input [31:0]    d,
-    input           en,
-    input [31:0]    q
+    input logic [31:0]    d,
+    input logic           en,
+    input logic [31:0]    q
   );
   begin
     t3_d  = d;
@@ -159,10 +159,10 @@ module top;
   // Test vc_ERReg
   //----------------------------------------------------------------------
 
-  reg         t4_reset = 1;
-  reg  [31:0] t4_d;
-  reg         t4_en;
-  wire [31:0] t4_q;
+  logic        t4_reset = 1'b1;
+  logic [31:0] t4_d;
+  logic        t4_en;
+  logic [31:0] t4_q;
 
   vc_EnResetReg#(32,32'hdeadbeef) t4_en_reset_reg_w32
   (
@@ -177,9 +177,9 @@ module top;
 
   task t4
   (
-    input [31:0]    d,
-    input           en,
-    input [31:0]    q
+    input logic [31:0]    d,
+    input logic           en,
+    input logic [31:0]    q
   );
   begin
     t4_d  = d;

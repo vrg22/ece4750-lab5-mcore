@@ -16,12 +16,12 @@ module top;
   localparam t1_p_count_reset_value = 3;
   localparam t1_p_count_max_value   = 5;
 
-  reg                         t1_reset;
-  reg                         t1_increment;
-  reg                         t1_decrement;
-  wire [t1_p_count_nbits-1:0] t1_count;
-  wire                        t1_count_is_zero;
-  wire                        t1_count_is_max;
+  logic                        t1_reset;
+  logic                        t1_increment;
+  logic                        t1_decrement;
+  logic [t1_p_count_nbits-1:0] t1_count;
+  logic                        t1_count_is_zero;
+  logic                        t1_count_is_max;
 
   vc_Counter
   #(
@@ -44,11 +44,11 @@ module top;
 
   task t1
   (
-    input                        increment,
-    input                        decrement,
-    input [t1_p_count_nbits-1:0] count,
-    input                        count_is_zero,
-    input                        count_is_max
+    input logic                        increment,
+    input logic                        decrement,
+    input logic [t1_p_count_nbits-1:0] count,
+    input logic                        count_is_zero,
+    input logic                        count_is_max
   );
   begin
     t1_increment = increment;

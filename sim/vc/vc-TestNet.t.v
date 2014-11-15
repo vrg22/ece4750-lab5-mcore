@@ -21,11 +21,11 @@ module TestHarness
   parameter p_queue_num_msgs = 64
 )
 (
-  input             clk,
-  input             reset,
-  input      [31:0] src_max_delay,
-  input      [31:0] sink_max_delay,
-  output            done
+  input  logic        clk,
+  input  logic        reset,
+  input  logic [31:0] src_max_delay,
+  input  logic [31:0] sink_max_delay,
+  output logic        done
 );
 
   // Local parameters
@@ -44,39 +44,39 @@ module TestHarness
 
   // Global wires for sources and sinks
 
-  wire [p_num_ports-1:0]      global_src_done;
-  wire [p_num_ports-1:0]      global_sink_done;
+  logic [p_num_ports-1:0]      global_src_done;
+  logic [p_num_ports-1:0]      global_sink_done;
 
   // Trace related regs
 
-  reg [p_num_ports*`VC_TRACE_NBITS-1:0] src_trace;
-  reg [p_num_ports*`VC_TRACE_NBITS-1:0] sink_trace;
+  logic [p_num_ports*`VC_TRACE_NBITS-1:0] src_trace;
+  logic [p_num_ports*`VC_TRACE_NBITS-1:0] sink_trace;
 
   // we use the fire hack to fire tasks
 
-  reg trace_fire = 0;
+  logic trace_fire = 0;
 
   // Test network wires
 
-  wire [p_num_ports-1:0]                 net_in_val;
-  wire [p_num_ports-1:0]                 net_in_rdy;
-  wire [p_num_ports*c_net_msg_nbits-1:0] net_in_msg;
+  logic [p_num_ports-1:0]                 net_in_val;
+  logic [p_num_ports-1:0]                 net_in_rdy;
+  logic [p_num_ports*c_net_msg_nbits-1:0] net_in_msg;
 
-  wire [p_num_ports-1:0]                 net_out_val;
-  wire [p_num_ports-1:0]                 net_out_rdy;
-  wire [p_num_ports*c_net_msg_nbits-1:0] net_out_msg;
+  logic [p_num_ports-1:0]                 net_out_val;
+  logic [p_num_ports-1:0]                 net_out_rdy;
+  logic [p_num_ports*c_net_msg_nbits-1:0] net_out_msg;
 
   // wires to kick off test source/sink loading
 
-  reg [c_net_msg_nbits-1:0] src_ld_msg;
-  reg [31:0]                src_ld_addr;
-  reg [31:0]                src_ld_port;
-  reg                       src_ld_fire = 0;
+  logic [c_net_msg_nbits-1:0] src_ld_msg;
+  logic [31:0]                src_ld_addr;
+  logic [31:0]                src_ld_port;
+  logic                       src_ld_fire = 0;
 
-  reg [c_net_msg_nbits-1:0] sink_ld_msg;
-  reg [31:0]                sink_ld_addr;
-  reg [31:0]                sink_ld_port;
-  reg                       sink_ld_fire = 0;
+  logic [c_net_msg_nbits-1:0] sink_ld_msg;
+  logic [31:0]                sink_ld_addr;
+  logic [31:0]                sink_ld_port;
+  logic                       sink_ld_fire = 0;
 
   //----------------------------------------------------------------------
   // Generate loop for source/sink
@@ -89,16 +89,16 @@ module TestHarness
 
     // local wires for the source and sink iteration
 
-    wire                        src_val;
-    wire                        src_rdy;
-    wire [c_net_msg_nbits-1:0]  src_msg;
-    wire                        src_done;
+    logic                        src_val;
+    logic                        src_rdy;
+    logic [c_net_msg_nbits-1:0]  src_msg;
+    logic                        src_done;
 
-    wire                        sink_val;
-    wire                        sink_rdy;
-    wire [c_net_msg_nbits-1:0]  sink_msg;
+    logic                        sink_val;
+    logic                        sink_rdy;
+    logic [c_net_msg_nbits-1:0]  sink_msg;
 
-    wire                        sink_done;
+    logic                        sink_done;
 
     // connect the local wires to the wide network ports
 
@@ -173,7 +173,7 @@ module TestHarness
     end
 
     // local trace string for source and sink for this generate iteration
-    reg [`VC_TRACE_NBITS-1:0] local_trace;
+    logic [`VC_TRACE_NBITS-1:0] local_trace;
 
     always @(trace_fire) begin
       local_trace = 0;
@@ -299,13 +299,13 @@ module top;
 
   localparam c_net_msg_nbits = `VC_NET_MSG_NBITS(p,o,s);
 
-  reg         th_reset = 1;
-  reg  [31:0] th_src_max_delay;
-  reg  [31:0] th_sink_max_delay;
-  wire        th_done;
+  logic        th_reset = 1;
+  logic [31:0] th_src_max_delay;
+  logic [31:0] th_sink_max_delay;
+  logic        th_done;
 
-  reg [10:0] th_src_index  [10:0];
-  reg [10:0] th_sink_index [10:0];
+  logic [10:0] th_src_index  [10:0];
+  logic [10:0] th_sink_index [10:0];
 
   TestHarness
   #(
@@ -324,8 +324,8 @@ module top;
   integer i;
   task init_rand_delays
   (
-    input [31:0] src_max_delay,
-    input [31:0] sink_max_delay
+    input logic [31:0] src_max_delay,
+    input logic [31:0] sink_max_delay
   );
   begin
     // we also clear the src/sink indexes
@@ -341,9 +341,9 @@ module top;
 
   task init_src
   (
-    input [31:0]   port,
+    input logic [31:0]   port,
 
-    input [c_net_msg_nbits-1:0] msg
+    input logic [c_net_msg_nbits-1:0] msg
   );
   begin
 
@@ -364,9 +364,9 @@ module top;
 
   task init_sink
   (
-    input [31:0]   port,
+    input logic [31:0]   port,
 
-    input [c_net_msg_nbits-1:0] msg
+    input logic [c_net_msg_nbits-1:0] msg
   );
   begin
 
@@ -385,14 +385,14 @@ module top;
   end
   endtask
 
-  reg [c_net_msg_nbits-1:0] th_port_msg;
+  logic [c_net_msg_nbits-1:0] th_port_msg;
 
   task init_net_msg
   (
-    input [`VC_NET_MSG_SRC_NBITS(p,o,s)-1:0]     src,
-    input [`VC_NET_MSG_DEST_NBITS(p,o,s)-1:0]    dest,
-    input [`VC_NET_MSG_OPAQUE_NBITS(p,o,s)-1:0]  opaque,
-    input [`VC_NET_MSG_PAYLOAD_NBITS(p,o,s)-1:0] payload
+    input logic [`VC_NET_MSG_SRC_NBITS(p,o,s)-1:0]     src,
+    input logic [`VC_NET_MSG_DEST_NBITS(p,o,s)-1:0]    dest,
+    input logic [`VC_NET_MSG_OPAQUE_NBITS(p,o,s)-1:0]  opaque,
+    input logic [`VC_NET_MSG_PAYLOAD_NBITS(p,o,s)-1:0] payload
   );
   begin
 

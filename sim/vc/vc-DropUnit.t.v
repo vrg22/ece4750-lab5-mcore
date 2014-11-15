@@ -12,16 +12,16 @@ module top;
   // Test vc_DropUnit
   //----------------------------------------------------------------------
 
-  reg         t1_reset;
-  reg         t1_drop;
+  logic        t1_reset;
+  logic        t1_drop;
 
-  reg  [31:0] t1_in_msg;
-  reg         t1_in_val;
-  wire        t1_in_rdy;
+  logic [31:0] t1_in_msg;
+  logic        t1_in_val;
+  logic        t1_in_rdy;
 
-  wire [31:0] t1_out_msg;
-  wire        t1_out_val;
-  reg         t1_out_rdy;
+  logic [31:0] t1_out_msg;
+  logic        t1_out_val;
+  logic        t1_out_rdy;
 
 
   vc_DropUnit #(32) drop_unit
@@ -43,15 +43,15 @@ module top;
 
   task t1
   (
-    input        drop,
+    input logic        drop,
 
-    input [31:0] in_msg,
-    input        in_val,
-    input        in_rdy,
+    input logic [31:0] in_msg,
+    input logic        in_val,
+    input logic        in_rdy,
 
-    input [31:0] out_msg,
-    input        out_val,
-    input        out_rdy
+    input logic [31:0] out_msg,
+    input logic        out_val,
+    input logic        out_rdy
   );
   begin
     t1_drop = drop;

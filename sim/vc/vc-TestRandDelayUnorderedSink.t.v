@@ -15,19 +15,19 @@ module TestHarness
 #(
   parameter p_msg_nbits = 8
 )(
-  input         clk,
-  input         reset,
-  input  [31:0] src_max_delay,
-  input  [31:0] sink_max_delay,
-  output        done
+  input  logic        clk,
+  input  logic        reset,
+  input  logic [31:0] src_max_delay,
+  input  logic [31:0] sink_max_delay,
+  output logic        done
 );
 
-  wire                   val;
-  wire                   rdy;
-  wire [p_msg_nbits-1:0] msg;
+  logic                   val;
+  logic                   rdy;
+  logic [p_msg_nbits-1:0] msg;
 
-  wire                   src_done;
-  wire                   sink_done;
+  logic                   src_done;
+  logic                   sink_done;
 
   vc_TestRandDelaySource#(p_msg_nbits) src
   (
@@ -76,10 +76,10 @@ module top;
 
   // Instantiate the test harness
 
-  reg         th_reset = 1;
-  reg  [31:0] th_src_max_delay;
-  reg  [31:0] th_sink_max_delay;
-  wire        th_done;
+  logic        th_reset = 1;
+  logic [31:0] th_src_max_delay;
+  logic [31:0] th_sink_max_delay;
+  logic        th_done;
 
   TestHarness th
   (

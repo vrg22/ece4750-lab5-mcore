@@ -6,7 +6,7 @@
 // this is one place we might actually want to use positional port
 // binding like this:
 //
-//  wire [p_nbits-1:0] result_B;
+//  logic [p_nbits-1:0] result_B;
 //  vc_Reg#(p_nbits) result_AB( clk, result_B, result_A );
 
 `ifndef VC_REGS_V

@@ -20,24 +20,24 @@ module vc_CombinationalSRAM_1rw
   parameter c_addr_nbits  = $clog2(p_num_entries),
   parameter c_data_nbytes = (p_data_nbits+7)/8 // $ceil(p_data_nbits/8)
 )(
-  input                      clk,
-  input                      reset,
+  input  logic                     clk,
+  input  logic                     reset,
 
   // Read port (combinational read)
 
-  input                      read_en,
-  input  [c_addr_nbits-1:0]  read_addr,
-  output [p_data_nbits-1:0]  read_data,
+  input  logic                     read_en,
+  input  logic [c_addr_nbits-1:0]  read_addr,
+  output logic [p_data_nbits-1:0]  read_data,
 
   // Write port (sampled on the rising clock edge)
 
-  input                      write_en,
-  input  [c_data_nbytes-1:0] write_byte_en,
-  input  [c_addr_nbits-1:0]  write_addr,
-  input  [p_data_nbits-1:0]  write_data
+  input  logic                     write_en,
+  input  logic [c_data_nbytes-1:0] write_byte_en,
+  input  logic [c_addr_nbits-1:0]  write_addr,
+  input  logic [p_data_nbits-1:0]  write_data
 );
 
-  reg [p_data_nbits-1:0] mem[p_num_entries-1:0];
+  logic [p_data_nbits-1:0] mem[p_num_entries-1:0];
 
   // Combinational read. We ensure the read data is all X's if we are
   // doing a write because we are modeling an SRAM with a single
@@ -45,7 +45,6 @@ module vc_CombinationalSRAM_1rw
   // read data is all X's if the read is not enable at all to avoid
   // (potentially) incorrectly assuming the SRAM latches the read data.
 
-  reg read_data;
   always @(*) begin
     if ( read_en )
       read_data = mem[read_addr];
@@ -105,24 +104,24 @@ module vc_SynchronousSRAM_1rw
   parameter c_addr_nbits  = $clog2(p_num_entries),
   parameter c_data_nbytes = (p_data_nbits+7)/8 // $ceil(p_data_nbits/8)
 )(
-  input                     clk,
-  input                     reset,
+  input  logic                     clk,
+  input  logic                     reset,
 
   // Read port (synchronous read)
 
-  input                     read_en,
-  input  [c_addr_nbits-1:0] read_addr,
-  output [p_data_nbits-1:0] read_data,
+  input  logic                     read_en,
+  input  logic [c_addr_nbits-1:0]  read_addr,
+  output logic [p_data_nbits-1:0]  read_data,
 
   // Write port (sampled on the rising clock edge)
 
-  input                     write_en,
-  input [c_data_nbytes-1:0] write_byte_en,
-  input  [c_addr_nbits-1:0] write_addr,
-  input  [p_data_nbits-1:0] write_data
+  input  logic                     write_en,
+  input  logic [c_data_nbytes-1:0] write_byte_en,
+  input  logic [c_addr_nbits-1:0]  write_addr,
+  input  logic [p_data_nbits-1:0]  write_data
 );
 
-  reg [p_data_nbits-1:0] mem[p_num_entries-1:0];
+  logic [p_data_nbits-1:0] mem[p_num_entries-1:0];
 
   // Combinational read. We ensure the read data is all X's if we are
   // doing a write because we are modeling an SRAM with a single
@@ -130,7 +129,6 @@ module vc_SynchronousSRAM_1rw
   // read data is all X's if the read is not enable at all to avoid
   // (potentially) incorrectly assuming the SRAM latches the read data.
 
-  reg read_data;
   always @( posedge clk ) begin
     if ( read_en )
       read_data <= mem[read_addr];

@@ -12,11 +12,11 @@ module top;
   // Test vc_Adder
   //----------------------------------------------------------------------
 
-  reg  [7:0] t1_in0;
-  reg  [7:0] t1_in1;
-  reg        t1_cin;
-  wire [7:0] t1_out;
-  wire       t1_cout;
+  logic [7:0] t1_in0;
+  logic [7:0] t1_in1;
+  logic       t1_cin;
+  logic [7:0] t1_out;
+  logic       t1_cout;
 
   vc_Adder#(8) t1_adder_w8
   (
@@ -29,11 +29,11 @@ module top;
 
   task t1
   (
-    input      [7:0] in0,
-    input      [7:0] in1,
-    input            cin,
-    input      [7:0] out,
-    input            cout
+    input logic [7:0] in0,
+    input logic [7:0] in1,
+    input logic       cin,
+    input logic [7:0] out,
+    input logic       cout
   );
   begin
     t1_in0 = in0;
@@ -66,9 +66,9 @@ module top;
   // Test vc_SimpleAdder
   //----------------------------------------------------------------------
 
-  reg  [7:0] t2_in0;
-  reg  [7:0] t2_in1;
-  wire [7:0] t2_out;
+  logic [7:0] t2_in0;
+  logic [7:0] t2_in1;
+  logic [7:0] t2_out;
 
   vc_SimpleAdder#(8) t2_simple_adder_w8
   (
@@ -79,9 +79,9 @@ module top;
 
   task t2
   (
-    input [7:0] in0,
-    input [7:0] in1,
-    input [7:0] out
+    input logic [7:0] in0,
+    input logic [7:0] in1,
+    input logic [7:0] out
   );
   begin
     t2_in0 = in0;
@@ -108,9 +108,9 @@ module top;
   // Test vc_Subtractor
   //----------------------------------------------------------------------
 
-  reg  [7:0] t3_in0;
-  reg  [7:0] t3_in1;
-  wire [7:0] t3_out;
+  logic [7:0] t3_in0;
+  logic [7:0] t3_in1;
+  logic [7:0] t3_out;
 
   vc_Subtractor#(8) t3_subtractor_w8
   (
@@ -121,9 +121,9 @@ module top;
 
   task t3
   (
-    input [7:0] in0,
-    input [7:0] in1,
-    input [7:0] out
+    input logic [7:0] in0,
+    input logic [7:0] in1,
+    input logic [7:0] out
   );
   begin
     t3_in0 = in0;
@@ -150,8 +150,8 @@ module top;
   // Test vc_Incrementer (increment = 1)
   //----------------------------------------------------------------------
 
-  reg  [7:0] t4_in;
-  wire [7:0] t4_out;
+  logic [7:0] t4_in;
+  logic [7:0] t4_out;
 
   vc_Incrementer#(8) t4_incrementer_w8_inc1
   (
@@ -161,8 +161,8 @@ module top;
 
   task t4
   (
-    input [7:0] in,
-    input [7:0] out
+    input logic [7:0] in,
+    input logic [7:0] out
   );
   begin
     t4_in = in;
@@ -188,8 +188,8 @@ module top;
   // Test vc_Incrementer (increment = 2)
   //----------------------------------------------------------------------
 
-  reg  [7:0] t5_in;
-  wire [7:0] t5_out;
+  logic [7:0] t5_in;
+  logic [7:0] t5_out;
 
   vc_Incrementer#(8,2) t5_incrementer_w8_inc2
   (
@@ -199,8 +199,8 @@ module top;
 
   task t5
   (
-    input [7:0] in,
-    input [7:0] out
+    input logic [7:0] in,
+    input logic [7:0] out
   );
   begin
     t5_in = in;
@@ -226,8 +226,8 @@ module top;
   // Test vc_ZeroExtender
   //----------------------------------------------------------------------
 
-  reg  [1:0] t6_in;
-  wire [7:0] t6_out;
+  logic [1:0] t6_in;
+  logic [7:0] t6_out;
 
   vc_ZeroExtender#(2,8) t6_zero_extender_2to8
   (
@@ -237,8 +237,8 @@ module top;
 
   task t6
   (
-    input [1:0] in,
-    input [7:0] out
+    input logic [1:0] in,
+    input logic [7:0] out
   );
   begin
     t6_in = in;
@@ -262,8 +262,8 @@ module top;
   // Test vc_SignExtender
   //----------------------------------------------------------------------
 
-  reg  [1:0] t7_in;
-  wire [7:0] t7_out;
+  logic [1:0] t7_in;
+  logic [7:0] t7_out;
 
   vc_SignExtender#(2,8) t7_sign_extender_2to8
   (
@@ -273,8 +273,8 @@ module top;
 
   task t7
   (
-    input [1:0] in,
-    input [7:0] out
+    input logic [1:0] in,
+    input logic [7:0] out
   );
   begin
     t7_in = in;
@@ -298,8 +298,8 @@ module top;
   // Test vc_ZeroComparator
   //----------------------------------------------------------------------
 
-  reg  [7:0] t8_in;
-  wire       t8_out;
+  logic [7:0] t8_in;
+  logic       t8_out;
 
   vc_ZeroComparator#(8) t8_zero_comparator_w8
   (
@@ -309,8 +309,8 @@ module top;
 
   task t8
   (
-    input [7:0] in,
-    input       out
+    input logic [7:0] in,
+    input logic       out
   );
   begin
     t8_in = in;
@@ -334,9 +334,9 @@ module top;
   // Test vc_EqComparator
   //----------------------------------------------------------------------
 
-  reg  [7:0] t9_in0;
-  reg  [7:0] t9_in1;
-  wire       t9_out;
+  logic [7:0] t9_in0;
+  logic [7:0] t9_in1;
+  logic       t9_out;
 
   vc_EqComparator#(8) t9_eq_comparator_w8
   (
@@ -347,9 +347,9 @@ module top;
 
   task t9
   (
-    input [7:0] in0,
-    input [7:0] in1,
-    input       out
+    input logic [7:0] in0,
+    input logic [7:0] in1,
+    input logic       out
   );
   begin
     t9_in0 = in0;
@@ -377,9 +377,9 @@ module top;
   // Test vc_LtComparator
   //----------------------------------------------------------------------
 
-  reg  [7:0] t10_in0;
-  reg  [7:0] t10_in1;
-  wire       t10_out;
+  logic [7:0] t10_in0;
+  logic [7:0] t10_in1;
+  logic       t10_out;
 
   vc_LtComparator#(8) t10_lt_comparator_w8
   (
@@ -390,9 +390,9 @@ module top;
 
   task t10
   (
-    input [7:0] in0,
-    input [7:0] in1,
-    input       out
+    input logic [7:0] in0,
+    input logic [7:0] in1,
+    input logic       out
   );
   begin
     t10_in0 = in0;
@@ -425,9 +425,9 @@ module top;
   // Test vc_GtComparator
   //----------------------------------------------------------------------
 
-  reg  [7:0] t11_in0;
-  reg  [7:0] t11_in1;
-  wire       t11_out;
+  logic [7:0] t11_in0;
+  logic [7:0] t11_in1;
+  logic       t11_out;
 
   vc_GtComparator#(8) t11_gt_comparator_w8
   (
@@ -438,9 +438,9 @@ module top;
 
   task t11
   (
-    input [7:0] in0,
-    input [7:0] in1,
-    input       out
+    input logic [7:0] in0,
+    input logic [7:0] in1,
+    input logic       out
   );
   begin
     t11_in0 = in0;
@@ -473,9 +473,9 @@ module top;
   // Test vc_LeftLogicalShifter
   //----------------------------------------------------------------------
 
-  reg  [7:0] t12_in;
-  reg  [4:0] t12_shamt;
-  wire [7:0] t12_out;
+  logic [7:0] t12_in;
+  logic [4:0] t12_shamt;
+  logic [7:0] t12_out;
 
   vc_LeftLogicalShifter#(8,5) t12_left_logical_shifter_w8
   (
@@ -486,9 +486,9 @@ module top;
 
   task t12
   (
-    input [7:0] in,
-    input [4:0] shamt,
-    input [7:0] out
+    input logic [7:0] in,
+    input logic [4:0] shamt,
+    input logic [7:0] out
   );
   begin
     t12_in    = in;
@@ -519,9 +519,9 @@ module top;
   // Test vc_RightLogicalShifter
   //----------------------------------------------------------------------
 
-  reg  [7:0] t13_in;
-  reg  [4:0] t13_shamt;
-  wire [7:0] t13_out;
+  logic [7:0] t13_in;
+  logic [4:0] t13_shamt;
+  logic [7:0] t13_out;
 
   vc_RightLogicalShifter#(8,5) t13_right_logical_shifter_w8
   (
@@ -532,9 +532,9 @@ module top;
 
   task t13
   (
-    input [7:0] in,
-    input [4:0] shamt,
-    input [7:0] out
+    input logic [7:0] in,
+    input logic [4:0] shamt,
+    input logic [7:0] out
   );
   begin
     t13_in    = in;

@@ -17,14 +17,14 @@ module top;
   localparam t1_c_addr_nbits  = $clog2(t1_p_num_entries);
   localparam t1_c_data_nbytes = (t1_p_data_nbits+7)/8;
 
-  reg                         t1_reset;
-  reg                         t1_read_en;
-  reg  [t1_c_addr_nbits-1:0]  t1_read_addr;
-  wire [t1_p_data_nbits-1:0]  t1_read_data;
-  reg                         t1_write_en;
-  reg  [t1_c_data_nbytes-1:0] t1_write_byte_en;
-  reg  [t1_c_addr_nbits-1:0]  t1_write_addr;
-  reg  [t1_p_data_nbits-1:0]  t1_write_data;
+  logic                        t1_reset;
+  logic                        t1_read_en;
+  logic [t1_c_addr_nbits-1:0]  t1_read_addr;
+  logic [t1_p_data_nbits-1:0]  t1_read_data;
+  logic                        t1_write_en;
+  logic [t1_c_data_nbytes-1:0] t1_write_byte_en;
+  logic [t1_c_addr_nbits-1:0]  t1_write_addr;
+  logic [t1_p_data_nbits-1:0]  t1_write_data;
 
   vc_CombinationalSRAM_1rw
   #(
@@ -48,13 +48,13 @@ module top;
 
   task t1
   (
-    input                        read_en,
-    input  [t1_c_addr_nbits-1:0] read_addr,
-    input  [t1_p_data_nbits-1:0] read_data,
-    input                        write_en,
-    input [t1_c_data_nbytes-1:0] write_byte_en,
-    input  [t1_c_addr_nbits-1:0] write_addr,
-    input  [t1_p_data_nbits-1:0] write_data
+    input logic                        read_en,
+    input logic [t1_c_addr_nbits-1:0]  read_addr,
+    input logic [t1_p_data_nbits-1:0]  read_data,
+    input logic                        write_en,
+    input logic [t1_c_data_nbytes-1:0] write_byte_en,
+    input logic [t1_c_addr_nbits-1:0]  write_addr,
+    input logic [t1_p_data_nbits-1:0]  write_data
   );
   begin
     t1_read_en       = read_en;
@@ -141,14 +141,14 @@ module top;
   localparam t2_c_addr_nbits  = $clog2(t2_p_num_entries);
   localparam t2_c_data_nbytes = (t2_p_data_nbits+7)/8;
 
-  reg                         t2_reset;
-  reg                         t2_read_en;
-  reg  [t2_c_addr_nbits-1:0]  t2_read_addr;
-  wire [t2_p_data_nbits-1:0]  t2_read_data;
-  reg                         t2_write_en;
-  reg  [t2_c_data_nbytes-1:0] t2_write_byte_en;
-  reg  [t2_c_addr_nbits-1:0]  t2_write_addr;
-  reg  [t2_p_data_nbits-1:0]  t2_write_data;
+  logic                        t2_reset;
+  logic                        t2_read_en;
+  logic [t2_c_addr_nbits-1:0]  t2_read_addr;
+  logic [t2_p_data_nbits-1:0]  t2_read_data;
+  logic                        t2_write_en;
+  logic [t2_c_data_nbytes-1:0] t2_write_byte_en;
+  logic [t2_c_addr_nbits-1:0]  t2_write_addr;
+  logic [t2_p_data_nbits-1:0]  t2_write_data;
 
   vc_SynchronousSRAM_1rw
   #(
@@ -172,13 +172,13 @@ module top;
 
   task t2
   (
-    input                        read_en,
-    input  [t2_c_addr_nbits-1:0] read_addr,
-    input  [t2_p_data_nbits-1:0] read_data,
-    input                        write_en,
-    input [t2_c_data_nbytes-1:0] write_byte_en,
-    input  [t2_c_addr_nbits-1:0] write_addr,
-    input  [t2_p_data_nbits-1:0] write_data
+    input logic                        read_en,
+    input logic [t2_c_addr_nbits-1:0]  read_addr,
+    input logic [t2_p_data_nbits-1:0]  read_data,
+    input logic                        write_en,
+    input logic [t2_c_data_nbytes-1:0] write_byte_en,
+    input logic [t2_c_addr_nbits-1:0]  write_addr,
+    input logic [t2_p_data_nbits-1:0]  write_data
   );
   begin
     t2_read_en       = read_en;

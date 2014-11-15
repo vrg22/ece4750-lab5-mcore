@@ -14,25 +14,25 @@
 
 module vc_PipeCtrl
 (
-  input         clk,
-  input         reset,
+  input  logic clk,
+  input  logic reset,
 
-  input         prev_val,     // valid bit from the prev stage
-  output        prev_stall,   // aggr stall signal for the prev stage
-  output        prev_squash,  // aggr squash signal for the prev stage
+  input  logic prev_val,     // valid bit from the prev stage
+  output logic prev_stall,   // aggr stall signal for the prev stage
+  output logic prev_squash,  // aggr squash signal for the prev stage
 
-  output        curr_reg_en,  // pipeline reg enable for the current stage
-  output        curr_val,     // combinational valid bit for the current stage
-  input         curr_stall,   // stall signal from the current stage
-  input         curr_squash,  // squash signal from the current stage
+  output logic curr_reg_en,  // pipeline reg enable for the current stage
+  output logic curr_val,     // combinational valid bit for the current stage
+  input  logic curr_stall,   // stall signal from the current stage
+  input  logic curr_squash,  // squash signal from the current stage
 
-  output        next_val,     // valid bit for the next stage
-  input         next_stall,   // stall signal from the next stage
-  input         next_squash   // squash signal from the next stage
+  output logic next_val,     // valid bit for the next stage
+  input  logic next_stall,   // stall signal from the next stage
+  input  logic next_squash   // squash signal from the next stage
 );
 
   // register that propogates the valid signal
-  wire reg_en;
+  logic reg_en;
 
   vc_EnResetReg #(1, 0) val_reg
   (
@@ -80,9 +80,9 @@ module vc_PipeCtrl
   //----------------------------------------------------------------------
 
   task trace_pipe_stage(
-    inout [`VC_TRACE_NBITS-1:0] trace_str,
-    input [`VC_TRACE_NBITS-1:0] msg_str,
-    input integer              trace_nchars
+    inout logic [`VC_TRACE_NBITS-1:0] trace_str,
+    input logic [`VC_TRACE_NBITS-1:0] msg_str,
+    input integer                     trace_nchars
   );
   begin
     if ( next_squash ) begin

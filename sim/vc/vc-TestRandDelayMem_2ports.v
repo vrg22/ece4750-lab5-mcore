@@ -29,62 +29,62 @@ module vc_TestRandDelayMem_2ports
   parameter c_req_nbits  = `VC_MEM_REQ_MSG_NBITS(o,a,d),
   parameter c_resp_nbits = `VC_MEM_RESP_MSG_NBITS(o,d)
 )(
-  input                     clk,
-  input                     reset,
+  input  logic                    clk,
+  input  logic                    reset,
 
   // clears the content of memory
 
-  input                     mem_clear,
+  input  logic                    mem_clear,
 
   // maximum delay
 
-  input  [31:0]             max_delay,
+  input  logic [31:0]             max_delay,
 
   // Memory request interface port 0
 
-  input                     memreq0_val,
-  output                    memreq0_rdy,
-  input  [c_req_nbits-1:0]  memreq0_msg,
+  input  logic                    memreq0_val,
+  output logic                    memreq0_rdy,
+  input  logic [c_req_nbits-1:0]  memreq0_msg,
 
   // Memory request interface port 1
 
-  input                     memreq1_val,
-  output                    memreq1_rdy,
-  input  [c_req_nbits-1:0]  memreq1_msg,
+  input  logic                    memreq1_val,
+  output logic                    memreq1_rdy,
+  input  logic [c_req_nbits-1:0]  memreq1_msg,
 
   // Memory response interface port 0
 
-  output                    memresp0_val,
-  input                     memresp0_rdy,
-  output [c_resp_nbits-1:0] memresp0_msg,
+  output logic                    memresp0_val,
+  input  logic                    memresp0_rdy,
+  output logic [c_resp_nbits-1:0] memresp0_msg,
 
   // Memory response interface port 1
 
-  output                    memresp1_val,
-  input                     memresp1_rdy,
-  output [c_resp_nbits-1:0] memresp1_msg
+  output logic                    memresp1_val,
+  input  logic                    memresp1_rdy,
+  output logic [c_resp_nbits-1:0] memresp1_msg
 );
 
   //------------------------------------------------------------------------
   // Dual ported test memory
   //------------------------------------------------------------------------
 
-  wire                    mem_memreq0_val;
-  wire                    mem_memreq0_rdy;
-  wire [c_req_nbits-1:0]  mem_memreq0_msg;
+  logic                    mem_memreq0_val;
+  logic                    mem_memreq0_rdy;
+  logic [c_req_nbits-1:0]  mem_memreq0_msg;
 
-  wire                    mem_memreq1_val;
-  wire                    mem_memreq1_rdy;
-  wire [c_req_nbits-1:0]  mem_memreq1_msg;
+  logic                    mem_memreq1_val;
+  logic                    mem_memreq1_rdy;
+  logic [c_req_nbits-1:0]  mem_memreq1_msg;
 
 
-  wire                    mem_memresp0_val;
-  wire                    mem_memresp0_rdy;
-  wire [c_resp_nbits-1:0] mem_memresp0_msg;
+  logic                    mem_memresp0_val;
+  logic                    mem_memresp0_rdy;
+  logic [c_resp_nbits-1:0] mem_memresp0_msg;
 
-  wire                    mem_memresp1_val;
-  wire                    mem_memresp1_rdy;
-  wire [c_resp_nbits-1:0] mem_memresp1_msg;
+  logic                    mem_memresp1_val;
+  logic                    mem_memresp1_rdy;
+  logic [c_resp_nbits-1:0] mem_memresp1_msg;
 
   //------------------------------------------------------------------------
   // Test random delay

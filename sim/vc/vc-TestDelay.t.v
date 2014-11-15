@@ -16,16 +16,16 @@ module TestHarness
 #(
   parameter p_msg_nbits = 8
 )(
-  input         clk,
-  input         reset,
-  input  [31:0] delay_amt,
-  output        done
+  input  logic        clk,
+  input  logic        reset,
+  input  logic [31:0] delay_amt,
+  output logic        done
 );
 
-  wire                   src_val;
-  wire                   src_rdy;
-  wire [p_msg_nbits-1:0] src_msg;
-  wire                   src_done;
+  logic                   src_val;
+  logic                   src_rdy;
+  logic [p_msg_nbits-1:0] src_msg;
+  logic                   src_done;
 
   vc_TestSource#(p_msg_nbits) src
   (
@@ -37,9 +37,9 @@ module TestHarness
     .done         (src_done)
   );
 
-  wire                   sink_val;
-  wire                   sink_rdy;
-  wire [p_msg_nbits-1:0] sink_msg;
+  logic                   sink_val;
+  logic                   sink_rdy;
+  logic [p_msg_nbits-1:0] sink_msg;
 
   vc_TestDelay#(p_msg_nbits) delay
   (
@@ -54,7 +54,7 @@ module TestHarness
     .out_msg      (sink_msg)
   );
 
-  wire sink_done;
+  logic sink_done;
 
   vc_TestSink#(p_msg_nbits) sink
   (
@@ -93,9 +93,9 @@ module top;
 
   // Instantiate the test harness
 
-  reg         th_reset = 1;
-  reg  [31:0] th_delay_amt;
-  wire        th_done;
+  logic        th_reset = 1;
+  logic [31:0] th_delay_amt;
+  logic        th_done;
 
   TestHarness th
   (

@@ -14,13 +14,13 @@
 
 module TestHarness
 (
-  input         clk,
-  input         reset,
-  input         mem_clear,
-  input  [31:0] src_max_delay,
-  input  [31:0] mem_max_delay,
-  input  [31:0] sink_max_delay,
-  output        done
+  input  logic        clk,
+  input  logic        reset,
+  input  logic        mem_clear,
+  input  logic [31:0] src_max_delay,
+  input  logic [31:0] mem_max_delay,
+  input  logic [31:0] sink_max_delay,
+  output logic        done
 );
 
   // Local parameters
@@ -35,10 +35,10 @@ module TestHarness
 
   // Test source
 
-  wire                   src_val;
-  wire                   src_rdy;
-  wire [c_req_nbits-1:0] src_msg;
-  wire                   src_done;
+  logic                   src_val;
+  logic                   src_rdy;
+  logic [c_req_nbits-1:0] src_msg;
+  logic                   src_done;
 
   vc_TestRandDelaySource#(c_req_nbits) src
   (
@@ -53,9 +53,9 @@ module TestHarness
 
   // Test memory
 
-  wire                     sink_val;
-  wire                     sink_rdy;
-  wire [c_resp_nbits-1:0]  sink_msg;
+  logic                     sink_val;
+  logic                     sink_rdy;
+  logic [c_resp_nbits-1:0]  sink_msg;
 
   vc_TestRandDelayMem_1port
   #(
@@ -83,7 +83,7 @@ module TestHarness
 
   // Test sink
 
-  wire        sink_done;
+  logic        sink_done;
 
   vc_TestRandDelaySink#(c_resp_nbits) sink
   (
@@ -131,12 +131,12 @@ module top;
   // Test setup
   //----------------------------------------------------------------------
 
-  reg         th_reset = 1;
-  reg         th_mem_clear;
-  reg  [31:0] th_src_max_delay;
-  reg  [31:0] th_mem_max_delay;
-  reg  [31:0] th_sink_max_delay;
-  wire        th_done;
+  logic        th_reset = 1;
+  logic        th_mem_clear;
+  logic [31:0] th_src_max_delay;
+  logic [31:0] th_mem_max_delay;
+  logic [31:0] th_sink_max_delay;
+  logic        th_done;
 
   TestHarness th
   (
@@ -153,9 +153,9 @@ module top;
 
   task init_rand_delays
   (
-    input [31:0] src_max_delay,
-    input [31:0] mem_max_delay,
-    input [31:0] sink_max_delay
+    input logic [31:0] src_max_delay,
+    input logic [31:0] mem_max_delay,
+    input logic [31:0] sink_max_delay
   );
   begin
     th_src_max_delay  = src_max_delay;
@@ -166,23 +166,23 @@ module top;
 
   // Helper task to initalize source/sink
 
-  reg [`VC_MEM_REQ_MSG_NBITS(8,16,32)-1:0] th_port_memreq;
-  reg [`VC_MEM_RESP_MSG_NBITS(8,32)-1:0]   th_port_memresp;
+  logic [`VC_MEM_REQ_MSG_NBITS(8,16,32)-1:0] th_port_memreq;
+  logic [`VC_MEM_RESP_MSG_NBITS(8,32)-1:0]   th_port_memresp;
 
   task init_port
   (
-    input [1023:0] index,
+    input logic [1023:0] index,
 
-    input [`VC_MEM_REQ_MSG_TYPE_NBITS(8,16,32)-1:0]   memreq_type,
-    input [`VC_MEM_REQ_MSG_OPAQUE_NBITS(8,16,32)-1:0] memreq_opaque,
-    input [`VC_MEM_REQ_MSG_ADDR_NBITS(8,16,32)-1:0]   memreq_addr,
-    input [`VC_MEM_REQ_MSG_LEN_NBITS(8,16,32)-1:0]    memreq_len,
-    input [`VC_MEM_REQ_MSG_DATA_NBITS(8,16,32)-1:0]   memreq_data,
+    input logic [`VC_MEM_REQ_MSG_TYPE_NBITS(8,16,32)-1:0]   memreq_type,
+    input logic [`VC_MEM_REQ_MSG_OPAQUE_NBITS(8,16,32)-1:0] memreq_opaque,
+    input logic [`VC_MEM_REQ_MSG_ADDR_NBITS(8,16,32)-1:0]   memreq_addr,
+    input logic [`VC_MEM_REQ_MSG_LEN_NBITS(8,16,32)-1:0]    memreq_len,
+    input logic [`VC_MEM_REQ_MSG_DATA_NBITS(8,16,32)-1:0]   memreq_data,
 
-    input [`VC_MEM_RESP_MSG_TYPE_NBITS(8,32)-1:0]     memresp_type,
-    input [`VC_MEM_RESP_MSG_OPAQUE_NBITS(8,32)-1:0]   memresp_opaque,
-    input [`VC_MEM_RESP_MSG_LEN_NBITS(8,32)-1:0]      memresp_len,
-    input [`VC_MEM_RESP_MSG_DATA_NBITS(8,32)-1:0]     memresp_data
+    input logic [`VC_MEM_RESP_MSG_TYPE_NBITS(8,32)-1:0]     memresp_type,
+    input logic [`VC_MEM_RESP_MSG_OPAQUE_NBITS(8,32)-1:0]   memresp_opaque,
+    input logic [`VC_MEM_RESP_MSG_LEN_NBITS(8,32)-1:0]      memresp_len,
+    input logic [`VC_MEM_RESP_MSG_DATA_NBITS(8,32)-1:0]     memresp_data
   );
   begin
     th_port_memreq[`VC_MEM_REQ_MSG_TYPE_FIELD(8,16,32)]   = memreq_type;

@@ -16,12 +16,12 @@ module top;
   localparam t1_p_num_entries = 5;
   localparam t1_c_addr_nbits  = $clog2(t1_p_num_entries);
 
-  reg                        t1_reset;
-  reg  [t1_c_addr_nbits-1:0] t1_read_addr;
-  wire [t1_p_data_nbits-1:0] t1_read_data;
-  reg                        t1_write_en;
-  reg  [t1_c_addr_nbits-1:0] t1_write_addr;
-  reg  [t1_p_data_nbits-1:0] t1_write_data;
+  logic                       t1_reset;
+  logic [t1_c_addr_nbits-1:0] t1_read_addr;
+  logic [t1_p_data_nbits-1:0] t1_read_data;
+  logic                       t1_write_en;
+  logic [t1_c_addr_nbits-1:0] t1_write_addr;
+  logic [t1_p_data_nbits-1:0] t1_write_data;
 
   vc_Regfile_1r1w
   #(
@@ -43,11 +43,11 @@ module top;
 
   task t1
   (
-    input [t1_c_addr_nbits-1:0] read_addr,
-    input [t1_p_data_nbits-1:0] read_data,
-    input                       write_en,
-    input [t1_c_addr_nbits-1:0] write_addr,
-    input [t1_p_data_nbits-1:0] write_data
+    input logic [t1_c_addr_nbits-1:0] read_addr,
+    input logic [t1_p_data_nbits-1:0] read_data,
+    input logic                       write_en,
+    input logic [t1_c_addr_nbits-1:0] write_addr,
+    input logic [t1_p_data_nbits-1:0] write_data
   );
   begin
     t1_read_addr  = read_addr;
@@ -134,12 +134,12 @@ module top;
   localparam t2_p_num_entries = 5;
   localparam t2_c_addr_nbits  = $clog2(t2_p_num_entries);
 
-  reg                        t2_reset;
-  reg  [t2_c_addr_nbits-1:0] t2_read_addr;
-  wire [t2_p_data_nbits-1:0] t2_read_data;
-  reg                        t2_write_en;
-  reg  [t2_c_addr_nbits-1:0] t2_write_addr;
-  reg  [t2_p_data_nbits-1:0] t2_write_data;
+  logic                       t2_reset;
+  logic [t2_c_addr_nbits-1:0] t2_read_addr;
+  logic [t2_p_data_nbits-1:0] t2_read_data;
+  logic                       t2_write_en;
+  logic [t2_c_addr_nbits-1:0] t2_write_addr;
+  logic [t2_p_data_nbits-1:0] t2_write_data;
 
   vc_ResetRegfile_1r1w
   #(
@@ -162,11 +162,11 @@ module top;
 
   task t2
   (
-    input [t2_c_addr_nbits-1:0] read_addr,
-    input [t2_p_data_nbits-1:0] read_data,
-    input                       write_en,
-    input [t2_c_addr_nbits-1:0] write_addr,
-    input [t2_p_data_nbits-1:0] write_data
+    input logic [t2_c_addr_nbits-1:0] read_addr,
+    input logic [t2_p_data_nbits-1:0] read_data,
+    input logic                       write_en,
+    input logic [t2_c_addr_nbits-1:0] write_addr,
+    input logic [t2_p_data_nbits-1:0] write_data
   );
   begin
     t2_read_addr  = read_addr;
@@ -261,14 +261,14 @@ module top;
   localparam t3_p_num_entries = 5;
   localparam t3_c_addr_nbits  = $clog2(t3_p_num_entries);
 
-  reg                        t3_reset;
-  reg  [t3_c_addr_nbits-1:0] t3_read_addr0;
-  wire [t3_p_data_nbits-1:0] t3_read_data0;
-  reg  [t3_c_addr_nbits-1:0] t3_read_addr1;
-  wire [t3_p_data_nbits-1:0] t3_read_data1;
-  reg                        t3_write_en;
-  reg  [t3_c_addr_nbits-1:0] t3_write_addr;
-  reg  [t3_p_data_nbits-1:0] t3_write_data;
+  logic                       t3_reset;
+  logic [t3_c_addr_nbits-1:0] t3_read_addr0;
+  logic [t3_p_data_nbits-1:0] t3_read_data0;
+  logic [t3_c_addr_nbits-1:0] t3_read_addr1;
+  logic [t3_p_data_nbits-1:0] t3_read_data1;
+  logic                       t3_write_en;
+  logic [t3_c_addr_nbits-1:0] t3_write_addr;
+  logic [t3_p_data_nbits-1:0] t3_write_data;
 
   vc_Regfile_2r1w
   #(
@@ -292,13 +292,13 @@ module top;
 
   task t3
   (
-    input [t3_c_addr_nbits-1:0] read_addr0,
-    input [t3_p_data_nbits-1:0] read_data0,
-    input [t3_c_addr_nbits-1:0] read_addr1,
-    input [t3_p_data_nbits-1:0] read_data1,
-    input                       write_en,
-    input [t3_c_addr_nbits-1:0] write_addr,
-    input [t3_p_data_nbits-1:0] write_data
+    input logic [t3_c_addr_nbits-1:0] read_addr0,
+    input logic [t3_p_data_nbits-1:0] read_data0,
+    input logic [t3_c_addr_nbits-1:0] read_addr1,
+    input logic [t3_p_data_nbits-1:0] read_data1,
+    input logic                       write_en,
+    input logic [t3_c_addr_nbits-1:0] write_addr,
+    input logic [t3_p_data_nbits-1:0] write_data
   );
   begin
     t3_read_addr0 = read_addr0;
@@ -397,17 +397,17 @@ module top;
   localparam t4_p_num_entries = 5;
   localparam t4_c_addr_nbits  = $clog2(t4_p_num_entries);
 
-  reg                        t4_reset;
-  reg  [t4_c_addr_nbits-1:0] t4_read_addr0;
-  wire [t4_p_data_nbits-1:0] t4_read_data0;
-  reg  [t4_c_addr_nbits-1:0] t4_read_addr1;
-  wire [t4_p_data_nbits-1:0] t4_read_data1;
-  reg                        t4_write_en0;
-  reg  [t4_c_addr_nbits-1:0] t4_write_addr0;
-  reg  [t4_p_data_nbits-1:0] t4_write_data0;
-  reg                        t4_write_en1;
-  reg  [t4_c_addr_nbits-1:0] t4_write_addr1;
-  reg  [t4_p_data_nbits-1:0] t4_write_data1;
+  logic                       t4_reset;
+  logic [t4_c_addr_nbits-1:0] t4_read_addr0;
+  logic [t4_p_data_nbits-1:0] t4_read_data0;
+  logic [t4_c_addr_nbits-1:0] t4_read_addr1;
+  logic [t4_p_data_nbits-1:0] t4_read_data1;
+  logic                       t4_write_en0;
+  logic [t4_c_addr_nbits-1:0] t4_write_addr0;
+  logic [t4_p_data_nbits-1:0] t4_write_data0;
+  logic                       t4_write_en1;
+  logic [t4_c_addr_nbits-1:0] t4_write_addr1;
+  logic [t4_p_data_nbits-1:0] t4_write_data1;
 
   vc_Regfile_2r2w
   #(
@@ -434,16 +434,16 @@ module top;
 
   task t4
   (
-    input [t4_c_addr_nbits-1:0] read_addr0,
-    input [t4_p_data_nbits-1:0] read_data0,
-    input [t4_c_addr_nbits-1:0] read_addr1,
-    input [t4_p_data_nbits-1:0] read_data1,
-    input                       write_en0,
-    input [t4_c_addr_nbits-1:0] write_addr0,
-    input [t4_p_data_nbits-1:0] write_data0,
-    input                       write_en1,
-    input [t4_c_addr_nbits-1:0] write_addr1,
-    input [t4_p_data_nbits-1:0] write_data1
+    input logic [t4_c_addr_nbits-1:0] read_addr0,
+    input logic [t4_p_data_nbits-1:0] read_data0,
+    input logic [t4_c_addr_nbits-1:0] read_addr1,
+    input logic [t4_p_data_nbits-1:0] read_data1,
+    input logic                       write_en0,
+    input logic [t4_c_addr_nbits-1:0] write_addr0,
+    input logic [t4_p_data_nbits-1:0] write_data0,
+    input logic                       write_en1,
+    input logic [t4_c_addr_nbits-1:0] write_addr1,
+    input logic [t4_p_data_nbits-1:0] write_data1
   );
   begin
     t4_read_addr0  = read_addr0;

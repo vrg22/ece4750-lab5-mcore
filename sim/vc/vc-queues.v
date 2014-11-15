@@ -35,24 +35,24 @@ module vc_QueueCtrl1
 #(
   parameter p_type = `VC_QUEUE_NORMAL
 )(
-  input  clk,
-  input  reset,
+  input  logic clk,
+  input  logic reset,
 
-  input  enq_val,        // Enqueue data is valid
-  output enq_rdy,        // Ready for producer to do an enqueue
+  input  logic enq_val,        // Enqueue data is valid
+  output logic enq_rdy,        // Ready for producer to do an enqueue
 
-  output deq_val,        // Dequeue data is valid
-  input  deq_rdy,        // Consumer is ready to do a dequeue
+  output logic deq_val,        // Dequeue data is valid
+  input  logic deq_rdy,        // Consumer is ready to do a dequeue
 
-  output write_en,       // Write en signal to wire up to storage element
-  output bypass_mux_sel, // Used to control bypass mux for bypass queues
-  output num_free_entries // Either zero or one
+  output logic write_en,       // Write en signal to wire up to storage element
+  output logic bypass_mux_sel, // Used to control bypass mux for bypass queues
+  output logic num_free_entries // Either zero or one
 );
 
   // Status register
 
-  reg  full;
-  wire full_next;
+  logic full;
+  logic full_next;
 
   always @ (posedge clk) begin
     full <= reset ? 1'b0 : full_next;
@@ -67,15 +67,23 @@ module vc_QueueCtrl1
 
   // We enq/deq only when they are both ready and valid
 
-  wire do_enq = enq_rdy && enq_val;
-  wire do_deq = deq_rdy && deq_val;
+  logic  do_enq;
+  assign do_enq = enq_rdy && enq_val;
+
+  logic  do_deq;
+  assign do_deq = deq_rdy && deq_val;
 
   // Determine if we have pipeline or bypass behaviour and
   // set the write enable accordingly.
 
-  wire empty     = ~full;
-  wire do_pipe   = c_pipe_en   && full  && do_enq && do_deq;
-  wire do_bypass = c_bypass_en && empty && do_enq && do_deq;
+  logic  empty;
+  assign empty = ~full;
+
+  logic  do_pipe;
+  assign do_pipe = c_pipe_en   && full  && do_enq && do_deq;
+
+  logic  do_bypass;
+  assign do_bypass = c_bypass_en && empty && do_enq && do_deq;
 
   assign write_en = do_enq && ~do_bypass;
 
@@ -113,17 +121,17 @@ module vc_QueueDpath1
   parameter p_type      = `VC_QUEUE_NORMAL,
   parameter p_msg_nbits = 1
 )(
-  input                    clk,
-  input                    reset,
-  input                    write_en,
-  input                    bypass_mux_sel,
-  input  [p_msg_nbits-1:0] enq_msg,
-  output [p_msg_nbits-1:0] deq_msg
+  input  logic                   clk,
+  input  logic                   reset,
+  input  logic                   write_en,
+  input  logic                   bypass_mux_sel,
+  input  logic [p_msg_nbits-1:0] enq_msg,
+  output logic [p_msg_nbits-1:0] deq_msg
 );
 
   // Queue storage
 
-  wire [p_msg_nbits-1:0] qstore;
+  logic [p_msg_nbits-1:0] qstore;
 
   vc_EnReg#(p_msg_nbits) qstore_reg
   (
@@ -174,25 +182,25 @@ module vc_QueueCtrl
   // Local constants not meant to be set from outside the module
   parameter c_addr_nbits = $clog2(p_num_msgs)
 )(
-  input                     clk, reset,
+  input  logic                    clk, reset,
 
-  input                     enq_val,        // Enqueue data is valid
-  output                    enq_rdy,        // Ready for producer to enqueue
+  input  logic                    enq_val,        // Enqueue data is valid
+  output logic                    enq_rdy,        // Ready for producer to enqueue
 
-  output                    deq_val,        // Dequeue data is valid
-  input                     deq_rdy,        // Consumer is ready to dequeue
+  output logic                    deq_val,        // Dequeue data is valid
+  input  logic                    deq_rdy,        // Consumer is ready to dequeue
 
-  output                    write_en,       // Wen to wire to regfile
-  output [c_addr_nbits-1:0] write_addr,     // Waddr to wire to regfile
-  output [c_addr_nbits-1:0] read_addr,      // Raddr to wire to regfile
-  output                    bypass_mux_sel, // Control mux for bypass queues
-  output [c_addr_nbits:0]   num_free_entries // Num of free entries in queue
+  output logic                    write_en,       // Wen to wire to regfile
+  output logic [c_addr_nbits-1:0] write_addr,     // Waddr to wire to regfile
+  output logic [c_addr_nbits-1:0] read_addr,      // Raddr to wire to regfile
+  output logic                    bypass_mux_sel, // Control mux for bypass queues
+  output logic [c_addr_nbits:0]   num_free_entries // Num of free entries in queue
 );
 
   // Enqueue and dequeue pointers
 
-  wire [c_addr_nbits-1:0] enq_ptr;
-  wire [c_addr_nbits-1:0] enq_ptr_next;
+  logic [c_addr_nbits-1:0] enq_ptr;
+  logic [c_addr_nbits-1:0] enq_ptr_next;
 
   vc_ResetReg#(c_addr_nbits) enq_ptr_reg
   (
@@ -202,8 +210,8 @@ module vc_QueueCtrl
     .q       (enq_ptr)
   );
 
-  wire [c_addr_nbits-1:0] deq_ptr;
-  wire [c_addr_nbits-1:0] deq_ptr_next;
+  logic [c_addr_nbits-1:0] deq_ptr;
+  logic [c_addr_nbits-1:0] deq_ptr_next;
 
   vc_ResetReg#(c_addr_nbits) deq_ptr_reg
   (
@@ -218,8 +226,8 @@ module vc_QueueCtrl
 
   // Extra state to tell difference between full and empty
 
-  wire full;
-  wire full_next;
+  logic full;
+  logic full_next;
 
   vc_ResetReg#(1) full_reg
   (
@@ -236,15 +244,23 @@ module vc_QueueCtrl
 
   // We enq/deq only when they are both ready and valid
 
-  wire do_enq = enq_rdy && enq_val;
-  wire do_deq = deq_rdy && deq_val;
+  logic  do_enq;
+  assign do_enq = enq_rdy && enq_val;
+
+  logic  do_deq;
+  assign do_deq = deq_rdy && deq_val;
 
   // Determine if we have pipeline or bypass behaviour and
   // set the write enable accordingly.
 
-  wire   empty     = ~full && (enq_ptr == deq_ptr);
-  wire   do_pipe   = c_pipe_en   && full  && do_enq && do_deq;
-  wire   do_bypass = c_bypass_en && empty && do_enq && do_deq;
+  logic  empty;
+  assign empty = ~full && (enq_ptr == deq_ptr);
+
+  logic  do_pipe;
+  assign do_pipe = c_pipe_en   && full  && do_enq && do_deq;
+
+  logic  do_bypass;
+  assign do_bypass = c_bypass_en && empty && do_enq && do_deq;
 
   assign write_en = do_enq && ~do_bypass;
 
@@ -265,13 +281,17 @@ module vc_QueueCtrl
 
   // Control logic for the enq/deq pointers and full register
 
-  wire [c_addr_nbits-1:0] deq_ptr_plus1 = deq_ptr + 1'b1;
-  wire [c_addr_nbits-1:0] deq_ptr_inc
-    = (deq_ptr_plus1 == p_num_msgs) ? {c_addr_nbits{1'b0}} : deq_ptr_plus1;
+  logic [c_addr_nbits-1:0] deq_ptr_plus1;
+  assign deq_ptr_plus1 = deq_ptr + 1'b1;
 
-  wire [c_addr_nbits-1:0] enq_ptr_plus1 = enq_ptr + 1'b1;
-  wire [c_addr_nbits-1:0] enq_ptr_inc
-    = (enq_ptr_plus1 == p_num_msgs) ? {c_addr_nbits{1'b0}} : enq_ptr_plus1;
+  logic [c_addr_nbits-1:0] deq_ptr_inc;
+  assign deq_ptr_inc = (deq_ptr_plus1 == p_num_msgs) ? {c_addr_nbits{1'b0}} : deq_ptr_plus1;
+
+  logic [c_addr_nbits-1:0] enq_ptr_plus1;
+  assign enq_ptr_plus1 = enq_ptr + 1'b1;
+
+  logic [c_addr_nbits-1:0] enq_ptr_inc;
+  assign enq_ptr_inc = (enq_ptr_plus1 == p_num_msgs) ? {c_addr_nbits{1'b0}} : enq_ptr_plus1;
 
   assign deq_ptr_next
     = ( do_deq && ~do_bypass ) ? ( deq_ptr_inc ) : deq_ptr;
@@ -310,19 +330,19 @@ module vc_QueueDpath
   // Local constants not meant to be set from outside the module
   parameter c_addr_nbits = $clog2(p_num_msgs)
 )(
-  input                     clk,
-  input                     reset,
-  input                     write_en,
-  input                     bypass_mux_sel,
-  input  [c_addr_nbits-1:0] write_addr,
-  input  [c_addr_nbits-1:0] read_addr,
-  input   [p_msg_nbits-1:0] enq_msg,
-  output  [p_msg_nbits-1:0] deq_msg
+  input  logic                    clk,
+  input  logic                    reset,
+  input  logic                    write_en,
+  input  logic                    bypass_mux_sel,
+  input  logic [c_addr_nbits-1:0] write_addr,
+  input  logic [c_addr_nbits-1:0] read_addr,
+  input  logic [p_msg_nbits-1:0]  enq_msg,
+  output logic [p_msg_nbits-1:0]  deq_msg
 );
 
   // Queue storage
 
-  wire [p_msg_nbits-1:0] read_data;
+  logic [p_msg_nbits-1:0] read_data;
 
   vc_Regfile_1r1w#(p_msg_nbits,p_num_msgs) qstore
   (
@@ -367,18 +387,18 @@ module vc_Queue
   // parameters not meant to be set outside this module
   parameter c_addr_nbits = $clog2(p_num_msgs)
 )(
-  input                    clk,
-  input                    reset,
+  input  logic                   clk,
+  input  logic                   reset,
 
-  input                    enq_val,
-  output                   enq_rdy,
-  input  [p_msg_nbits-1:0] enq_msg,
+  input  logic                   enq_val,
+  output logic                   enq_rdy,
+  input  logic [p_msg_nbits-1:0] enq_msg,
 
-  output                   deq_val,
-  input                    deq_rdy,
-  output [p_msg_nbits-1:0] deq_msg,
+  output logic                   deq_val,
+  input  logic                   deq_rdy,
+  output logic [p_msg_nbits-1:0] deq_msg,
 
-  output [c_addr_nbits:0]  num_free_entries
+  output logic [c_addr_nbits:0]  num_free_entries
 );
 
 
@@ -386,8 +406,8 @@ module vc_Queue
   if ( p_num_msgs == 1 )
   begin
 
-    wire write_en;
-    wire bypass_mux_sel;
+    logic write_en;
+    logic bypass_mux_sel;
 
     vc_QueueCtrl1#(p_type) ctrl
     (
@@ -416,10 +436,10 @@ module vc_Queue
   else
   begin
 
-    wire                    write_en;
-    wire                    bypass_mux_sel;
-    wire [c_addr_nbits-1:0] write_addr;
-    wire [c_addr_nbits-1:0] read_addr;
+    logic                    write_en;
+    logic                    bypass_mux_sel;
+    logic [c_addr_nbits-1:0] write_addr;
+    logic [c_addr_nbits-1:0] read_addr;
 
     vc_QueueCtrl#(p_type,p_num_msgs) ctrl
     (
@@ -464,7 +484,7 @@ module vc_Queue
 
   // Line Tracing
 
-  reg [`VC_TRACE_NBITS_TO_NCHARS(p_msg_nbits)*8-1:0] str;
+  logic [`VC_TRACE_NBITS_TO_NCHARS(p_msg_nbits)*8-1:0] str;
 
   `VC_TRACE_BEGIN
   begin

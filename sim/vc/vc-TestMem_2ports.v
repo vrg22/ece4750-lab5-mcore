@@ -32,35 +32,35 @@ module vc_TestMem_2ports
   parameter c_req_nbits  = `VC_MEM_REQ_MSG_NBITS(o,a,d),
   parameter c_resp_nbits = `VC_MEM_RESP_MSG_NBITS(o,d)
 )(
-  input clk,
-  input reset,
+  input  logic                    clk,
+  input  logic                    reset,
 
   // clears the content of memory
-  input mem_clear,
+  input  logic                    mem_clear,
 
   // Memory request port 0 interface
 
-  input                     memreq0_val,
-  output                    memreq0_rdy,
-  input  [c_req_nbits-1:0]  memreq0_msg,
+  input  logic                    memreq0_val,
+  output logic                    memreq0_rdy,
+  input  logic [c_req_nbits-1:0]  memreq0_msg,
 
   // Memory request port 1 interface
 
-  input                     memreq1_val,
-  output                    memreq1_rdy,
-  input  [c_req_nbits-1:0]  memreq1_msg,
+  input  logic                    memreq1_val,
+  output logic                    memreq1_rdy,
+  input  logic [c_req_nbits-1:0]  memreq1_msg,
 
   // Memory response port 0 interface
 
-  output                    memresp0_val,
-  input                     memresp0_rdy,
-  output [c_resp_nbits-1:0] memresp0_msg,
+  output logic                    memresp0_val,
+  input  logic                    memresp0_rdy,
+  output logic [c_resp_nbits-1:0] memresp0_msg,
 
   // Memory response port 1 interface
 
-  output                    memresp1_val,
-  input                     memresp1_rdy,
-  output [c_resp_nbits-1:0] memresp1_msg
+  output logic                    memresp1_val,
+  input  logic                    memresp1_rdy,
+  output logic [c_resp_nbits-1:0] memresp1_msg
 );
 
   //----------------------------------------------------------------------
@@ -120,9 +120,9 @@ module vc_TestMem_2ports
   // memory (helping to avoid combinational loops) and also preserve our
   // registered input policy.
 
-  wire                   memreq0_val_M;
-  wire                   memreq0_rdy_M;
-  wire [c_req_nbits-1:0] memreq0_msg_M;
+  logic                   memreq0_val_M;
+  logic                   memreq0_rdy_M;
+  logic [c_req_nbits-1:0] memreq0_msg_M;
 
   vc_Queue
   #(
@@ -142,9 +142,9 @@ module vc_TestMem_2ports
     .deq_msg (memreq0_msg_M)
   );
 
-  wire                   memreq1_val_M;
-  wire                   memreq1_rdy_M;
-  wire [c_req_nbits-1:0] memreq1_msg_M;
+  logic                   memreq1_val_M;
+  logic                   memreq1_rdy_M;
+  logic [c_req_nbits-1:0] memreq1_msg_M;
 
   vc_Queue
   #(
@@ -168,11 +168,11 @@ module vc_TestMem_2ports
   // Unpack the request messages
   //----------------------------------------------------------------------
 
-  wire [c_req_type_nbits-1:0]   memreq0_msg_type_M;
-  wire [c_req_opaque_nbits-1:0] memreq0_msg_opaque_M;
-  wire [c_req_addr_nbits-1:0]   memreq0_msg_addr_M;
-  wire [c_req_len_nbits-1:0]    memreq0_msg_len_M;
-  wire [c_req_data_nbits-1:0]   memreq0_msg_data_M;
+  logic [c_req_type_nbits-1:0]   memreq0_msg_type_M;
+  logic [c_req_opaque_nbits-1:0] memreq0_msg_opaque_M;
+  logic [c_req_addr_nbits-1:0]   memreq0_msg_addr_M;
+  logic [c_req_len_nbits-1:0]    memreq0_msg_len_M;
+  logic [c_req_data_nbits-1:0]   memreq0_msg_data_M;
 
   vc_MemReqMsgUnpack#(o,a,d) memreq0_msg_unpack
   (
@@ -184,11 +184,11 @@ module vc_TestMem_2ports
     .data   (memreq0_msg_data_M)
   );
 
-  wire [c_req_type_nbits-1:0]   memreq1_msg_type_M;
-  wire [c_req_opaque_nbits-1:0] memreq1_msg_opaque_M;
-  wire [c_req_addr_nbits-1:0]   memreq1_msg_addr_M;
-  wire [c_req_len_nbits-1:0]    memreq1_msg_len_M;
-  wire [c_req_data_nbits-1:0]   memreq1_msg_data_M;
+  logic [c_req_type_nbits-1:0]   memreq1_msg_type_M;
+  logic [c_req_opaque_nbits-1:0] memreq1_msg_opaque_M;
+  logic [c_req_addr_nbits-1:0]   memreq1_msg_addr_M;
+  logic [c_req_len_nbits-1:0]    memreq1_msg_len_M;
+  logic [c_req_data_nbits-1:0]   memreq1_msg_data_M;
 
   vc_MemReqMsgUnpack#(o,a,d) memreq1_msg_unpack
   (
@@ -204,7 +204,7 @@ module vc_TestMem_2ports
   // Actual memory array
   //----------------------------------------------------------------------
 
-  reg [p_data_nbits-1:0] m[c_num_blocks-1:0];
+  logic [p_data_nbits-1:0] m[c_num_blocks-1:0];
 
   //----------------------------------------------------------------------
   // Handle request and create response
@@ -213,11 +213,13 @@ module vc_TestMem_2ports
   // Handle case where length is zero which actually represents a full
   // width access.
 
-  wire [c_req_len_nbits:0] memreq0_msg_len_modified_M
+  logic [c_req_len_nbits:0] memreq0_msg_len_modified_M;
+  assign memreq0_msg_len_modified_M
     = ( memreq0_msg_len_M == 0 ) ? (c_req_data_nbits/8)
     :                              memreq0_msg_len_M;
 
-  wire [c_req_len_nbits:0] memreq1_msg_len_modified_M
+  logic [c_req_len_nbits:0] memreq1_msg_len_modified_M;
+  assign memreq1_msg_len_modified_M
     = ( memreq1_msg_len_M == 0 ) ? (c_req_data_nbits/8)
     :                              memreq1_msg_len_M;
 
@@ -225,56 +227,61 @@ module vc_TestMem_2ports
   // truncate the higher order bits that are beyond the size of the
   // physical memory.
 
-  wire [c_physical_addr_nbits-1:0] physical_byte_addr0_M
-    = memreq0_msg_addr_M[c_physical_addr_nbits-1:0];
+  logic [c_physical_addr_nbits-1:0] physical_byte_addr0_M;
+  assign physical_byte_addr0_M = memreq0_msg_addr_M[c_physical_addr_nbits-1:0];
 
-  wire [c_physical_addr_nbits-1:0] physical_byte_addr1_M
-    = memreq1_msg_addr_M[c_physical_addr_nbits-1:0];
+  logic [c_physical_addr_nbits-1:0] physical_byte_addr1_M;
+  assign physical_byte_addr1_M = memreq1_msg_addr_M[c_physical_addr_nbits-1:0];
 
-  // Cacluate the block address and block offset
+  // Calculate the block address and block offset
 
-  wire [c_physical_block_addr_nbits-1:0] physical_block_addr0_M
-    = physical_byte_addr0_M/c_data_byte_nbits;
+  logic [c_physical_block_addr_nbits-1:0] physical_block_addr0_M;
+  assign physical_block_addr0_M = physical_byte_addr0_M/c_data_byte_nbits;
 
-  wire [c_block_offset_nbits-1:0] block_offset0_M
-    = physical_byte_addr0_M[c_block_offset_nbits-1:0];
+  logic [c_block_offset_nbits-1:0] block_offset0_M;
+  assign block_offset0_M = physical_byte_addr0_M[c_block_offset_nbits-1:0];
 
-  wire [c_physical_block_addr_nbits-1:0] physical_block_addr1_M
-    = physical_byte_addr1_M/c_data_byte_nbits;
+  logic [c_physical_block_addr_nbits-1:0] physical_block_addr1_M;
+  assign physical_block_addr1_M = physical_byte_addr1_M/c_data_byte_nbits;
 
-  wire [c_block_offset_nbits-1:0] block_offset1_M
-    = physical_byte_addr1_M[c_block_offset_nbits-1:0];
+  logic [c_block_offset_nbits-1:0] block_offset1_M;
+  assign block_offset1_M = physical_byte_addr1_M[c_block_offset_nbits-1:0];
 
   // Read the data
 
-  wire [p_data_nbits-1:0] read_block0_M
-    = m[physical_block_addr0_M];
+  logic [p_data_nbits-1:0] read_block0_M;
+  assign read_block0_M = m[physical_block_addr0_M];
 
-  wire [c_resp_data_nbits-1:0] read_data0_M
-    = read_block0_M >> (block_offset0_M*8);
+  logic [c_resp_data_nbits-1:0] read_data0_M;
+  assign read_data0_M = read_block0_M >> (block_offset0_M*8);
 
-  wire [p_data_nbits-1:0] read_block1_M
-    = m[physical_block_addr1_M];
+  logic [p_data_nbits-1:0] read_block1_M;
+  assign read_block1_M = m[physical_block_addr1_M];
 
-  wire [c_resp_data_nbits-1:0] read_data1_M
-    = read_block1_M >> (block_offset1_M*8);
+  logic [c_resp_data_nbits-1:0] read_data1_M;
+  assign read_data1_M = read_block1_M >> (block_offset1_M*8);
 
   // Write the data if required. This is a sequential always block so
   // that the write happens on the next edge.
 
-  wire write_en0_M = memreq0_val_M &&
+  logic write_en0_M;
+  assign write_en0_M = memreq0_val_M &&
       ( memreq0_msg_type_M == c_write || memreq0_msg_type_M == c_write_init );
-  wire write_en1_M = memreq1_val_M &&
+
+  logic write_en1_M;
+  assign write_en1_M = memreq1_val_M &&
       ( memreq1_msg_type_M == c_write || memreq1_msg_type_M == c_write_init );
 
   // Note: amos need to happen once, so we only enable the amo transaction
   // when both val and rdy is high
 
-  wire amo_en0_M = memreq0_val_M && memreq0_rdy_M &&
+  logic amo_en0_M;
+  assign amo_en0_M = memreq0_val_M && memreq0_rdy_M &&
                                   ( memreq0_msg_type_M == c_amo_and
                                  || memreq0_msg_type_M == c_amo_add
                                  || memreq0_msg_type_M == c_amo_or  );
-  wire amo_en1_M = memreq1_val_M && memreq1_rdy_M &&
+  logic amo_en1_M;
+  assign amo_en1_M = memreq1_val_M && memreq1_rdy_M &&
                                   ( memreq1_msg_type_M == c_amo_and
                                  || memreq1_msg_type_M == c_amo_add
                                  || memreq1_msg_type_M == c_amo_or  );
@@ -345,7 +352,7 @@ module vc_TestMem_2ports
   // Pack the response message
   //----------------------------------------------------------------------
 
-  wire [c_resp_nbits-1:0] memresp0_msg_M;
+  logic [c_resp_nbits-1:0] memresp0_msg_M;
 
   vc_MemRespMsgPack#(o,d) memresp0_msg_pack
   (
@@ -356,7 +363,7 @@ module vc_TestMem_2ports
     .msg    (memresp0_msg_M)
   );
 
-  wire [c_resp_nbits-1:0] memresp1_msg_M;
+  logic [c_resp_nbits-1:0] memresp1_msg_M;
 
   vc_MemRespMsgPack#(o,d) memresp1_msg_pack
   (

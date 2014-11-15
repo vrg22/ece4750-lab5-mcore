@@ -12,10 +12,10 @@ module top;
   // Test Case: smoke test to make sure there are no compilation errors
   //----------------------------------------------------------------------
 
-  reg        t1_reset = 1;
-  reg        t1_next;
-  wire [3:0] t1_out;
-  reg  [3:0] t1_prev_out;
+  logic       t1_reset = 1;
+  logic       t1_next;
+  logic [3:0] t1_out;
+  logic [3:0] t1_prev_out;
 
 
   vc_RandomNumGen #(4,32'hdeadbeef) t1_random
@@ -30,8 +30,8 @@ module top;
 
   task t1
   (
-    input       next,
-    input [3:0] out
+    input logic       next,
+    input logic [3:0] out
   );
   begin
     t1_next = next;

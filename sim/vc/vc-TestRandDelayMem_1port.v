@@ -29,41 +29,41 @@ module vc_TestRandDelayMem_1port
   parameter c_req_nbits  = `VC_MEM_REQ_MSG_NBITS(o,a,d),
   parameter c_resp_nbits = `VC_MEM_RESP_MSG_NBITS(o,d)
 )(
-  input                     clk,
-  input                     reset,
+  input  logic                    clk,
+  input  logic                    reset,
 
   // clears the content of memory
 
-  input                     mem_clear,
+  input  logic                    mem_clear,
 
   // maximum delay
 
-  input  [31:0]             max_delay,
+  input  logic [31:0]             max_delay,
 
   // Memory request interface port
 
-  input                     memreq_val,
-  output                    memreq_rdy,
-  input  [c_req_nbits-1:0]  memreq_msg,
+  input  logic                    memreq_val,
+  output logic                    memreq_rdy,
+  input  logic [c_req_nbits-1:0]  memreq_msg,
 
   // Memory response interface port
 
-  output                    memresp_val,
-  input                     memresp_rdy,
-  output [c_resp_nbits-1:0] memresp_msg
+  output logic                    memresp_val,
+  input  logic                    memresp_rdy,
+  output logic [c_resp_nbits-1:0] memresp_msg
 );
 
   //------------------------------------------------------------------------
   // Dual ported test memory
   //------------------------------------------------------------------------
 
-  wire                    mem_memreq_val;
-  wire                    mem_memreq_rdy;
-  wire [c_req_nbits-1:0]  mem_memreq_msg;
+  logic                    mem_memreq_val;
+  logic                    mem_memreq_rdy;
+  logic [c_req_nbits-1:0]  mem_memreq_msg;
 
-  wire                    mem_memresp_val;
-  wire                    mem_memresp_rdy;
-  wire [c_resp_nbits-1:0] mem_memresp_msg;
+  logic                    mem_memresp_val;
+  logic                    mem_memresp_rdy;
+  logic [c_resp_nbits-1:0] mem_memresp_msg;
 
   //------------------------------------------------------------------------
   // Test random delay
