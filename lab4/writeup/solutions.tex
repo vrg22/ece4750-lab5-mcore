@@ -297,19 +297,40 @@ the network, allowing more packets to be in flight?
 Additionally, the zero-load latency drop off should not have been that drastic.
 We were expecting results along the lines of tornado; maybe a very slight
 increase in latency, but not on the order of multiples of cycles. 
-This means that our adaptive routing algorithm is miscalculating the cost
-of rerouting to the non greedy path. 
+\textbf{This means that our adaptive routing algorithm is under-calculating 
+the cost of rerouting to the non greedy path.
+This is also affecting our ideal throughput.}
 The cost needs to be higher in our non-greedy path to make sure that the path 
 is taken only when it will reduce latency. \par
 
-The problem is that we do not have global informatino about our network.
-Compounding the problem is the staleness of the global information we have.
+The problem also is that we do not have global information about our network.
+Compounding that problem is the staleness of the global information we have.
 We are possibly delayed by four cycles in getting network state at some time
 $t$. 
 Now, this should not matter in our test programs because the network streams
 are constant and elephant in nature. 
 However, on any real workload, this strategy will surely falter as nodes 
-are taking longer paths for no benefit. 
+are taking longer paths for no benefit.
+For example, in a MapReduce Job, there are two waves of network traffic.
+The first wave is when data is spread out to the workers to run the map
+operation, and the second wave is when data is collected by the controller
+to complete the job. 
+Unless we broke our abstraction and promised low latency delivery of data
+given an application, it would be hard to give the same performance of 
+uniform random traffic without investing considerable resources. \par
+
+Looking at the special traffic case, the neighbor, we see that both 
+patterns are equally low-latency and high throughput. 
+However, this pattern is exactly the special case where we always 
+route greedy. Thus, we expect to see that pattern.
+The only thing that is confusing is that there is no bottleneck on the ideal
+throughput.
+Either we are out of scale or the throughput is really close to the theoretical
+limit. \par
+
+Given the data shown in Figure~\ref{fig:patterns}, a designer would
+emphatically choose to support the baseline greedy routing algorithm.
+
 
 \newpage
 \section {Tables and Diagrams}
