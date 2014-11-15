@@ -164,12 +164,12 @@ the Router Output Control unit that a packet needs to be placed on the port 0
 queue if it needs to continue traveling westward or the port 1 queue if it 
 still needs to continue traveling eastwards.
 Packets entering the router via the port 1 (west) or port 2 (east) input queues
-are directed along the same path (west-bound packet continues west) by a Router
-Input Control Module (not to be confused with the Router Input Terminal Control 
-Module, which deals with packets in the router's terminal queue and performs route 
-computation). If the current router is the destination of the packet, the Router
-Input Control Module requests the Router Output Control unit to place the packet on
-the port 1 input queue.  \par
+are directed along the same path (a west-bound packet continues west by routing through
+the router's east output terminal) by a Router Input Control Module (not to be 
+confused with the Router Input Terminal Control Module, which deals with packets
+ in the router's terminal queue and performs route computation). If the current 
+ router is the destination of the packet, the Router Input Control Module requests
+ the Router Output Control unit to place the packet on the port 1 input queue.  \par
 
 Since there is contention on each of the three output ports, the 
 Router Output Control module mediates access to the ports. 
@@ -260,6 +260,23 @@ of only looking at channel queues (which may have been a better indicator of act
 congestion in a given route). 
 
 \section{Testing Strategy}
+
+We began the testing process by developing directed tests for the baseline router 
+components and verifying them on the functional model. These components were the 
+Router Input Control, Router Input Terminal Control, and Router Output Control 
+Units. We tested each of these components as soon as they were implemented. Next
+we tested the baseline router itself and finally the entire baseline ring network
+once they were implemented. This process was repeated for the alternative 
+design; we re-used all the baseline tests but added some more tests to target the 
+new adaptive routing algorithm. 
+
+We tried to ensure that we were testing all possible use-case scenarios of the modules
+we implemented. The Router Input Control module required simple testing since its
+functionality is simple. The module only directs packet flow along the same 
+direction in the network so we tested the three different possible scenarios: west-bound packet
+continuing west, east-bound packet continuing east, packet bound to current router is 
+directed to current router. For the Router Input Terminal Control, we tested 
+
 
 \section{Evaluation}
 
