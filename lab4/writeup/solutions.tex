@@ -13,7 +13,8 @@
 \begin{document}
 
 \title{ECE 4750 Lab 4: Ring Network}
-\author{Avinash Navada (abn44) \& Akshay Dongaonkar (akd54) \& Vivek Gaddam (vrg22)}
+\author{Avinash Navada (abn44) \& Akshay Dongaonkar (akd54) 
+		\& Vivek Gaddam (vrg22)}
 \maketitle
 
 
@@ -44,7 +45,7 @@ This routing algorithm ingests greater information on the congestion within
 the network to route intelligently.
 In the evaluation section, we compare the performance under both routing
 algorithms and the performance of the topology in general. 
-We found that generally the adaptive scheme is pareto-optimal to the 
+We found that generally the adaptive scheme is not much different to the 
 oblivious, baseline scheme. 
 One can always construct a specific scheme to defeat a routing algorithm that
 does not have perfect global state; thus we say generally pareto-optimal.
@@ -125,9 +126,11 @@ cases of source and destination addresses. \par
 The physical datapath on which the messages travel on is shown in Figure 3.
 Each router port is buffered by an input queue of size four which carries
 network messages. 
-Under some control logic soon to be discussed, a hot encoding of the 
-\texttt{xbal\_sel*} bits allows one message to traverse the crossbar and cross
-to the output port.
+Under some control logic soon to be discussed, an encoding of the 
+\texttt{xbal\_sel*} bits allows one message meant for one output port to
+traverse the crossbar at every cycle.
+This allows up to three discrete messages to traverse the router on any 
+given cycle.
 A val/rdy interface mediates transfer of the packet out of the router. 
 This process repeats as long as there are packets in the input queues.
 The box show in Figure 3 around our router datapath is the interface for our 
@@ -140,25 +143,91 @@ alternative design.
 We did not need to change much of our baseline datapath to implement an 
 entirely new algorithm relying pseudo-global network information. \par
 
+The control logic consists of multiple modules to route network packets.
+This design was to make it easier to implement multiple routing algorithms
+and to decouple the task of ingesting a packet, determining its destination,
+and actually sending the message to the correct port. \par
+The Router Input Control module implements the logic to ingest packets into
+a router. 
+If a packet is from the input terminal, the module performs deadlock avoidance 
+checks by ensuring there is a bubble in our network so that packets can still
+route freely.
+A bubble is simply a free queue slot in which new packets reside.
+The route computation module then comes into play to route the packet.
+If a packet originates from the network, it checks whether it needs to accept
+that packet for its terminal or keep routing. 
+If the router needs to accept the packet for its terminal, it sends the
+corresponding signal to the Router Output Control unit that a packet needs to 
+be placed on the port 1 queue. 
+If the router needs to keep routing, it will send the corresponding signal to
+the Router Output Control unit that a packet needs to be placed on the port 0
+queue if it needs to continue traveling westward or the port 1 queue if it 
+still needs to continue traveling eastwards. \par
 
+Since there is contention on each of the three output ports, the 
+Router Output Control module mediates access to the ports. 
+The vehicle for access to ports is a round-robin arbiter. 
+Given multiple packets that need to travel out of a singular port, the arbiter
+allows only one packet to traverse the crossbar to continue routing. 
+This flow control scheme is entirely given by the arbiter module provided. \par
 
-
-
-
+As mentioned previously, the final module (Route Computation) actually provides
+the routing logic required move packets across the network.
+In the baseline implementation, we implemented a greedy algorithm.
+We routed packets east if the router hop count to the destination was less than
+the router hop count to the west. 
+%Of course, in the situation where the source address was equivalent to the 
+%destination address, we routed the packet back into the terminal without
+%letting the packet interact with another router. 
+We were able to compute the router hop count because our network is static. 
+This led to a simple and efficient route computation unit, which will be 
+discussed further in our evaluation of our two designs.
 
 \section{Alternative Design}
+
+Our alternative design changes our route computation. 
+Instead of simply greedily routing packets on the shorter router hop count
+path, we look at the channel queues of the channel each router's packet 
+takes up to 2 hops away. 
+To clarify, we look at router $n-1$'s and $n-2$'s port 0 (west) queue sizes 
+for router $n$ as well as router $n+1$'s and $n+2$'s port 2 (east) queue sizes.
+Of course, this arithmetic is done under modulo 8. 
+Given this congestion factor, we determine whether we want to route packets 
+through the path with the longer hop count. \par
+
+There are, however, special cases to consider.
+As stated before, if the source and destination address are the same, then the
+router immediately routes back to the input terminal for a router hop count 
+of 1.
+This is always the optimal routing path.
+Another special case is for the destination one address away. 
+This is equivalent to the two router hop case.
+In this case, we always route greedily. 
+This is because the maximum amount of time we would have to wait on a queue
+would be 6 cycles: 
+potentially 3 cycles for arbitration to allow the channel in the other 
+direction to route to the output terminal port (port 1) and another three
+cycles for your own channel to route to the output terminal port.
+If there were loopback requests from the terminal, there could be up to 10 
+packets attempting to enter a given terminal.
+However, if the source was one channel away from the destination router and the
+rest of the network was empty, it would still take 10 cycles to route the 
+opposite direction. 
+There would be 7 cycles of empty traffic and three cycle of pure waiting time.
+Therefore, either way leads to 10 cycles of waiting.
+It makes no sense to route the other way, \textit{ever}.
+So, we will simply route greedily in that case. \par
+
+In the other cases so far,   
+
 
 
 \section{Testing Strategy}
 
 
 \section{Evaluation}
-
 \newpage
-
 \section {Tables and Diagrams}
-
-
 
 % % Figure: Gantt Chart
 
@@ -185,6 +254,22 @@ entirely new algorithm relying pseudo-global network information. \par
 		The Datapath for our Router.
 		Each channel mediates transmission via val/rdy interfaces.
 		An arbiter allows messages to go in and out in a round robin fashion.
+	}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.7]{baselinectrl}
+	\label{fig:ctrl}
+	\caption
+	{
+		The Control Unit for our Router.
+		The Router Input Control module routes existing packets in our network 
+		based on destination and accepts new packets to transfer.
+		The Route Computation module determines on which port the packet will
+		exit.
+		The Router Output module allows packets to exit on a port by performing
+		some arbitration. 
 	}
 \end{figure}
 
