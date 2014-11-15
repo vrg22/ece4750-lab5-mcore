@@ -218,7 +218,13 @@ Therefore, either way leads to 10 cycles of waiting.
 It makes no sense to route the other way, \textit{ever}.
 So, we will simply route greedily in that case. \par
 
-In the other cases so far,   
+In the other cases so far, we simply add the congestion as a one router hop 
+cost.
+So if a channel going east has a 3 queue length delay at the first router 
+and the hop count is 4 to the destination, we say routing east has a cost of 7..
+Vice versa, a channel going west having no delay and no congestion has a cost
+of $ 0 + 4 =4 $. 
+Therefore, we route west.
 
 
 
