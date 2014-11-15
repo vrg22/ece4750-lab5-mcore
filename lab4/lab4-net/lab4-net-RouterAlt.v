@@ -22,7 +22,8 @@ module lab4_net_RouterAlt
 
   parameter p_router_id      = 0,
   parameter p_num_routers    = 8,
-  parameter f                = 2,  // bits to represent 3 possible values of channel free entries
+  parameter p_num_free_nbits = 3,       // 3 bits to represent 5 possible values in a 4-element queue (0,1,2,3,4)
+  parameter f                = 2,       // bits to represent 3 possible values of channel free entries
 
   // Shorter names, not to be set from outside the module
   parameter p = p_payload_nbits,
@@ -81,6 +82,11 @@ module lab4_net_RouterAlt
   logic                       in2_deq_rdy;
   logic [c_net_msg_nbits-1:0] in2_deq_msg;
 
+  // Free entry signals - NOTE the extra bit in each to allow it to represent 
+  // the n+1 possible values in an n-element queue
+  logic [2:0]                 num_free_west;
+  logic [2:0]                 num_free_east;
+
   // instantiate input queues, crossbar and control modules here
 
   //----------------------------------------------------------------------
@@ -103,7 +109,7 @@ module lab4_net_RouterAlt
     .deq_rdy  (in0_deq_rdy),
     .deq_msg  (in0_deq_msg),
 
-    .num_free_entries ()
+    .num_free_entries (num_free_west)
   );
 
   vc_Queue#(`VC_QUEUE_NORMAL,c_net_msg_nbits,4) in1_queue
@@ -135,7 +141,7 @@ module lab4_net_RouterAlt
     .deq_rdy  (in2_deq_rdy),
     .deq_msg  (in2_deq_msg),
 
-    .num_free_entries ()
+    .num_free_entries (num_free_east)
   );
 
 
@@ -250,12 +256,15 @@ module lab4_net_RouterAlt
     .grants   (in_grants2)
   );
 
-  lab4_net_RouterAdaptiveInputTerminalCtrl#(p_router_id, p_num_routers, f) in1_ctrl //Input/Output Terminal Port
+  lab4_net_RouterAdaptiveInputTerminalCtrl#(p_router_id, p_num_routers, p_num_free_nbits, f) in1_ctrl //Input/Output Terminal Port
   (
     .dest               (dest1),
 
     .in_val             (in1_deq_val),
     .in_rdy             (in1_deq_rdy),
+
+    .num_free_west      (num_free_west),
+    .num_free_east      (num_free_east),
 
     .forw_free_one      (forw_free_one),
     .forw_free_two      (forw_free_two),
