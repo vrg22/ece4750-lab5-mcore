@@ -189,13 +189,15 @@ Our alternative design changes our route computation.
 Instead of simply greedily routing packets on the shorter router hop count
 path, we look at the channel queues of the channel each router's packet 
 takes up to 2 hops away. 
-To clarify, we look at router $n-1$'s and $n-2$'s port 0 (west) queue sizes 
-for router $n$ as well as router $n+1$'s and $n+2$'s port 2 (east) queue sizes.
-Of course, this arithmetic is done under modulo 8. 
+To clarify, we look at router $n-1$'s and $n-2$'s channel sizes 
+for router $n$ as well as router $n+1$'s and $n+2$'s channel sizes.
+This size is their congestion at their ports. 
+Of course, this arithmetic for router names is done under modulo 8. 
 Given this congestion factor, we determine whether we want to route packets 
-through the path with the longer hop count. \par
+through the path with the longer hop count. 
+A representation of the new control signal is shown in Figure 5.\par
 
-There are, however, special cases to consider.
+There are, however, special cases to consider. \\
 As stated before, if the source and destination address are the same, then the
 router immediately routes back to the input terminal for a router hop count 
 of 1.
@@ -218,20 +220,29 @@ Therefore, either way leads to 10 cycles of waiting.
 It makes no sense to route the other way, \textit{ever}.
 So, we will simply route greedily in that case. \par
 
-In the other cases so far, we simply add the congestion as a one router hop 
+In the other cases so far, we simply treat congestion as a one router hop 
 cost.
-So if a channel going east has a 3 queue length delay at the first router 
-and the hop count is 4 to the destination, we say routing east has a cost of 7..
+So if a channel going east has a 2 queue length delay at the first router 
+and the hop count is 4 to the destination, we say routing east has a cost of 7.
 Vice versa, a channel going west having no delay and no congestion has a cost
 of $ 0 + 4 =4 $. 
-Therefore, we route west.
+Therefore, we route west. 
+We route on whichever route has a lower cost. \par
 
-
+We simulate wire delay in queue size length by pipeline the signal of each 
+router through a module that contains registers to relay our control unit. 
+This was a modification done in the datapath that was encapuslated in a 
+module, 
+This is fairly simple, however, as we are simply inducing wire delay. \par
+This does lead to imperfect information though.
+However, we assume the network is close to steady state and that general 
+congestion eariler implies general congestion later.
+This is some type of temporal prediction of network state.
 
 \section{Testing Strategy}
 
-
 \section{Evaluation}
+
 \newpage
 \section {Tables and Diagrams}
 
@@ -277,6 +288,14 @@ Therefore, we route west.
 		The Router Output module allows packets to exit on a port by performing
 		some arbitration. 
 	}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+	INSERT HERE
+	\caption{The Control Store for the Adaptive algorithm. 
+			 Notice that the inputs now contain channel information as well.}
+	\label{fig:altctrl}
 \end{figure}
 
 \end{document}
