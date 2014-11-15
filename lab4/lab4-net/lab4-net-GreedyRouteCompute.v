@@ -23,7 +23,7 @@ module lab4_net_GreedyRouteCompute
   assign cur = p_router_id;
 
 
-  // Simple logic: We know what east and west are. we know what dest is.
+  // Route the shortest distance to destination
   always @(*) begin
   	if (dest > cur) begin
       if (dest - cur > 4)
