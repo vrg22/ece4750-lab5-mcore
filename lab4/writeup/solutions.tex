@@ -8,6 +8,7 @@
 \usepackage{caption}
 \usepackage{listings}
 \usepackage{enumitem}
+\usepackage{subfigure}
 
 
 \begin{document}
@@ -245,6 +246,43 @@ new routing algorithm with minimum
 \section{Testing Strategy}
 
 \section{Evaluation}
+
+The figure below is quite indicative of the performance of our baseline and
+alternate implementations of a ring network.
+There are multiple traffic patterns under consideration, such as uniform 
+random, tornado, and rotation. 
+In every single traffic pattern, the baseline implementation is pareto-optimal
+to the alternative implementation. 
+
+\begin{figure}[h]
+\subfigure[Uniform Random]{
+	\includegraphics[width=0.33\textwidth]{lab4-net-urandom-plot}
+}
+\subfigure[Partition2]{
+	\includegraphics[width=0.33\textwidth]{lab4-net-partition2-plot}
+}
+\subfigure[Partition4]{
+	\includegraphics[width=0.33\textwidth]{lab4-net-partition4-plot}
+}
+
+\subfigure[Tornado]{
+	\includegraphics[width=0.33\textwidth]{lab4-net-tornado-plot}
+}
+\subfigure[Neighbor]{
+	\includegraphics[width=0.33\textwidth]{lab4-net-neighbor-plot}
+}
+\subfigure[Complement]{
+	\includegraphics[width=0.33\textwidth]{lab4-net-complement-plot}
+}
+
+\subfigure[Reverse]{
+	\includegraphics[width=0.33\textwidth]{lab4-net-reverse-plot}
+}
+\subfigure[Rotation]{
+	\includegraphics[width=0.33\textwidth]{lab4-net-rotation-plot}
+}
+
+\end{figure}
 
 \newpage
 \section {Tables and Diagrams}
