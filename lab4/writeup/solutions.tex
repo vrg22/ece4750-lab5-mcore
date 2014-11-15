@@ -95,7 +95,7 @@ for its topology.
 Each node contains a message producer/consumer (also known as Input/Output 
 terminals), a router that the terminal connects to,
 and two outgoing channels from the router to other routers in the ring.
-This topology is logicaly shown in Figure~\ref{fig:topo}. 
+This topology is logically shown in Figure 2. 
 Each router connects to two other routers; the west channel of router $n$ 
 is the channel connecting to router $n-1$ and 
 the east channel of router $n$ connecting to router $n+1$.
@@ -124,8 +124,7 @@ the source and destination addresses are the same.
 Depending on the routing algorithm, either port 0 or 2 is chosen for other
 cases of source and destination addresses. \par
 
-The physical datapath on which the messages travel on is shown in 
-Figure~\ref{fig:topo}.
+The physical datapath on which the messages travel on is shown in Figure 3.
 Each router port is buffered by an input queue of size four which carries
 network messages. 
 Under some control logic soon to be discussed, an encoding of the 
@@ -135,8 +134,8 @@ This allows up to three discrete messages to traverse the router on any
 given cycle.
 A val/rdy interface mediates transfer of the packet out of the router. 
 This process repeats as long as there are packets in the input queues.
-The box show in Figure~\ref{fig:topo} around our router datapath is the 
-interface for our Router Base module. 
+The box shown in Figure 3 around our router datapath is the interface for our 
+Router Base module. 
 We repeat this modular design in our control logic.
 The control logic is stored separately in another module so as to follow the
 design pattern of the control-datapath split. 
@@ -166,12 +165,12 @@ the Router Output Control unit that a packet needs to be placed on the port 0
 queue if it needs to continue traveling westward or the port 1 queue if it 
 still needs to continue traveling eastwards.
 Packets entering the router via the port 1 (west) or port 2 (east) input queues
-are directed along the same path (west-bound packet continues west) by a Router
-Input Control Module (not to be confused with the Router Input Terminal Control 
-Module, which deals with packets in the router's terminal queue and performs route 
-computation). If the current router is the destination of the packet, the Router
-Input Control Module requests the Router Output Control unit to place the packet on
-the port 1 input queue.  \par
+are directed along the same path (a west-bound packet continues west by routing through
+the router's east output terminal) by a Router Input Control Module (not to be 
+confused with the Router Input Terminal Control Module, which deals with packets
+ in the router's terminal queue and performs route computation). If the current 
+ router is the destination of the packet, the Router Input Control Module requests
+ the Router Output Control unit to place the packet on the port 1 input queue.  \par
 
 Since there is contention on each of the three output ports, the 
 Router Output Control module mediates access to the ports. 
@@ -204,8 +203,7 @@ This size is their congestion at their ports.
 Of course, this arithmetic for router names is done under modulo 8. 
 Given this congestion factor, we determine whether we want to route packets 
 through the path with the longer hop count. 
-A representation of the new control signal is shown in 
-Figure~\ref{fig:altctrl}.\par
+A representation of the new control signal is shown in Figure 5.\par
 
 There are, however, special cases to consider. \\
 As stated before, if the source and destination address are the same, then the
@@ -247,15 +245,38 @@ directions.
 This was a modification done in the datapath that was encapuslated in a 
 module, 
 This is fairly simple, however, as we are simply inducing wire delay. \par
-This does lead to imperfect information though. We are not considering 
+This does lead to imperfect information though. We are not considering congestion 
+information from 4 other channel queues that are further away, and pipelining the 
+congestion information implies that we are receiving old information. This delay 
+is one reason we chose to look at 2 hops over east and west instead of 4 (which 
+would cover the whole network). 
 However, we assume the network is close to steady state and that general 
-congestion earlier implies general congestion later.
+congestion earlier implies general congestion later. 
 This is some type of temporal prediction of network state. \par
 
-As far as the design of the alternative network, we were able to plug in our
-new routing algorithm with minimum 
+As far as the design of the alternative network goes, we were able to plug in our
+new routing algorithm without having catastrophic debugging issues. We could also 
+have pipelined congestion information from neighboring router input queues instead 
+of only looking at channel queues (which may have been a better indicator of actual
+congestion in a given route). 
 
 \section{Testing Strategy}
+
+We began the testing process by developing directed tests for the baseline router 
+components and verifying them on the functional model. These components were the 
+Router Input Control, Router Input Terminal Control, and Router Output Control 
+Units. We tested each of these components as soon as they were implemented. Next
+we tested the baseline router itself and finally the entire baseline ring network
+once they were implemented. This process was repeated for the alternative 
+design; we re-used all the baseline tests but added some more tests to target the 
+new adaptive routing algorithm. 
+
+We tried to ensure that we were testing all possible use-case scenarios of the modules
+we implemented. The Router Input Control module required simple testing since its
+functionality is simple. The module only directs packet flow along the same 
+direction in the network so we tested the three different possible scenarios: west-bound packet
+continuing west, east-bound packet continuing east, packet bound to current router is 
+directed to current router. For the Router Input Terminal Control, we tested 
 
 \section{Evaluation}
 
@@ -305,25 +326,26 @@ are taking longer paths for no benefit.
 \begin{figure}[h]
 	\centering
 	\includegraphics[scale=0.5]{topology}
-	\caption{Network Topology of our Ring}
 	\label{fig:topo}
+	\caption{Network Topology of our Ring}
 \end{figure}
 
 \begin{figure}[h]
 	\centering
 	\includegraphics[scale=0.7]{dpath}
+	\label{fig:dpath}
 	\caption
 	{
 		The Datapath for our Router.
 		Each channel mediates transmission via val/rdy interfaces.
 		An arbiter allows messages to go in and out in a round robin fashion.
 	}
-	\label{fig:dpath}
 \end{figure}
 
 \begin{figure}[h]
 	\centering
 	\includegraphics[scale=0.7]{baselinectrl}
+	\label{fig:ctrl}
 	\caption
 	{
 		The Control Unit for our Router.
@@ -334,7 +356,6 @@ are taking longer paths for no benefit.
 		The Router Output module allows packets to exit on a port by performing
 		some arbitration. 
 	}
-	\label{fig:ctrl}
 \end{figure}
 
 \begin{figure}[h]
