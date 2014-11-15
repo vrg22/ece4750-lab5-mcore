@@ -64,10 +64,10 @@ module lab4_net_AdaptiveRouteCompute
     end
     // destination < current router
     else begin
-      west_hops = dest-cur;
-      east_hops = p_num_routers-(dest-cur);
+      west_hops = cur-dest;
+      east_hops = p_num_routers-(cur-dest);
       // destination is only one hop away so don't need to check two hops away
-      if (dest-cur == 1) begin
+      if (cur-dest == 1) begin
         east_factor = (f-forw_free_one) + east_hops;
         west_factor = (f-backw_free_one) + west_hops;
       end
