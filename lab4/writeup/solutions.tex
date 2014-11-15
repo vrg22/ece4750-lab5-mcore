@@ -306,7 +306,7 @@ random, tornado, and rotation.
 In every single traffic pattern, the baseline implementation is pareto-optimal
 to the alternative implementation. \par
 
-In some cases, the throughput of the traffic patter almost drops by half.
+In some cases, the throughput of the traffic pattern almost drops by half.
 This is in reference to Partition2 traffic, 
 and to a lesser extent, Uniform Random. 
 Such a big dropoff was not initially expected. 
@@ -320,7 +320,9 @@ increase in latency, but not on the order of multiples of cycles.
 the cost of rerouting to the non greedy path.
 This is also affecting our ideal throughput.}
 The cost needs to be higher in our non-greedy path to make sure that the path 
-is taken only when it will reduce latency. \par
+is taken only when it will reduce latency.
+The packets also stay in the network longer, congesting it more. 
+This severely reduces throughput under many circumstances. \par
 
 The problem also is that we do not have global information about our network.
 Compounding that problem is the staleness of the global information we have.
