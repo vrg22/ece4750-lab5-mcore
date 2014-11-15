@@ -283,8 +283,10 @@ we ensured that the \texttt{xbar\_sel*} signals were being sent correctly based 
 requests and grants signals. Testing for the top-level router module was slightly different
 in that we could consider the current router as being the source of a packet or as an
 intermediary that directs a packet along its current path. We used this opportunity to vary
-the source and destination router IDs to test both these cases. We also tested the greedy
-algorithm in this module to ensure that packets were being sent along the shorter path. \par
+the source and destination router IDs to test both these cases. We tested the greedy
+algorithm in this module to ensure that packets were being sent along the shorter path. 
+We also added a tornado test case to the test harness to test high volume packet traffic
+in the network in a different pattern than the \texttt{urandom} dataset provided. \par
 
 We tested the alternative implementation on all the baseline tests first to ensure it was
 functional before adding additional tests to target the adaptive routing algorithm. We
@@ -295,10 +297,10 @@ tested this by modifying the test harness to accept channel congestion informati
 then simulating high congestion along one pathway and low congestion along the other (with 
 both pathways having the same hop count to eliminate that factor). For cases of little to no 
 channel congestion, the baseline tests suffice in verifying the correct functionality of the 
-adaptive algorithm and the alternative top-level ring network as a whole. 
+adaptive algorithm and the alternative top-level ring network as a whole. \par
 
-We believe that our directed test cases sufficiently test our baseline and alternative 
-implementations so we did not see the need for random testing. 
+Ultimately both our baseline and alternative implementations ran successfully on all test 
+cases. \par
 
 
 \section{Evaluation}
