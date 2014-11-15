@@ -46,10 +46,10 @@ This routing algorithm ingests greater information on the congestion within
 the network to route intelligently.
 In the evaluation section, we compare the performance under both routing
 algorithms and the performance of the topology in general. 
-We found that generally the adaptive scheme is not more effective to the 
+We found that generally the adaptive scheme is not much more effective to the 
 oblivious, baseline scheme in throughput and zero load latency. 
 One can always construct a specific scheme to defeat a routing algorithm that
-does not have perfect global state; thus we say generally pareto-optimal.
+does not have perfect global state; thus we say generally not more effective.
 
 
 \section{Project Management}
@@ -306,25 +306,32 @@ random, tornado, and rotation.
 In every single traffic pattern, the baseline implementation is pareto-optimal
 to the alternative implementation. \par
 
-In some cases, the throughput of the traffic pattern almost drops by half.
-This is in reference to Partition2 traffic, 
-and to a lesser extent, Uniform Random. 
-Such a big dropoff was not initially expected. 
-Weren't we in fact increasing ideal throughput by distributing congestion in 
-the network, allowing more packets to be in flight? 
+As we can see in all our traffic patterns, the zero load latency of both
+routing algorithms are equivalent. 
+We expect this behavior, as with little to no congestion, the adaptive 
+algorithm behaves exactly like the greedy algorithm. \\
 
-Additionally, the zero-load latency drop off should not have been that drastic.
-We were expecting results along the lines of tornado; maybe a very slight
-increase in latency, but not on the order of multiples of cycles. 
-\textbf{This means that our adaptive routing algorithm is under-calculating 
-the cost of rerouting to the non greedy path.
-This is also affecting our ideal throughput.}
-The cost needs to be higher in our non-greedy path to make sure that the path 
-is taken only when it will reduce latency.
-The packets also stay in the network longer, congesting it more. 
-This severely reduces throughput under many circumstances. \par
+%In some cases, the throughput of the traffic pattern almost drops by half.
+%This is in reference to Partition2 traffic, 
+%and to a lesser extent, Uniform Random. 
+%Such a big dropoff was not initially expected. 
+%Weren't we in fact increasing ideal throughput by distributing congestion in 
+%the network, allowing more packets to be in flight? 
 
-The problem also is that we do not have global information about our network.
+%Additionally, the zero-load latency drop off should not have been that drastic.
+%We were expecting results along the lines of tornado; maybe a very slight
+%increase in latency, but not on the order of multiples of cycles. 
+%\textbf{This means that our adaptive routing algorithm is under-calculating 
+%the cost of rerouting to the non greedy path.
+%This is also affecting our ideal throughput.}
+%The cost needs to be higher in our non-greedy path to make sure that the path 
+%is taken only when it will reduce latency.
+%The packets also stay in the network longer, congesting it more. 
+%This severely reduces throughput under many circumstances. \par
+
+However, we do not a marked increase in ideal throughput. \\
+
+The problem is that we do not have global information about our network.
 Compounding that problem is the staleness of the global information we have.
 We are possibly delayed by four cycles in getting network state at some time
 $t$. 
@@ -337,11 +344,23 @@ The first wave is when data is spread out to the workers to run the map
 operation, and the second wave is when data is collected by the controller
 to complete the job. 
 Unless we broke our abstraction and promised low latency delivery of data
-given an application, it would be hard to give the same performance of 
+given an application, it would be hard to give the smooth performance of 
 uniform random traffic without investing considerable resources. \par
 
-Looking at the special traffic case, the neighbor, we see that both 
-patterns are equally low-latency and high throughput. 
+So why does ideal throughput not increase?
+Well, most of these patterns distribute the messages in some sense. 
+They do not send all messages in one direction, leaving half the channels
+unused.
+In that situation, we would see the adaptive routing algorithm 
+perform at a much higher level than the greedy routing algorithm.
+For instance, MapReduce models some of that pattern with half the network.
+If the controller was on router 0, terminals 1,2,3, and 4 would direct all 
+their traffic in one direction. 
+Terminals 5,6, and 7 would also send their traffic in one direction. 
+The adaptive algorithm may be useful in this case. 
+
+Looking at a special traffic case, the neighbor, we see that both 
+routing algorithms equally show low-latency and high throughput. 
 However, this pattern is exactly the special case where we always 
 route greedy. Thus, we expect to see that pattern.
 The only thing that is confusing is that there is no bottleneck on the ideal
@@ -349,11 +368,17 @@ throughput.
 Either we are out of scale or the throughput is really close to the theoretical
 limit. \par
 
-Given the data shown in Figure~\ref{fig:patterns}, a designer would
-emphatically choose to support the baseline greedy routing algorithm.
-The relative costs of implementing one route scheme over another amount to 
-some extra global wires and a little bit more combinational logic. 
-In all practical effects, they have the same cost. 
+Given the data shown in Figure~\ref{fig:patterns}, the greedy routing algorithm 
+outperforms the adaptive algorithm in almost all cases. 
+However, this result holds on these sets of patterns.
+On a more practical traffic pattern such as MapReduce, the adaptive routing 
+algorithm would probably be better performing. 
+Given the costs of implementing the additional logic for the adaptive 
+algorithm, which is global wiring and extra combinational logic, either 
+routing algorithm is adequate. 
+They perform almost at the same level in terms of throughput and zero-load
+latency at almost the same cost. 
+There is not enough performance difference to separate the two. 
 
 
 \newpage
