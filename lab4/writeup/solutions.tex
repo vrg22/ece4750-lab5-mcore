@@ -110,11 +110,11 @@ The path is as follows:
 	\item Take the path leading to the terminal
 \end{enumerate}
 Naturally, this is not the minimal path in the network; we simply want to show
-our network of terminals is connected.
+how our network of terminals is connected.
 This property is highly desirable as we need to communicate with 
 all of our components! \par
 
-The messages that our network transmit have a parametrized structure.
+The messages that our network transmit have a parameterized structure.
 There is a payload size, a source/destination tag size determined by the number
 of addresses (in our case eight), and an opaque bit size.
 These messages are ingested at port 1 of our router at a given node, and based
@@ -129,7 +129,7 @@ Figure~\ref{fig:topo}.
 Each router port is buffered by an input queue of size four which carries
 network messages. 
 Under some control logic soon to be discussed, an encoding of the 
-\texttt{xbal\_sel*} bits allows one message meant for one output port to
+\texttt{xbar\_sel*} bits allows one message meant for one output port to
 traverse the crossbar at every cycle.
 This allows up to three discrete messages to traverse the router on any 
 given cycle.
@@ -139,7 +139,7 @@ The box show in Figure~\ref{fig:topo} around our router datapath is the
 interface for our Router Base module. 
 We repeat this modular design in our control logic.
 The control logic is stored separately in another module so as to follow the
-design principle of the control-datapath split. 
+design pattern of the control-datapath split. 
 The reason we did this is because it made it easier to implement our 
 alternative design.
 We did not need to change much of our baseline datapath to implement an 
@@ -149,7 +149,7 @@ The control logic consists of multiple modules to route network packets.
 This design was to make it easier to implement multiple routing algorithms
 and to decouple the task of ingesting a packet, determining its destination,
 and actually sending the message to the correct port. \par
-The Router Input Control module implements the logic to ingest packets into
+The Router Input Terminal Control module implements the logic to ingest packets into
 a router. 
 If a packet is from the input terminal, the module performs deadlock avoidance 
 checks by ensuring there is a bubble in our network so that packets can still
@@ -164,7 +164,14 @@ be placed on the port 1 queue.
 If the router needs to keep routing, it will send the corresponding signal to
 the Router Output Control unit that a packet needs to be placed on the port 0
 queue if it needs to continue traveling westward or the port 1 queue if it 
-still needs to continue traveling eastwards. \par
+still needs to continue traveling eastwards.
+Packets entering the router via the port 1 (west) or port 2 (east) input queues
+are directed along the same path (west-bound packet continues west) by a Router
+Input Control Module (not to be confused with the Router Input Terminal Control 
+Module, which deals with packets in the router's terminal queue and performs route 
+computation). If the current router is the destination of the packet, the Router
+Input Control Module requests the Router Output Control unit to place the packet on
+the port 1 input queue.  \par
 
 Since there is contention on each of the three output ports, the 
 Router Output Control module mediates access to the ports. 
@@ -174,7 +181,7 @@ allows only one packet to traverse the crossbar to continue routing.
 This flow control scheme is entirely given by the arbiter module provided. \par
 
 As mentioned previously, the final module (Route Computation) actually provides
-the routing logic required move packets across the network.
+the routing logic required to move packets across the network.
 In the baseline implementation, we implemented a greedy algorithm.
 We routed packets east if the router hop count to the destination was less than
 the router hop count to the west. 
@@ -339,7 +346,7 @@ This is in reference to Uniform Random and Partition2 traffic.
 
 \begin{figure}[h]
 	\centering
-	\includegraphics[scale=1.0]{altctrl}
+	\includegraphics[scale=0.7]{altctrl}
 	\caption{The Control Store for the Adaptive algorithm. 
 			 Notice that the inputs now contain channel information as well.}
 	\label{fig:altctrl}
