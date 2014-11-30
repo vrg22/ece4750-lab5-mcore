@@ -64,7 +64,8 @@ module lab5_mcore_ProcCacheNetBase
   output logic                       stats_en
 );
 
-  // Processor-Cache wires
+
+ // Processor-Cache wires
 
   logic [c_memreq_nbits-1:0] imemreq_msg;
   logic                      imemreq_val;
@@ -159,7 +160,8 @@ module lab5_mcore_ProcCacheNetBase
 
 
 
-  /*************************    LINE TRACING    ***************************/
+  /**********************************    LINE TRACING    ************************************/
+
 
   `VC_TRACE_BEGIN
   begin
@@ -174,12 +176,6 @@ module lab5_mcore_ProcCacheNetBase
 
 endmodule
 
-// Dummy Module (avoids Make errors on clean build) (REMOVE ME)
-
-module dummy;
-  typedef struct packed { logic val_MW; } dummy_wire;
-  dummy_wire ctrl;
-endmodule
 
 
 `endif /* LAB5_MCORE_PROC_CACHE_NET_BASE_V */

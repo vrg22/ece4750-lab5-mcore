@@ -64,25 +64,108 @@ module lab5_mcore_ProcCacheNetBase
   output logic                       stats_en
 );
 
-  // placeholder assignments, add processor-cache composition here
 
-  assign proc0_from_mngr_rdy = 0;
-  assign proc0_to_mngr_msg   = 0;
-  assign proc0_to_mngr_val   = 0;
+// Processor-Cache wires
 
-  assign memreq0_msg  = 0;
-  assign memreq0_val  = 0;
-  assign memresp0_rdy = 0;
+logic [`VC_MEM_REQ_MSG_NBITS(o,a,d)-1:0]  imemreq_msg;
+logic                                     imemreq_val;
+logic                                     imemreq_rdy;
+logic [`VC_MEM_RESP_MSG_NBITS(o,d)-1:0]   imemresp_msg;
+logic                                     imemresp_val;
+logic                                     imemresp_rdy;
 
-  assign memreq1_msg  = 0;
-  assign memreq1_val  = 0;
-  assign memresp1_rdy = 0;
+logic [`VC_MEM_REQ_MSG_NBITS(o,a,d)-1:0]  dmemreq_msg;
+logic                                     dmemreq_val;
+logic                                     dmemreq_rdy;
+logic [`VC_MEM_RESP_MSG_NBITS(o,d)-1:0]   dmemresp_msg;
+logic                                     dmemresp_val;
+logic                                     dmemresp_rdy;
 
-  assign stats_en     = 0;
+// Pipelined Processor 
 
-  // dummy proc
+lab2_proc_PipelinedProcAlt #(1,0) proc0
+(
+  .clk            (clk),
+  .reset          (reset),
+  
+  .imemreq_msg    (imemreq_msg),
+  .imemreq_val    (imemreq_val),
+  .imemreq_rdy    (imemreq_rdy),
 
-  dummy proc0 ();
+  .imemresp_msg   (imemresp_msg),
+  .imemresp_val   (imemresp_val),
+  .imemresp_rdy   (imemresp_rdy),
+
+  .dmemreq_msg    (dmemreq_msg),
+  .dmemreq_val    (dmemreq_val),
+  .dmemreq_rdy    (dmemreq_rdy),
+
+  .dmemresp_msg   (dmemresp_msg),
+  .dmemresp_val   (dmemresp_val),
+  .dmemresp_rdy   (dmemresp_rdy),
+
+  .from_mngr_msg  (proc0_from_mngr_msg),
+  .from_mngr_val  (proc0_from_mngr_val),
+  .from_mngr_rdy  (proc0_from_mngr_rdy),
+
+  .to_mngr_val    (proc0_to_mngr_val),
+  .to_mngr_msg    (proc0_to_mngr_msg),
+  .to_mngr_rdy    (proc0_to_mngr_rdy),
+
+  .stats_en(stats_en)
+);
+
+// Instruction Cache
+
+lab3_mem_BlockingCacheAlt #(p_icache_nbytes,1) icache0
+(
+  .clk            (clk),
+  .reset          (reset),
+
+  .cachereq_msg   (imemreq_msg),
+  .cachereq_val   (imemreq_val),
+  .cachereq_rdy   (imemreq_rdy),
+
+  .cacheresp_msg  (imemresp_msg),
+  .cacheresp_val  (imemresp_val),
+  .cacheresp_rdy  (imemresp_rdy),  
+
+  .memreq_msg     (memreq0_msg),
+  .memreq_val     (memreq0_val),
+  .memreq_rdy     (memreq0_rdy),
+
+  .memresp_msg    (memresp0_msg),
+  .memresp_val    (memresp0_val),
+  .memresp_rdy    (memresp0_rdy)    
+);
+
+// Data Cache
+
+lab3_mem_BlockingCacheAlt #(p_icache_nbytes,1) dcache0
+(
+  .clk            (clk),
+  .reset          (reset),
+
+  .cachereq_msg   (dmemreq_msg),
+  .cachereq_val   (dmemreq_val),
+  .cachereq_rdy   (dmemreq_rdy),
+
+  .cacheresp_msg  (dmemresp_msg),
+  .cacheresp_val  (dmemresp_val),
+  .cacheresp_rdy  (dmemresp_rdy),  
+
+  .memreq_msg     (memreq1_msg),
+  .memreq_val     (memreq1_val),
+  .memreq_rdy     (memreq1_rdy),
+
+  .memresp_msg    (memresp1_msg),
+  .memresp_val    (memresp1_val),
+  .memresp_rdy    (memresp1_rdy)    
+);
+
+
+
+  /**************************     LINE TRACING    ****************************/
 
   `VC_TRACE_BEGIN
   begin
@@ -97,12 +180,6 @@ module lab5_mcore_ProcCacheNetBase
 
 endmodule
 
-// Dummy Module (avoids Make errors on clean build) (REMOVE ME)
-
-module dummy;
-  typedef struct packed { logic val_MW; } dummy_wire;
-  dummy_wire ctrl;
-endmodule
 
 
 `endif /* LAB5_MCORE_PROC_CACHE_NET_BASE_V */
