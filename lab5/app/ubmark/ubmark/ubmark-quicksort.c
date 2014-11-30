@@ -27,21 +27,17 @@ void qsort_in_place( int*src, int first, int last)
       while(src[i] <= src[p] && i < last)
       {
         i++;
-        printf("Incrementing i\n");
       }
       while(src[j] > src[p])
       {
         j--;
-        printf("Decrementing j\n");
       }
       if(i<j)
       {
         temp = src[i];
         src[i] = src[j];
         src[j] = temp;
-        printf("Swapping\n");
       }
-      printf("I: %d, J: %d\n", i,j);
     }
 
     temp = src[p];
