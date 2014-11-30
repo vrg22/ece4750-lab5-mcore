@@ -9,8 +9,10 @@
 // quicksort-scalar
 //------------------------------------------------------------------------
 
+// http://www.cquestions.com/2008/01/c-program-for-quick-sort.html
 void qsort_in_place( int*src, int first, int last)
 {
+  // don't dynamically allocate
   static int p;
   static int i;
   static int j;
@@ -18,7 +20,8 @@ void qsort_in_place( int*src, int first, int last)
 
   if(first < last)
   {
-    p = first;
+    // Choose last element as pivot. Most likely fresh in mem/cache
+    p = last;
     i = first;
     j = last;
 
@@ -52,8 +55,10 @@ __attribute__ ((noinline))
 void quicksort_scalar( int* dest, int* src, int size )
 {
   int i;
-  printf("Size is : %d\n",size);
+  printf("Size is : %d\n",size);  
 
+  // Reduce active memory locations
+  // Should do 1 split of quicksort here!!
   for(i = 0 ; i < size ; i++)
   {
     dest[i] = src[i];
