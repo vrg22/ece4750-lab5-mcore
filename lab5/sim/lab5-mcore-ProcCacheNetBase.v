@@ -64,25 +64,52 @@ module lab5_mcore_ProcCacheNetBase
   output logic                       stats_en
 );
 
-  // placeholder assignments, add processor-cache composition here
 
-  assign proc0_from_mngr_rdy = 0;
-  assign proc0_to_mngr_msg   = 0;
-  assign proc0_to_mngr_val   = 0;
+  // Pipelined Processor 
 
-  assign memreq0_msg  = 0;
-  assign memreq0_val  = 0;
-  assign memresp0_rdy = 0;
+  lab2_proc_PipelinedProcAlt #(1,0) proc0
+  (
+    .clk(clk),
+    .reset(reset),
 
-  assign memreq1_msg  = 0;
-  assign memreq1_val  = 0;
-  assign memresp1_rdy = 0;
+    .imemreq_msg(imemreq_msg),
+    .imemreq_val(imemreq_val),
+    .imemreq_rdy(imemreq_rdy),
 
-  assign stats_en     = 0;
+    .imemresp_msg(imemresp_msg),
+    .imemresp_val(imemresp_val),
+    .imemresp_rdy(imemresp_rdy),
 
-  // dummy proc
+    .dmemreq_msg(dmemreq_msg),
+    .dmemreq_val(dmemreq_val),
+    .dmemreq_rdy(dmemreq_rdy),
 
-  dummy proc0 ();
+    .dmemresp_msg(dmemresp_msg),
+    .dmemresp_val(dmemresp_val),
+    .dmemresp_rdy(dmemresp_rdy),
+
+    .from_mngr_msg(proc0_from_mngr_msg),
+    .from_mngr_val(proc0_from_mngr_val),
+    .from_mngr_rdy(proc0_from_mngr_rdy),
+
+    .to_mngr_val(proc0_to_mngr_val),
+    .to_mngr_msg(proc0_to_mngr_msg),
+    .to_mngr_rdy(proc0_to_mngr_rdy),
+
+    .stats_en(stats_en)
+  );
+
+
+  // Instruction Cache
+
+  lab3-mem-BlockingCacheAlt #() icache0
+  (
+
+
+  );
+
+
+  /*************************    LINE TRACING    ***************************/
 
   `VC_TRACE_BEGIN
   begin

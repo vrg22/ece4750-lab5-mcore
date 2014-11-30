@@ -80,9 +80,43 @@ module lab5_mcore_ProcCacheNetBase
 
   assign stats_en     = 0;
 
-  // dummy proc
 
-  dummy proc0 ();
+  // Pipelined Processor 
+
+  lab2_proc_PipelinedProcAlt #(1,0) proc0
+  (
+    .clk(clk),
+    .reset(reset),
+
+    .imemreq_msg(imemreq_msg),
+    .imemreq_val(imemreq_val),
+    .imemreq_rdy(imemreq_rdy),
+
+    .imemresp_msg(imemresp_msg),
+    .imemresp_val(imemresp_val),
+    .imemresp_rdy(imemresp_rdy),
+
+    .dmemreq_msg(dmemreq_msg),
+    .dmemreq_val(dmemreq_val),
+    .dmemreq_rdy(dmemreq_rdy),
+
+    .dmemresp_msg(dmemresp_msg),
+    .dmemresp_val(dmemresp_val),
+    .dmemresp_rdy(dmemresp_rdy),
+
+    .from_mngr_msg(proc0_from_mngr_msg),
+    .from_mngr_val(proc0_from_mngr_val),
+    .from_mngr_rdy(proc0_from_mngr_rdy),
+
+    .to_mngr_val(proc0_to_mngr_val),
+    .to_mngr_msg(proc0_to_mngr_msg),
+    .to_mngr_rdy(proc0_to_mngr_rdy),
+
+    .stats_en(stats_en)
+  );
+
+
+  /*************************    LINE TRACING    ***************************/
 
   `VC_TRACE_BEGIN
   begin
