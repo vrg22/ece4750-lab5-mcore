@@ -81,6 +81,22 @@ logic [`VC_MEM_RESP_MSG_NBITS(o,d)-1:0]   dmemresp_msg;
 logic                                     dmemresp_val;
 logic                                     dmemresp_rdy;
 
+// Cache-Memory Wires
+
+logic [c_memreq_nbits-1:0]                icache_memreq_msg;
+logic                                     icache_memreq_val;
+logic                                     icache_memreq_rdy;
+logic [c_memresp_nbits-1:0]               icache_memresp_msg;
+logic                                     icache_memresp_val;
+logic                                     icache_memresp_rdy;
+
+logic [c_memreq_nbits-1:0]                dcache_memreq_msg;
+logic                                     dcache_memreq_val;
+logic                                     dcache_memreq_rdy;
+logic [c_memresp_nbits-1:0]               dcache_memresp_msg;
+logic                                     dcache_memresp_val;
+logic                                     dcache_memresp_rdy;
+
 // Pipelined Processor 
 
 lab2_proc_PipelinedProcAlt #(1,0) proc0
@@ -130,13 +146,13 @@ lab3_mem_BlockingCacheAlt #(p_icache_nbytes,1) icache0
   .cacheresp_val  (imemresp_val),
   .cacheresp_rdy  (imemresp_rdy),  
 
-  .memreq_msg     (memreq0_msg),
-  .memreq_val     (memreq0_val),
-  .memreq_rdy     (memreq0_rdy),
+  .memreq_msg     (icache_memreq_msg),
+  .memreq_val     (icache_memreq_val),
+  .memreq_rdy     (icache_memreq_rdy),
 
-  .memresp_msg    (memresp0_msg),
-  .memresp_val    (memresp0_val),
-  .memresp_rdy    (memresp0_rdy)    
+  .memresp_msg    (icache_memresp_msg),
+  .memresp_val    (icache_memresp_val),
+  .memresp_rdy    (icache_memresp_rdy)    
 );
 
 // Data Cache
@@ -154,14 +170,32 @@ lab3_mem_BlockingCacheAlt #(p_icache_nbytes,1) dcache0
   .cacheresp_val  (dmemresp_val),
   .cacheresp_rdy  (dmemresp_rdy),  
 
-  .memreq_msg     (memreq1_msg),
-  .memreq_val     (memreq1_val),
-  .memreq_rdy     (memreq1_rdy),
+  .memreq_msg     (dcache_memreq_msg),
+  .memreq_val     (dcache_memreq_val),
+  .memreq_rdy     (dcache_memreq_rdy),
 
-  .memresp_msg    (memresp1_msg),
-  .memresp_val    (memresp1_val),
-  .memresp_rdy    (memresp1_rdy)    
+  .memresp_msg    (dcache_memresp_msg),
+  .memresp_val    (dcache_memresp_val),
+  .memresp_rdy    (dcache_memresp_rdy)    
 );
+
+// Connecting global memory ports to refill ports
+
+assign memreq0_msg        = icache_memreq_msg;
+assign memreq0_val        = icache_memreq_val;
+assign icache_memreq_rdy  = memreq0_rdy;
+
+assign icache_memresp_msg = memresp0_msg;
+assign icache_memresp_val = memresp0_val;
+assign memresp0_rdy       = memresp0_rdy;
+
+assign memreq1_msg        = dcache_memreq_msg;
+assign memreq1_val        = dcache_memreq_val;
+assign dcache_memreq_rdy  = memreq1_rdy;
+
+assign dcache_memresp_msg = memresp1_msg;
+assign dcache_memresp_val = memresp1_val;
+assign memresp1_rdy       = memresp1_rdy;
 
 
 
