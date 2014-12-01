@@ -187,7 +187,7 @@ assign icache_memreq_rdy  = memreq0_rdy;
 
 assign icache_memresp_msg = memresp0_msg;
 assign icache_memresp_val = memresp0_val;
-assign memresp0_rdy       = memresp0_rdy;
+assign memresp0_rdy       = icache_memresp_rdy;
 
 assign memreq1_msg        = dcache_memreq_msg;
 assign memreq1_val        = dcache_memreq_val;
@@ -195,7 +195,7 @@ assign dcache_memreq_rdy  = memreq1_rdy;
 
 assign dcache_memresp_msg = memresp1_msg;
 assign dcache_memresp_val = memresp1_val;
-assign memresp1_rdy       = memresp1_rdy;
+assign memresp1_rdy       = dcache_memresp_rdy;
 
 
 
