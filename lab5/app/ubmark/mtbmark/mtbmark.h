@@ -151,7 +151,7 @@ inline int get_core_size( int size )
 #include <stdlib.h>
 
 int get_num_cores() {
-  return 1;
+  return 4;
 }
 
 int get_core_id() {
