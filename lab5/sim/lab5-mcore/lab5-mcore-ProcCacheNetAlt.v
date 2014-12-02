@@ -166,7 +166,7 @@ module lab5_mcore_ProcCacheNetAlt
 
   // Data Cache Refill Network
 
-  lab5_mcore_MemNet #(c_opaque_nbits, c_addr_nbits, c_cacheline_nbits, p_num_cores, 0) dcache_refill_net
+  lab5_mcore_MemNet #(c_opaque_nbits, c_addr_nbits, c_cacheline_nbits, p_num_cores, 1) dcache_refill_net
   (
     .clk          (clk),
     .reset        (reset),
@@ -186,7 +186,7 @@ module lab5_mcore_ProcCacheNetAlt
 
   // Data Cache Network
 
-  lab5_mcore_MemNet #(c_opaque_nbits, c_addr_nbits, c_data_nbits, p_num_cores, 1) dcache_net
+  lab5_mcore_MemNet #(c_opaque_nbits, c_addr_nbits, c_data_nbits, p_num_cores, 0) dcache_net
   (
     .clk          (clk),
     .reset        (reset),
@@ -213,7 +213,7 @@ module lab5_mcore_ProcCacheNetAlt
 
       // processor core 0
 
-      lab2_proc_PipelinedProcAlt #(1,i) proc0
+      lab2_proc_PipelinedProcAlt #(p_num_cores,i) proc0
       (
         .clk            (clk),
         .reset          (reset),
@@ -247,7 +247,7 @@ module lab5_mcore_ProcCacheNetAlt
 
       // instruction cache 0
 
-      lab3_mem_BlockingCacheAlt #(p_icache_nbytes, 0, o) icache0
+      lab3_mem_BlockingCacheAlt #(p_icache_nbytes, p_num_cores, o) icache0
       (
         .clk            (clk),
         .reset          (reset),
@@ -267,7 +267,7 @@ module lab5_mcore_ProcCacheNetAlt
 
       // data cache 0
 
-      lab3_mem_BlockingCacheAlt #(p_dcache_nbytes, 0, o) dcache0
+      lab3_mem_BlockingCacheAlt #(p_dcache_nbytes, p_num_cores, o) dcache0
       (
         .clk            (clk),
         .reset          (reset),
@@ -290,7 +290,7 @@ module lab5_mcore_ProcCacheNetAlt
 
       // processor core i
 
-      lab2_proc_PipelinedProcAlt #(1,i) proc
+      lab2_proc_PipelinedProcAlt #(p_num_cores,i) proc
       (
         .clk            (clk),
         .reset          (reset),
@@ -324,7 +324,7 @@ module lab5_mcore_ProcCacheNetAlt
 
       // instruction cache i
 
-      lab3_mem_BlockingCacheAlt #(p_icache_nbytes, 0, o) icache
+      lab3_mem_BlockingCacheAlt #(p_icache_nbytes, p_num_cores, o) icache
       (
         .clk            (clk),
         .reset          (reset),
@@ -344,7 +344,7 @@ module lab5_mcore_ProcCacheNetAlt
 
       // data cache i
 
-      lab3_mem_BlockingCacheAlt #(p_dcache_nbytes, 0, o) dcache
+      lab3_mem_BlockingCacheAlt #(p_dcache_nbytes, p_num_cores, o) dcache
       (
         .clk            (clk),
         .reset          (reset),
