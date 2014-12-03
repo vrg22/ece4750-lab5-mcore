@@ -54,17 +54,77 @@ void qsort_in_place( int*src, int first, int last)
 __attribute__ ((noinline))
 void quicksort_scalar( int* dest, int* src, int size )
 {
+  // don't dynamically allocate
+  int p;
   int i;
-  printf("Size is : %d\n",size);  
+  int j;
 
+  int temp;
+  int first = 0;
+  int last = size-1;
+
+  // int i;
+  printf("Size is : %d\n",size);
+
+
+/*  
   // Reduce active memory locations
   // Should do 1 split of quicksort here!!
   for(i = 0 ; i < size ; i++)
   {
     dest[i] = src[i];
   }
+*/
 
-  qsort_in_place(dest,0,size-1);
+  if(first < last)
+  {
+    // Choose last element as pivot. Most likely fresh in mem/cache
+    p = last;
+    i = first;
+    j = last;
+
+    while (i < j)
+    {
+      while(src[i] <= src[p] && i < last)
+      {
+        // Make dest match src
+        dest[i] = src[i];
+        i++;
+      }
+      while(src[j] > src[p])
+      {
+        // Make dest match src
+        dest[j] = src[j];
+        j--;
+      }
+      if(i<j)
+      {
+        temp = src[i];
+        src[i] = src[j];
+        src[j] = temp;
+
+        // Make dest match src
+        dest[i] = src[i];
+        dest[j] = src[j];
+      }
+    }
+
+    temp = src[p];
+    src[p] = src[j];
+    src[j] = temp;
+
+    // Make dest match src
+    dest[j] = src[j];
+    dest[p] = src[p];
+
+    // qsort_in_place(src,first,j-1);
+    // qsort_in_place(src,(j+1),last);
+
+    qsort_in_place(dest,first,j-1);
+    qsort_in_place(dest,(j+1),last);
+  }
+
+  // qsort_in_place(dest,0,size-1);
 }
 
 
