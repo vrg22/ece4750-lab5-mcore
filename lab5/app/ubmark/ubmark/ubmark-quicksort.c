@@ -54,7 +54,7 @@ void qsort_in_place( int*src, int first, int last)
 __attribute__ ((noinline))
 void quicksort_scalar( int* dest, int* src, int size )
 {
-  // don't dynamically allocate
+  // forced to dynamically allocate
   int p;
   int i;
   int j;
@@ -63,18 +63,8 @@ void quicksort_scalar( int* dest, int* src, int size )
   int first = 0;
   int last = size-1;
 
-  // int i;
   printf("Size is : %d\n",size);
 
-
-/*  
-  // Reduce active memory locations
-  // Should do 1 split of quicksort here!!
-  for(i = 0 ; i < size ; i++)
-  {
-    dest[i] = src[i];
-  }
-*/
 
   if(first < last)
   {
@@ -89,12 +79,14 @@ void quicksort_scalar( int* dest, int* src, int size )
       {
         // Make dest match src
         dest[i] = src[i];
+
         i++;
       }
       while(src[j] > src[p])
       {
         // Make dest match src
         dest[j] = src[j];
+
         j--;
       }
       if(i<j)
@@ -117,14 +109,9 @@ void quicksort_scalar( int* dest, int* src, int size )
     dest[j] = src[j];
     dest[p] = src[p];
 
-    // qsort_in_place(src,first,j-1);
-    // qsort_in_place(src,(j+1),last);
-
     qsort_in_place(dest,first,j-1);
     qsort_in_place(dest,(j+1),last);
   }
-
-  // qsort_in_place(dest,0,size-1);
 }
 
 
