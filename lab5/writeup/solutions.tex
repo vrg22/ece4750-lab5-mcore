@@ -53,12 +53,24 @@ For this lab, all testing was provided. Therefore, we split the remainder of the
 \section{Baseline Design}
 
 The baseline design for this lab report is a single-core system consisting of a bypassed pipelined PARCv2 
-processor, a two-way set-associative instruction cache, and a two-way set-associative data cache.
+processor, a two-way set-associative instruction cache, and a two-way set-associative data cache. 
 
-Due to an existing bug in our evaluation of our baseline pipelin, we decided to use the provided processor core, cache, and network units in composing our baseline design. Our design is in accordance with the setup in Figure~\ref{fig:bline}.
+Due to an existing bug in our pipelined processor from Lab 2, we decided to use the provided processor core, 
+cache, and network units in composing our baseline design. Our design is in accordance with the setup in 
+Figure~\ref{fig:bline}. This overall setup is responsible for taking assembly instructions from a provided
+instruction memory and interfacing with a provided data memory in order to execute programs.
+
+Because our baseline design is composed entirely of components that were designed in previous labs that were 
+tested individually, specifically the caches and processor core, it is a good example of a modular design. 
+
+This design can be viewed as the minimum hardware one expects to have when running full C programs, and is therefore
+an appropriate baseline for comparison for more complicated designs, such as the quad-core processor that serves as
+our alternative design. Any real system includes caches for instruction and data memories to reduce the average memory
+access latency (AMAL), so it makes sense for our baseline implementation to use them as well. 
 
 As part of the requirements of completing the baseline design, we implemented the quicksort algorithm in C for use on
-one core. This was used as a microbenchmark in our lab. A slight optimization that we provided in our lab was 
+one core. This was used as a microbenchmark in our lab. The provided quicksort method signature contains a A slight optimization that we provided in our lab was to amortize
+because this eliminates , this should 
 
 % Diagram of base datapath or block diagram
 
@@ -67,6 +79,7 @@ one core. This was used as a microbenchmark in our lab. A slight optimization th
 
 In our alternative design, which is a quad-core system, we use four processor cores like the one in the baselign design and compose them with four two-way set-associative instruction caches, one per core, and one two-way set-associative data cache unit.An interconnect network supports communication between the cores. See Figure~\ref{fig:alt} for the datapath of our alternative design.
 
+We would like to see how close our alternative design can come to actually realizing the ideal performance benefit of having four cores with the knowledge that the additional network infrastructure required to make such a design work comes with some energy and performance cost.
 
 
 \section{Testing Strategy}

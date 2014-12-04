@@ -2,7 +2,7 @@
 // Processor Simulator Harness
 //=========================================================================
 // This harness is meant to be instantiated for a specific implementation
-// of the multiplier using the special IMPL macro like this:
+// of the multiplier(???) using the special IMPL macro like this:
 //
 //  `define LAB5_MCORE_IMPL     lab5_mcore_Impl
 //  `define LAB5_MCORE_IMPL_STR "lab5-mcore-Impl"
@@ -10,6 +10,12 @@
 //  `include "lab5-mcore-Impl.v"
 //  `include "lab5-mcore-sim-harness.v"
 //
+
+// Instantiate this harness for a specific implementation of the multiplier
+ // `define LAB5_MCORE_IMPL     lab5_mcore_ProcCacheNetAlt
+ // `define LAB5_MCORE_IMPL_STR "lab5_mcore_ProcCacheNetAlt"
+ // `include "lab5-mcore-ProcCacheNetAlt.v"
+ // `include "lab5-mcore-sim-harness.v"
 
 `include "vc-TestRandDelaySource.v"
 `include "vc-TestRandDelaySink.v"
