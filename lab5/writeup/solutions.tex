@@ -82,24 +82,24 @@ As mentioned earlier, the testing suite for this lab was provided to us and cons
 
 \section{Evaluation}
 
-Assuming both designs have the same cycle time, we can use
-the number of cycles as a proxy for the performance.
+By running the various single-threaded and multithreaded microbenchmarks on the single-core and multicore systems, respectively, we can get an idea for how their performance compares. 
 
-Base
-----
-vvadd:     2294 cyc, 502 instr, 4.57 cpi
-cmplx-mult: 9080, 1972, 4.6
-bin search: 12205, 2658, 4.59
-masked filter: 25596, 5742, 4.46
-quicksort: -----
+As shown in Table~\ref{tab:eval}, the alternative design generally provides a 2x speedup on all the applications over the baseline design. Note that we assume that both designs have the same cycle time, so that we can compare the designs by comparing their performances in cycles. This appears to be a reasonable assumption: we do not seem to have introduced any long pathways between clocked units going from the baseline design to the alternative design.
 
-Alt
-----
-vvadd:     1812 cyc, 233 instr, 7.78 cpi
-cmplx-mult: 5525, 641, 8.62
-bin search: 6187, 926, 6.68
-masked filter: 12827, 1992, 6.44
-quicksort: -----
+For the binary search and masked filter applications, we get almost exactly a 2x speedup in performance when going from baseline design to alternative, with binary search going from 12205 cycles to 6187 cycles and masked filter going from 25596 cycles to 12827 cycles. These operations, like the quicksort, are well-suited to multithreading and therefore we do expect large performance gains. However, as mentioned in the lab handout, ``a fully parallelized application running on N
+processors would speedup by 4x'', which we do not see here.
+
+% You must include some kind of analysis of
+% the results: Why is one design better or worse than another? Can you predict how the results
+% might change for other designs or parameters? What can we learn from these results?
+
+Note that the CPI in Table~\ref{tab:eval} is total cycles per program over instructions \textit{per core}. So, while CPI appears to baloon after adding more cores, we still get a significant speedup overall by parallelizing.
+
+Clearly, the alternative design, with its multiple cores and cache units, takes up more area than the baseline design. Given that having multiple cores also necessitates the use of networks, we would expect the alternative design to take up more than 4x the amount of area taken up by the baseline design.
+
+The alternative design also appears to use more power (energy per time) than the baseline. It has four execution cores and presumably many more cache requests per cycle, not to mention the extra energy expended in traversing the various interconnect networks or the additional logic computed every cycle in the multicore system's control unit to coordinate the cores. These extra costs probably outweigh any potential gains the multicore system might experience over the single-core configuration on a typical multithreaded program, specifically in the form of fewer data memory accesses due to having a larger banked data cache and less cache evictions. Collectively, we expect a large (>4x) power consumption increase from the baseline to alternative design. Given that we do not get a matching performance increase in terms of number of cycles from baseline to alternative, we may conclude that the alternative design also eats up more energy per program than does the baseline.
+
+In the end, we pay area, energy and power costs to get greater performance in the quad-core system over the standard single-core system.
 
 
 \newpage
