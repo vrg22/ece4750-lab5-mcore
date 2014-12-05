@@ -26,11 +26,12 @@ The baseline design is the single-core setup, and the alternative design is the 
 
 \section{Project Management}
 
-% 
 For this lab, all testing was provided. Therefore, we split the remainder of the work amongst ourselves as follows:
--Avinash wrote the RTL code for the baseline and alternative designs composing the processor cores, caches, and network.
--Akshay wrote the version of the quicksort algorithm to be run on the baseline design and parallelized it for testing on the alternative design.
--Vivek helped optimize the quicksort C algorithm and was the lead in writing the lab report. \par
+\begin{itemize}
+\item Avinash wrote the RTL code for the baseline and alternative designs composing the processor cores, caches, and network.
+\item Akshay wrote the version of the quicksort algorithm to be run on the baseline design and parallelized it for testing on the alternative design.
+\item Vivek helped optimize the quicksort C algorithm and was the lead in writing the lab report. \par
+\end{itemize}
 
 Our expected and actual work patterns are shown in Figure~\ref{fig:gantt}.
 
@@ -56,8 +57,6 @@ our alternative design. Any real system should include caches for instruction an
 access latency (AMAL), so it makes sense for our baseline implementation to use them as well. 
 
 We also implemented the quicksort sorting algorithm in C for use on one core. This was used as a microbenchmark in our lab. This was a straightforward quicksort algorithm implementation (we referred to http://algs4.cs.princeton.edu/23quicksort/ for clarifications on quicksort). A slight optimization that we provided in our lab was to amortize copying the contents of the source array over to the destination array as the first quicksort iteration was performed, which may result in the reduction of a small number of assembly instructions, depending on the compiler.
-
-% Diagram of base datapath or block diagram
 
 
 \section{Alternative Design}
@@ -99,12 +98,12 @@ Overall, we pay extra area, energy and power costs to get greater performance in
 \section {Tables and Diagrams}
 
 % Figure: Gantt Chart
-% \begin{figure}[H]
-% 	\centering
-% 	\includegraphics[scale=0.4, angle=90]{gantt}
-% 	\caption{Gantt Chart.}
-% 	\label{fig:gantt}
-% \end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.7, angle=90]{gantt}
+	\caption{Gantt Chart}
+	\label{fig:gantt}
+\end{figure}
 
 % Figure: Baseline Design
 \begin{figure}[H]
