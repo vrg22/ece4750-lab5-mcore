@@ -20,10 +20,7 @@ cache and on-chip interconnect network schemes used. \par
 
 In this lab, we implement and analyze the benefits of using a quad-core system with a banked data cache and private instruction caches per core over a single-core system with single data and instruction caches by comparing their performance on a set of single and multithreaded microbenchmarks. In doing so, we can gain insight into the specific area, energy, and performance tradeoffs between these setups and draw conclusions on when one system might be more appropriate than the other. \par
 
-The baseline design is the single-core setup, and the alternative design is the quad-core setup. In completing both designs, we ultimately found that in terms of total number of cycles per program, multithreaded microbenchmarks run on the alternative design performed better than did single-threaded versions of the same benchmarks run on the baseline.
-% INSERT QUANTITATIVE RESULTS HERE!!!! in terms of the number of cycles executed
-% INSERT EFFECT OF ALT ON AREA, ENERGY, CYCLE TIME
-Based on these results, we can say that we generally expect ...
+The baseline design is the single-core setup, and the alternative design is the quad-core setup. In completing both designs, we ultimately found that in terms of total number of cycles per program, multithreaded microbenchmarks run on the alternative design performed approximately 2 times better than did single-threaded versions of the same benchmarks run on the baseline. Based on these simulation results, we would choose the alternative multicore implementation over the baseline implementation if performance is of the highest priority. However, the multicore processor requires much more logic and energy (assuming the same clock frequency) compared to the baseline and so if cost, complexity, area, and energy are also important considerations, the design of choice may be either the single-core or the multicore processor. 
 
 
 
@@ -31,32 +28,34 @@ Based on these results, we can say that we generally expect ...
 
 % 
 For this lab, all testing was provided. Therefore, we split the remainder of the work amongst ourselves as follows:
--Avinash wrote the RTL code for the baseline and alternative designs composing the processor cores, caches, and network
--Akshay wrote the version of the quicksort algorithm to be run on the baseline design and parallelized it for testing on the alternative design
--Vivek helped optimize the quicksort C algorithm and was the lead in writing the lab report
+-Avinash wrote the RTL code for the baseline and alternative designs composing the processor cores, caches, and network.
+-Akshay wrote the version of the quicksort algorithm to be run on the baseline design and parallelized it for testing on the alternative design.
+-Vivek helped optimize the quicksort C algorithm and was the lead in writing the lab report. \par
 
 Our expected and actual work patterns are shown in Figure~\ref{fig:gantt}.
 
 
 \section{Baseline Design}
 
-The baseline design for this lab report is a single-core system consisting of a bypassed pipelined PARCv2 
-processor, a two-way set-associative instruction cache, and a two-way set-associative data cache. 
+The baseline design for this lab report is a single-core system consisting of a fully bypassed pipelined PARCv2 
+processor interfaced with a two-way set-associative instruction cache and a two-way set-associative data cache. 
+The processor communicates with an external source and sink for testing purposes. All interfaces between these
+components are val-ready to allow for composing a variety of different implementations. \par
 
 Due to an existing bug in our pipelined processor from Lab 2, we decided to use the provided processor core, 
 cache, and network units in composing our baseline design. Our design is in accordance with the setup in 
-Figure~\ref{fig:bline}. This overall setup is responsible for taking assembly instructions from a provided
-instruction memory and interfacing with a provided data memory in order to execute programs.
+Figure~\ref{fig:bline}. This overall setup is responsible for fetching assembly instructions from a provided
+instruction memory and accessing a provided data memory when needed in order to execute programs.
 
 Because our baseline design is composed entirely of components that were designed in previous labs that were 
 tested individually, specifically the caches and processor core, it is a good example of a modular design. 
 
 This design can be viewed as the minimum hardware one expects to have when running full C programs, and is therefore
-an appropriate baseline for comparison for more complicated designs, such as the quad-core processor that serves as
-our alternative design. Any real system includes caches for instruction and data memories to reduce the average memory
+an appropriate baseline for comparison to more complicated designs, such as the quad-core processor that serves as
+our alternative design. Any real system should include caches for instruction and data memories to reduce the average memory
 access latency (AMAL), so it makes sense for our baseline implementation to use them as well. 
 
-As part of the requirements of completing the baseline design, we implemented the quicksort algorithm in C for use on
+We also implemented the quicksort sorting algorithm in C for use on
 one core. This was used as a microbenchmark in our lab. The provided quicksort method signature contains a ...
 A slight optimization that we provided in our lab was to amortize
 because this eliminates , this should 
@@ -66,7 +65,7 @@ because this eliminates , this should
 
 \section{Alternative Design}
 
-In our alternative design, which is a quad-core system, we use four processor cores identical to the one in the baseline design and compose them with four two-way set-associative instruction caches and four two-way set-associative data caches. Of course, this composition of multiple processor cores and caches must still behave to the outside as a single execution unit that takes instructions from a single instruction memory and uses a single data memory, just as the baseline design does. Therefore, we must coordinate the separate entities with networks. We have special networks between the caches and their respective memory interface. We also use a third interconnect network for handling data cache requests so that they can be sent to the appropriate bank. See Figure~\ref{fig:alt} for the datapath of our alternative design.
+In our alternative design, our processor consists of four cores each identical to the one in the baseline design and compose them with four two-way set-associative instruction caches and four two-way set-associative data caches. Of course, this composition of multiple processor cores and caches must still behave externally as a single execution unit that takes instructions from a single instruction memory and uses a single data memory, just as the baseline design does. Therefore, we must coordinate the separate entities with networks. We have special networks between the caches and their respective memory interface. We also use a third interconnect network for handling data cache requests so that they can be sent to the appropriate bank. See Figure~\ref{fig:alt} for the datapath of our alternative design.
 
 One important feature of the alternative design is to use a single banked data cache. In a typical multithreaded application, threads will provide parallelization by performing significant amounts of calculation on some sort of common state. Two observations come from this: first, that the threads will likely access and modify large numbers of data addresses (ex: while streaming through a large array), and second, that the data is shared amongst the threads, regardless of whether or not the threads are performing the same type of work on that data (i.e., whether or not they are dealing with the same instruction PCs). A banked data cache is a response to both of these observations. Given some fixed technology constraints such as a restriction on area devoted to caches, we would like to use the data caches as effectively as possible. Therefore, we would like to share the allowed cache space amongst all threads (to make the cache as big as possible), allowing any particular data address to live in only one place in the shared cache at a time. We do not however bank the instruction caches here; we decide not to always pay the overhead of having a network arbitrate a single banked instruction cache over multiple execution cores when in fact having a banked instruction cache does not necessarily make sense for multithreaded applications.
 
