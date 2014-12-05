@@ -1,14 +1,8 @@
 
 \documentclass[10pt]{article}
 \usepackage[margin=1in]{geometry}
-\usepackage{amsmath}
-\usepackage{amssymb}
-\usepackage{setspace}
-\usepackage{graphicx}
-\usepackage{caption}
-\usepackage{listings}
-\usepackage{enumitem}
-\usepackage{subfigure}
+\usepackage{amsmath, amssymb, setspace, graphicx, caption, listings, enumitem, subfigure, float}
+
 
 
 \begin{document}
@@ -97,6 +91,9 @@ As mentioned earlier, the testing suite for this lab was provided to us and cons
 
 \section{Evaluation}
 
+Assuming both designs have the same cycle time, we can use
+the number of cycles as a proxy for the performance.
+
 Base
 ----
 vvadd:     2294 cyc, 502 instr, 4.57 cpi
@@ -118,7 +115,7 @@ quicksort: -----
 \section {Tables and Diagrams}
 
 % Figure: Gantt Chart
-% \begin{figure}[h]
+% \begin{figure}[H]
 % 	\centering
 % 	\includegraphics[scale=0.4, angle=90]{gantt}
 % 	\caption{Gantt Chart.}
@@ -126,28 +123,44 @@ quicksort: -----
 % \end{figure}
 
 % Figure: Baseline Design
-\begin{figure}[h]
+\begin{figure}[H]
 	\centering
-	\includegraphics[scale=0.4, angle=90]{bline_diag}
+	\includegraphics{bline_diag}
 	\caption{Baseline Design - Single-Core system}
 	\label{fig:bline}
 \end{figure}
 
 % Figure: Alt Design
-\begin{figure}[h]
+\begin{figure}[H]
 	\centering
-	\includegraphics[scale=0.4, angle=90]{alt_diag}
+	\includegraphics{alt_diag}
 	\caption{Alternative Design - Multi-Core system}
 	\label{fig:alt}
 \end{figure}
 
-
+% EVALUATION: Summary Table
+\begin{table}[H]
+\centering
+	\begin{tabular} {|l | r | r | r |}
+	\hline
+	\textbf{Design}    & \textbf{Cycles} & \textbf{Instructions} & \textbf{CPI} \\
+	\hline
+	Baseline - vvadd       		&  2294  &  502   &  4.97   \\
+	Baseline - cmplx-mult  		&  9080  &  1972  &  4.6  	\\
+	Baseline - bin-search       &  12205 &  2658  &  4.59   \\
+	Baseline - masked-filter    &  25596 &  5742  &  4.46   \\
+	Baseline - quicksort        &  ----  &  --    &      	\\
+	\hline
+	Alternative - vvadd    		&  1812  &  233   &  7.78   \\
+	Alternative - cmplx-mult    &  5525  &  641   &  8.62   \\
+	Alternative - bin-search    &  6187  &  926   &  6.68   \\
+	Alternative - masked-filter &  1287  &  1992  &  6.44   \\
+	Alternative - quicksort    	&  ----  &  --    &         \\
+	\hline                    
+	\end{tabular}
+	\caption{Baseline v. Alternative Design Performance}
+	\label{tab:eval}
+\end{table}
 
 % END
 \end{document}
-
-
-
-
-
-
